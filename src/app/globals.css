@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html.light {
+    --color-background: 0 0% 100%; /* #ffffff */
+    --color-primary: 220 90% 56%; /* #2563eb */
+    --color-default: 0 0% 10%; /* #1a1a1a */
+}
+
+html.dark {
+    --color-background: 0 0% 10%; /* #1a1a1a */
+    --color-primary: 220 90% 56%; /* #2563eb */
+    --color-default: 0 0% 100%; /* #ffffff */
+}
+
+@layer utilities {
+    /* hide scrollbar for chrome, safari and opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        /* hide scrollbar for ie and edge */
+        -ms-overflow-style: none;
+
+        /* hide scrollbar for firefox */
+        scrollbar-width: none;
+    }
+}
+
+nextjs-portal {
+    display: none;
+}
+
+.skeleton-loading {
+    @apply relative overflow-hidden rounded-lg bg-gray-500/20;
+}
+
+.skeleton-loading::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg animate-skeleton-move bg-gradient-to-r from-transparent via-background/50 to-transparent opacity-50;
+    transform: translateX(-100%);
+}
