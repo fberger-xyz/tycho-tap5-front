@@ -12,13 +12,7 @@ interface ChangelogEntry {
 // Fill this array with your logs
 const logs: ChangelogEntry[] = [
     {
-        date: '2025-06-05',
-        description: 'PWA setup (https://nextjs.org/docs/app/guides/progressive-web-apps)',
-        type: 'chore',
-        author: 'fberger',
-    },
-    {
-        date: '2025-06-05',
+        date: '2025-06-06',
         description: 'Next 15 setup',
         type: 'chore',
         author: 'fberger',
@@ -37,10 +31,14 @@ export default function Page() {
                         <div key={i} className="flex flex-col gap-1 border-b border-default/10 pb-3 mb-3">
                             <div className="flex items-center gap-2 text-xs opacity-60">
                                 <span>{log.date}</span>
-                                {log.type && <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-[10px] uppercase">{log.type}</span>}
+                                {log.type && (
+                                    <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-[10px] uppercase">{log.type}</span>
+                                )}
                                 {log.author && <span>by {log.author}</span>}
                                 {log.link && (
-                                    <a href={log.link} target="_blank" rel="noopener noreferrer" className="underline text-primary">details</a>
+                                    <a href={log.link} target="_blank" rel="noopener noreferrer" className="underline text-primary">
+                                        details
+                                    </a>
                                 )}
                             </div>
                             <div className="text-base">{log.description}</div>
