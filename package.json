@@ -9,13 +9,17 @@
         "lint": "next lint",
         "eslint:fix": "eslint ./src --fix",
         "prettier:fix": "prettier --write src",
-        "lint:fix": "pnpm eslint:fix && pnpm prettier:fix"
+        "lint:fix": "pnpm eslint:fix && pnpm prettier:fix",
+        "postinstall": "prisma generate",
+        "prisma:seed": "NODE_ENV=development prisma db seed",
+        "vercel-build": "prisma generate && next build && prisma migrate deploy"
     },
     "dependencies": {
         "@aave/contract-helpers": "^1.33.3",
         "@aave/math-utils": "^1.33.3",
         "@next/env": "15.2.1",
         "@nextui-org/tooltip": "^2.2.5",
+        "@prisma/client": "^6.9.0",
         "@tanstack/react-query": "^5.62.7",
         "@tanstack/react-virtual": "^3.13.8",
         "@wagmi/core": "^2.16.7",
@@ -64,8 +68,10 @@
         "pino-pretty": "^13.0.0",
         "postcss": "^8.4.49",
         "prettier": "^3.4.2",
+        "prisma": "^6.9.0",
         "tailwindcss": "^3.4.16",
         "ts-prune": "^0.10.3",
+        "tsx": "^4.19.4",
         "typescript": "^5.7.2"
     },
     "pnpm": {

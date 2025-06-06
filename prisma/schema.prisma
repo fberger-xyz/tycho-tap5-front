@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Bot {
+  // meta
+  id        Int @id @default(autoincrement())
+  createdAt Int
+  updatedAt Int
+  deletedAt Int
+
+  // logic
+  team   String
+  config Json
+  trade  Trade[]
+}
+
+model Log {
+  // meta
+  id        Int @id @default(autoincrement())
+  createdAt Int
+  updatedAt Int
+  deletedAt Int
+
+  // logic
+  description String // 'start' / 'trade' / 'error' / 'end' ... ?
+  trades      Trade[]
+  prices      Price[]
+}
+
+model Trade {
+  // meta
+  id        Int @id @default(autoincrement())
+  createdAt Int
+  updatedAt Int
+  deletedAt Int
+
+  // logic
+  preTradeContext  Json // for discussion
+  details          Json // for discussion
+  postTradeContext Json // for discussion
+  logId            Int
+  log              Log  @relation(fields: [logId], references: [id])
+  botId            Int
+  bot              Bot  @relation(fields: [botId], references: [id])
+}
+
+model Price {
+  // meta
+  id        Int @id @default(autoincrement())
+  createdAt Int
+  updatedAt Int
+  deletedAt Int
+
+  // logic
+  reference Json // for discussion
+  pools     Json // for discussion
+  logId     Int
+  log       Log  @relation(fields: [logId], references: [id])
+}
