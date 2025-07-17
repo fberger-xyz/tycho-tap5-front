@@ -13,7 +13,7 @@ export default function NotFound() {
 
                 <LinkWrapper
                     href={APP_PAGES[0].path}
-                    className={cn('w-full p-4 hover:bg/10 rounded-xl cursor-pointer flex justify-center font-light text/50')}
+                    className={cn('w-full p-4 hover:bg-milk-100 rounded-xl cursor-pointer flex justify-center font-light text-milk-400')}
                 >
                     <p>Go back</p>
                 </LinkWrapper>

@@ -1,8 +1,8 @@
-export const copyToClipboard = (value: string) => {
+export const copyToClipboard = async (value: string) => {
     try {
-        navigator.clipboard.writeText(value)
+        await navigator.clipboard.writeText(value)
     } catch (error) {
-        console.log(error)
+        // Clipboard API might not be available
     }
 }
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
