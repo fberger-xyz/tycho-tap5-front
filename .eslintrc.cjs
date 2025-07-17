@@ -27,6 +27,10 @@ module.exports = {
                 'no-html-link-for-pages': 'off',
                 'eslint(react-hooks/exhaustive-deps)': 'off',
                 'react-hooks/exhaustive-deps': 'off',
+                // Tailwind CSS rules
+                'tailwindcss/no-custom-classname': 'warn',
+                'tailwindcss/no-contradicting-classname': 'error',
+                'tailwindcss/classnames-order': 'warn',
             },
             files: ['src/**/*.ts', 'src/**/*.tsx', './tailwind.config.ts', './src/app/global.css'],
         },
