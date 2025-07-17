@@ -8,8 +8,10 @@ dayjs.extend(utc)
 dayjs.extend(relativeTime)
 
 import { cn } from '@/utils'
-import DeployedAt from '../app/DeployedAt'
-import { SITE_URL } from '@/config/app.config'
+import StyledTooltip from '../common/StyledTooltip'
+import IframeWrapper from '../common/IframeWrapper'
+import { AppUrls } from '@/enums'
+import LinkWrapper from '../common/LinkWrapper'
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
@@ -24,21 +26,58 @@ export default function Footer(props: { className?: string }) {
     return (
         <footer
             className={cn(
-                'w-full flex flex-col items-center lg:flex-row lg:justify-between lg:items-end py-4 px-8 font-light text-xs gap-1',
+                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-6 lg:gap-0',
                 props.className,
             )}
         >
             {/* left */}
-            <div className="flex flex-col gap-1 lg:gap-8 lg:flex-row items-center">
-                <p className="truncate opacity-50 hover:opacity-100 transition-all duration-300 ease-in-out">
-                    2025 © {SITE_URL.replace('https://', '')}
-                </p>
+            <div className="flex lg:gap-8 flex-col gap-6 lg:flex-row">
+                <p className="truncate hidden lg:flex">2025 © PropellerHeads</p>
+                <StyledTooltip closeDelay={500} content={<p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>}>
+                    <p className="truncate hover:underline hover:text-aquamarine">Alpha version</p>
+                </StyledTooltip>
             </div>
 
             {/* right */}
-            <div className="flex flex-col lg:flex-row gap-1 lg:gap-8 items-center">
-                <DeployedAt commitDate={commitDate} />
-            </div>
+            <p className="text-wrap lg:text-right">
+                Made by
+                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
+                    <LinkWrapper
+                        href={AppUrls.PROPELLERHEADS_WEBSITE}
+                        target="_blank"
+                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
+                    >
+                        Propeller Heads,
+                    </LinkWrapper>
+                </StyledTooltip>
+                <LinkWrapper
+                    href={AppUrls.QUANT_TELEGRAM}
+                    target="_blank"
+                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                >
+                    @hugoschrng
+                </LinkWrapper>
+                ,
+                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.MERSO_WEBSITE} />}>
+                    <LinkWrapper
+                        href={AppUrls.FBERGER_WEBSITE}
+                        target="_blank"
+                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
+                    >
+                        xMerso
+                    </LinkWrapper>
+                </StyledTooltip>
+                and
+                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
+                    <LinkWrapper
+                        href={AppUrls.FBERGER_WEBSITE}
+                        target="_blank"
+                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
+                    >
+                        fberger_xyz
+                    </LinkWrapper>
+                </StyledTooltip>
+            </p>
         </footer>
     )
 }

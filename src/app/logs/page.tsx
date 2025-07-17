@@ -22,29 +22,25 @@ const logs: ChangelogEntry[] = [
 export default function Page() {
     return (
         <PageWrapper>
-            <div className="flex flex-col gap-4 mx-auto w-full max-w-2xl">
-                <h1 className="text-2xl font-bold mb-4">Changelog</h1>
-                {logs.length === 0 && <p className="opacity-60">No logs yet.</p>}
-                {logs
-                    .sort((a, b) => b.date.localeCompare(a.date))
-                    .map((log, i) => (
-                        <div key={i} className="flex flex-col gap-1 border-b border-default/10 pb-3 mb-3">
-                            <div className="flex items-center gap-2 text-xs opacity-60">
-                                <span>{log.date}</span>
-                                {log.type && (
-                                    <span className="px-2 py-0.5 rounded bg-primary/10 text-primary font-mono text-[10px] uppercase">{log.type}</span>
-                                )}
-                                {log.author && <span>by {log.author}</span>}
-                                {log.link && (
-                                    <a href={log.link} target="_blank" rel="noopener noreferrer" className="underline text-primary">
-                                        details
-                                    </a>
-                                )}
-                            </div>
-                            <div className="text-base">{log.description}</div>
+            <h1 className="text-2xl font-bold mb-4">Changelog</h1>
+            {logs.length === 0 && <p className="opacity-60">No logs yet.</p>}
+            {logs
+                .sort((a, b) => b.date.localeCompare(a.date))
+                .map((log, i) => (
+                    <div key={i} className="flex flex-col gap-1 border-b pb-3 mb-3">
+                        <div className="flex items-center gap-2 text-xs opacity-60">
+                            <p>{log.date}</p>
+                            {log.type && <p className="px-2 py-0.5 rounded text-[10px] uppercase">{log.type}</p>}
+                            {log.author && <p>by {log.author}</p>}
+                            {log.link && (
+                                <a href={log.link} target="_blank" rel="noopener noreferrer" className="underline">
+                                    details
+                                </a>
+                            )}
                         </div>
-                    ))}
-            </div>
+                        <div className="text-base">{log.description}</div>
+                    </div>
+                ))}
         </PageWrapper>
     )
 }
