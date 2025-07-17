@@ -17,6 +17,7 @@ import { AppThemes } from '@/enums'
 import { ReactQueryProvider } from '@/providers/react-query.providers'
 import PWAProvider from '@/providers/pwa.provider'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme'
+import StructuredData from '@/components/common/StructuredData'
 
 const image = {
     url: '/github/market-maker.png',
@@ -27,31 +28,68 @@ const image = {
 }
 
 export const metadata: Metadata = {
-    icons: {
-        icon: '/favicon.svg',
+    // Basic metadata
+    title: {
+        default: APP_METADATA.SITE_NAME,
+        template: `%s | ${APP_METADATA.SITE_NAME}`,
     },
-    title: APP_METADATA.SITE_NAME,
     description: APP_METADATA.SITE_DESCRIPTION,
     metadataBase: new URL(APP_METADATA.SITE_URL),
+    
+    // Icons
+    icons: {
+        icon: '/favicon.ico',
+        shortcut: '/favicon.ico',
+    },
+    
+    // PWA & Mobile
     appleWebApp: {
         title: APP_METADATA.SITE_NAME,
         capable: true,
         statusBarStyle: 'black-translucent',
+        startupImage: '/favicon.ico',
     },
+    
+    // OpenGraph
     openGraph: {
         type: 'website',
-        title: APP_METADATA.SITE_URL.replace('https://', ''),
+        title: APP_METADATA.SITE_NAME,
         siteName: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
         url: APP_METADATA.SITE_URL,
         images: [image],
+        locale: 'en_US',
     },
+    
+    // Twitter/X
     twitter: {
         card: 'summary_large_image',
-        site: '@fberger_xyz',
+        site: APP_METADATA.AUTHOR.twitter,
+        creator: APP_METADATA.AUTHOR.twitter,
         title: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
         images: [image],
+    },
+    
+    // Additional metadata
+    keywords: ['tycho', 'market maker', 'defi', 'trading', 'automated market maker', 'amm'],
+    authors: [
+        { name: APP_METADATA.AUTHOR.name, url: APP_METADATA.AUTHOR.url },
+        { name: 'xMerso', url: 'https://x.com/xMerso' },
+        { name: 'hugoschrng', url: 'https://x.com/hugoschrng' },
+        { name: 'PropellerHeads', url: 'https://www.propellerheads.xyz/' },
+    ],
+    category: 'finance',
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-video-preview': -1,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
     },
 }
 
@@ -68,6 +106,9 @@ export default async function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning className="h-screen w-screen bg-background">
+            <head>
+                <StructuredData />
+            </head>
             <body
                 className={cn(
                     INTER_FONT.className,
