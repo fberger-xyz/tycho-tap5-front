@@ -17,10 +17,10 @@ import { AppThemes } from '@/enums'
 import { ReactQueryProvider } from '@/providers/react-query.providers'
 import PWAProvider from '@/providers/pwa.provider'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme'
-import StructuredData from '@/components/common/StructuredData'
+import { AppUrls } from '@/enums'
 
 const image = {
-    url: '/github/market-maker.png',
+    url: '/market-maker.png',
     width: 1494,
     height: 444,
     alt: 'Tycho Market Maker — minimal lovable market maker that showcases how to build a market maker with Tycho.',
@@ -35,13 +35,13 @@ export const metadata: Metadata = {
     },
     description: APP_METADATA.SITE_DESCRIPTION,
     metadataBase: new URL(APP_METADATA.SITE_URL),
-    
+
     // Icons
     icons: {
         icon: '/favicon.ico',
         shortcut: '/favicon.ico',
     },
-    
+
     // PWA & Mobile
     appleWebApp: {
         title: APP_METADATA.SITE_NAME,
@@ -49,7 +49,7 @@ export const metadata: Metadata = {
         statusBarStyle: 'black-translucent',
         startupImage: '/favicon.ico',
     },
-    
+
     // OpenGraph
     openGraph: {
         type: 'website',
@@ -60,7 +60,7 @@ export const metadata: Metadata = {
         images: [image],
         locale: 'en_US',
     },
-    
+
     // Twitter/X
     twitter: {
         card: 'summary_large_image',
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
         description: APP_METADATA.SITE_DESCRIPTION,
         images: [image],
     },
-    
+
     // Additional metadata
     keywords: ['tycho', 'market maker', 'defi', 'trading', 'automated market maker', 'amm'],
     authors: [
@@ -104,10 +104,35 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode
 }>) {
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: APP_METADATA.SITE_NAME,
+        description: APP_METADATA.SITE_DESCRIPTION,
+        url: APP_METADATA.SITE_URL,
+        applicationCategory: APP_METADATA.STRUCTURED_DATA.applicationCategory,
+        operatingSystem: APP_METADATA.STRUCTURED_DATA.operatingSystem,
+        offers: {
+            '@type': 'Offer',
+            price: APP_METADATA.STRUCTURED_DATA.price,
+            priceCurrency: APP_METADATA.STRUCTURED_DATA.priceCurrency,
+        },
+        author: {
+            '@type': 'Person',
+            name: APP_METADATA.AUTHOR.name,
+            url: AppUrls.FBERGER_WEBSITE,
+        },
+        about: {
+            '@type': 'Thing',
+            name: APP_METADATA.STRUCTURED_DATA.about.name,
+            description: APP_METADATA.STRUCTURED_DATA.about.description,
+        },
+    }
+
     return (
         <html lang="en" suppressHydrationWarning className="h-screen w-screen bg-background">
             <head>
-                <StructuredData />
+                <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </head>
             <body
                 className={cn(
