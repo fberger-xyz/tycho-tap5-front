@@ -15,6 +15,21 @@ export const APP_METADATA = {
     SITE_DOMAIN,
     SITE_DESCRIPTION: 'A market maker that anyone can easily run, well documented',
     SITE_URL: SITE_URL,
+    AUTHOR: {
+        name: 'fberger',
+        twitter: '@fberger_xyz',
+        url: 'https://twitter.com/fberger_xyz',
+    },
+    STRUCTURED_DATA: {
+        applicationCategory: 'FinanceApplication',
+        operatingSystem: 'Any',
+        price: '0',
+        priceCurrency: 'USD',
+        about: {
+            name: 'Automated Market Making',
+            description: 'DeFi trading and liquidity provision',
+        },
+    },
 }
 
 /**
