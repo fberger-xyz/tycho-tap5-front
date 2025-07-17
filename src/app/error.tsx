@@ -24,7 +24,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                 <div className="flex w-full flex-col items-center gap-2">
                     <button
                         onClick={() => reset()}
-                        className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-default hover:bg-default/10 px-3 py-3 font-semibold sm:py-2"
+                        className="flex w-full items-center justify-center gap-2.5 rounded-xl border hover:bg/10 px-3 py-3 font-semibold sm:py-2"
                     >
                         <p className="font-semibold">Reload page</p>
                         <IconWrapper id={IconIds.UPDATE_NOW} className="size-5" />
@@ -32,7 +32,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
                     <p className="font-light text-xs">
                         Or reach out for help on telegram:
-                        <LinkWrapper href={AppUrls.DEV_TELEGRAM} target="_blank" className="hover:underline px-1">
+                        <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="hover:underline px-1">
                             @fberger_xyz
                         </LinkWrapper>
                     </p>

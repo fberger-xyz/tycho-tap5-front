@@ -69,3 +69,5 @@ model Price {
   logId     Int
   log       Log  @relation(fields: [logId], references: [id])
 }
+
+// npx prisma migrate dev --name init

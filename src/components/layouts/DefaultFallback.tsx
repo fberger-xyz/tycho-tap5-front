@@ -2,13 +2,15 @@ import PageWrapper from '../common/PageWrapper'
 
 export function DefaultFallbackContent() {
     return (
-        <div className="size-full flex flex-col gap-10">
-            <div className="grid gap-8 w-full grid-cols-2">
-                <div className="skeleton-loading h-16 w-80 ml-auto" />
-                <div className="skeleton-loading h-16 w-80 mr-auto" />
+        <div className="size-full grid grid-cols-1 md:grid-cols-10 gap-4">
+            <div className="col-span-1 md:col-span-6 flex flex-col gap-4 xl:col-span-7 h-full w-full">
+                <div className="skeleton-loading h-28" />
+                <div className="skeleton-loading h-80" />
+                <div className="skeleton-loading h-48" />
+                <div className="skeleton-loading h-32" />
             </div>
-            <div className="flex gap-6 flex-col">
-                <div className="skeleton-loading h-10 w-60 mx-auto" />
+            <div className="col-span-1 md:col-span-4 flex flex-col gap-4 xl:col-span-3">
+                <div className="skeleton-loading h-40" />
                 <div className="skeleton-loading h-80" />
             </div>
         </div>

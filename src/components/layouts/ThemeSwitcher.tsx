@@ -7,8 +7,8 @@ import IconWrapper from '../icons/IconWrapper'
 import { APP_THEMES } from '@/config'
 
 export default function ThemeSwitcher({
-    containerClassName = 'gap-2',
-    buttonClassName = 'px-3 py-2 rounded-xl',
+    containerClassName = 'gap-1',
+    buttonClassName = 'px-2.5 py-1.5 rounded-xl',
     iconClassName = 'size-6 rounded-xl',
 }: {
     containerClassName?: string
@@ -29,8 +29,8 @@ export default function ThemeSwitcher({
                         onClick={() => setTheme(theme)}
                         className={cn('transition-all duration-300 ease-in-out', buttonClassName, {
                             'skeleton-loading': !mounted,
-                            'bg-default/10': mounted && resolvedTheme === theme,
-                            'bg-default/5 opacity-40 hover:opacity-100': mounted && resolvedTheme !== theme,
+                            'bg-milk-100': mounted && resolvedTheme === theme,
+                            'bg-milk-50 opacity-40 hover:opacity-100': mounted && resolvedTheme !== theme,
                         })}
                     >
                         {mounted ? <IconWrapper id={config.iconId} className={cn('m-auto', iconClassName)} /> : <div className={iconClassName} />}
