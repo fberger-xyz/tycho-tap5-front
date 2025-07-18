@@ -8,7 +8,7 @@ import { InterfaceAppLink } from '@/interfaces'
 
 export const SITE_NAME = 'Tycho Market Maker'
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const SITE_DOMAIN = IS_DEV ? 'http://localhost:3000' : 'https://www.market-maker.wtf'
+export const SITE_DOMAIN = IS_DEV ? 'http://localhost:3000' : 'https://tap5.fberger.xyz'
 export const SITE_URL = SITE_DOMAIN.replace('www.', '')
 export const APP_METADATA = {
     SITE_NAME,
