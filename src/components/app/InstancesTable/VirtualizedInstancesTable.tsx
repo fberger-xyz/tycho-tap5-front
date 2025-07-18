@@ -60,7 +60,7 @@ const InstanceRows = memo(function InstanceRows({
     parentRef: React.RefObject<HTMLDivElement | null>
 }) {
     return (
-        <div ref={parentRef} className="max-h-[60vh] overflow-y-auto transition-all duration-200 ease-in-out">
+        <div ref={parentRef} className="max-h-[70vh] overflow-y-auto transition-all duration-200 ease-in-out">
             <div
                 style={{
                     height: `${virtualizer.getTotalSize()}px`,
