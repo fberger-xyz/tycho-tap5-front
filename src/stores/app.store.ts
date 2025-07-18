@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import type { Configuration, Instance } from '@prisma/client'
+import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode } from '@/enums'
 
 type InstanceWithCounts = Instance & {
     _count: {
@@ -45,6 +46,22 @@ export const useAppStore = create<{
     setLastInstancesFetchedAt: (timestamp: number) => void
 
     /**
+     * sorting
+     */
+
+    instancesSortedBy: SupportedFilters
+    instancesSortedByFilterDirection: SupportedFilterDirections
+    sortInstancesBy: (filter: SupportedFilters) => void
+    toggleFilterDirection: () => void
+
+    /**
+     * display mode
+     */
+
+    instanceDisplayMode: InstanceDisplayMode
+    setInstanceDisplayMode: (mode: InstanceDisplayMode) => void
+
+    /**
      * computeds
      */
 
@@ -83,6 +100,30 @@ export const useAppStore = create<{
                 })),
 
             setLastInstancesFetchedAt: (timestamp) => set(() => ({ lastInstancesFetchedAt: timestamp })),
+
+            /**
+             * sorting
+             */
+
+            instancesSortedBy: SupportedFilters.INSTANCE_STARTED,
+            instancesSortedByFilterDirection: SupportedFilterDirections.DESCENDING,
+
+            sortInstancesBy: (filter) => set(() => ({ instancesSortedBy: filter })),
+
+            toggleFilterDirection: () =>
+                set((state) => ({
+                    instancesSortedByFilterDirection:
+                        state.instancesSortedByFilterDirection === SupportedFilterDirections.ASCENDING
+                            ? SupportedFilterDirections.DESCENDING
+                            : SupportedFilterDirections.ASCENDING,
+                })),
+
+            /**
+             * display mode
+             */
+
+            instanceDisplayMode: InstanceDisplayMode.GROUPED,
+            setInstanceDisplayMode: (mode) => set(() => ({ instanceDisplayMode: mode })),
 
             /**
              * computeds

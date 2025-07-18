@@ -10,9 +10,10 @@ import superjson from 'superjson'
 import { getToken } from '@/tokens/list.token'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { AppInstanceStatus } from '@/enums'
-import { VirtualizedInstancesTable } from './InstancesTable/VirtualizedInstancesTable'
+import { InstancesTable } from './InstancesTable/InstancesTable'
 import { useAppStore } from '@/stores/app.store'
 import { useRef } from 'react'
+import { sortInstances } from '@/utils/instance-sorting.util'
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
@@ -39,7 +40,8 @@ async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
 }
 
 export default function ListInstances() {
-    const { refetchInstancesInterval, setConfigurations, getConfigurationsWithInstances } = useAppStore()
+    const { refetchInstancesInterval, setConfigurations, getConfigurationsWithInstances, instancesSortedBy, instancesSortedByFilterDirection } =
+        useAppStore()
 
     const isFetchingRef = useRef(false)
 
@@ -81,8 +83,11 @@ export default function ListInstances() {
 
     const configurationsWithInstances = getConfigurationsWithInstances()
 
+    // Apply sorting to configurations
+    const sortedConfigurations = sortInstances(configurationsWithInstances, instancesSortedBy, instancesSortedByFilterDirection)
+
     // Transform data for the new table format
-    const tableData = configurationsWithInstances.flatMap((config) =>
+    const tableData = sortedConfigurations.flatMap((config) =>
         config.Instance.map((instance) => {
             const chainConfig = CHAINS_CONFIG[config.chainId]
             const chainName = chainConfig?.name || `Chain ${config.chainId}`
@@ -94,7 +99,7 @@ export default function ListInstances() {
                 base: baseToken?.symbol || shortenValue(config.baseTokenAddress, 3),
                 quote: quoteToken?.symbol || shortenValue(config.quoteTokenAddress, 3),
                 configuration: {
-                    id: shortenValue(config.id, 4),
+                    id: config.id,
                     createdAt: config.createdAt,
                 },
                 instance: {
@@ -115,7 +120,7 @@ export default function ListInstances() {
 
     return (
         <div className="w-full">
-            <VirtualizedInstancesTable data={tableData} isLoading={showLoading} />
+            <InstancesTable data={tableData} isLoading={showLoading} />
         </div>
     )
 }

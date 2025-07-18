@@ -1,14 +1,17 @@
 'use client'
 
-import { TableHeaders } from './headers/TableHeaders'
-import { InstanceRow } from './rows/TableRow'
-import { LoadingRows } from './rows/LoadingRows'
+import { TableHeaders } from './InstancesTableHeader'
+import { InstanceRow } from './InstancesTableRow'
+import { LoadingRows } from './InstancesTableLoadingRow'
+import { GroupedInstancesView } from './GroupedInstancesView'
+import { DisplayModeToggle } from './DisplayModeToggle'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { getDurationBetween } from '@/utils'
-import { AppInstanceStatus } from '@/enums'
+import { AppInstanceStatus, InstanceDisplayMode } from '@/enums'
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual'
 import { useRef, useMemo, memo } from 'react'
+import { useAppStore } from '@/stores/app.store'
 
 dayjs.extend(relativeTime)
 
@@ -49,7 +52,7 @@ interface FormattedRow extends InstanceData {
     }
 }
 
-// Memoized table content to prevent unnecessary re-renders
+// Memoized table content to prevent unnecessary re-renders (virtualized for list view)
 const InstanceRows = memo(function InstanceRows({
     rows,
     virtualizer,
@@ -110,10 +113,11 @@ const EmptyState = memo(function EmptyState({ message }: { message: string }) {
     )
 })
 
-export function VirtualizedInstancesTable({ data, isLoading }: { data?: InstanceData[]; isLoading?: boolean }) {
+export function InstancesTable({ data, isLoading }: { data?: InstanceData[]; isLoading?: boolean }) {
     const parentRef = useRef<HTMLDivElement>(null)
+    const { instanceDisplayMode } = useAppStore()
 
-    // Transform data to include formatted values
+    // Transform data to include formatted values (only used in list view)
     const rows = useMemo((): FormattedRow[] => {
         if (!data || data.length === 0) return []
 
@@ -142,6 +146,7 @@ export function VirtualizedInstancesTable({ data, isLoading }: { data?: Instance
         })
     }, [data])
 
+    // Virtualizer is only used for list view (not for grouped view)
     const virtualizer = useVirtualizer({
         count: rows.length,
         getScrollElement: () => parentRef.current,
@@ -150,16 +155,32 @@ export function VirtualizedInstancesTable({ data, isLoading }: { data?: Instance
     })
 
     return (
-        <div className="w-full overflow-x-scroll px-4">
-            <div className="flex min-w-[1200px] w-full flex-col overflow-hidden rounded-xl border border-milk-200 text-xs">
-                <TableHeaders />
-                {isLoading ? (
-                    <LoadingRows />
-                ) : rows.length === 0 ? (
-                    <EmptyState message="No instances found" />
-                ) : (
-                    <InstanceRows rows={rows} virtualizer={virtualizer} parentRef={parentRef} />
-                )}
+        <div className="w-full space-y-4">
+            <div className="flex justify-end px-4">
+                <DisplayModeToggle />
+            </div>
+
+            <div className="overflow-x-scroll px-4">
+                <div className="flex min-w-[1200px] w-full flex-col overflow-hidden bg-milk-50 border-milk-200 text-xs">
+                    {isLoading ? (
+                        <>
+                            <TableHeaders />
+                            <LoadingRows />
+                        </>
+                    ) : !data || data.length === 0 ? (
+                        <>
+                            <TableHeaders />
+                            <EmptyState message="No instances found" />
+                        </>
+                    ) : instanceDisplayMode === InstanceDisplayMode.GROUPED ? (
+                        <GroupedInstancesView data={data} />
+                    ) : (
+                        <>
+                            <TableHeaders />
+                            <InstanceRows rows={rows} virtualizer={virtualizer} parentRef={parentRef} />
+                        </>
+                    )}
+                </div>
             </div>
         </div>
     )

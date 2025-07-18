@@ -40,7 +40,7 @@ export default function StyledTooltip({
     content,
     children,
     placement = 'top',
-    disableAnimation = false,
+    disableAnimation = true,
     className,
     delay = 200,
     closeDelay = 0,

@@ -6,9 +6,9 @@ import { InterfaceAppLink } from '@/interfaces'
  * https://github.com/propeller-heads/tycho-x/blob/main/TAP-5.md
  */
 
-export const SITE_NAME = 'Tycho Market Maker'
+export const SITE_NAME = 'Wintercute'
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const SITE_DOMAIN = IS_DEV ? 'http://localhost:3000' : 'https://tap5.fberger.xyz'
+export const SITE_DOMAIN = IS_DEV ? 'http://localhost:3000' : 'https://wintercute.vercel.app'
 export const SITE_URL = SITE_DOMAIN.replace('www.', '')
 export const APP_METADATA = {
     SITE_NAME,
@@ -26,7 +26,7 @@ export const APP_METADATA = {
         price: '0',
         priceCurrency: 'USD',
         about: {
-            name: 'Automated Market Making',
+            name: 'Market Making',
             description: 'DeFi trading and liquidity provision',
         },
     },
@@ -42,7 +42,7 @@ export const APP_PAGES: InterfaceAppLink[] = [
         path: AppUrls.ABOUT,
     },
     {
-        name: 'Market Maker',
+        name: SITE_NAME,
         path: AppUrls.MARKET_MAKER,
     },
     // {
