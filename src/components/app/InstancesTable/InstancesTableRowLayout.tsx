@@ -9,7 +9,7 @@ import { ReactNode } from 'react'
 
 export function InstanceRowLayout({ children, className, onClick }: { children: ReactNode; className?: string; onClick?: () => void }) {
     return (
-        <div className={cn('w-full px-2 grid grid-cols-12 items-center gap-2 text-sm text-milk', className)} onClick={onClick}>
+        <div className={cn('w-full px-2 grid grid-cols-12 items-center gap-2', className)} onClick={onClick}>
             {children}
         </div>
     )

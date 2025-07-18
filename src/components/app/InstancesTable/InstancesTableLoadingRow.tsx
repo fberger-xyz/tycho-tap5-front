@@ -1,6 +1,6 @@
-import { Cell } from './TableRow'
-import { InstanceRowLayout, ChainAndPairSection, ConfigSection, InstanceDetailsSection } from '../shared/InstanceRowLayout'
-import { COLUMN_HEADERS } from '../headers/TableHeaders'
+import { Cell } from './InstancesTableRow'
+import { InstanceRowLayout, ChainAndPairSection, ConfigSection, InstanceDetailsSection } from './InstancesTableRowLayout'
+import { COLUMN_HEADERS } from './InstancesTableHeader'
 
 export function LoadingRows() {
     return (
@@ -31,9 +31,9 @@ export function LoadingRows() {
                             <Cell className="skeleton-loading w-full h-3/5 text-transparent rounded-xl">
                                 <p className="text-transparent">{COLUMN_HEADERS.instanceId}</p>
                             </Cell>
-                            <Cell className="skeleton-loading w-full h-3/5 text-transparent rounded-xl">
+                            {/* <Cell className="skeleton-loading w-full h-3/5 text-transparent rounded-xl">
                                 <p className="text-transparent">{COLUMN_HEADERS.instanceCreatedAt}</p>
-                            </Cell>
+                            </Cell> */}
                             <Cell className="skeleton-loading w-full h-3/5 text-transparent rounded-xl">
                                 <p className="text-transparent">{COLUMN_HEADERS.instanceStartedAt}</p>
                             </Cell>

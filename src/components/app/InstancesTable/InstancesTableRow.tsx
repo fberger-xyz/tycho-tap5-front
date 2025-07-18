@@ -2,9 +2,10 @@
 
 import { cn, shortenValue } from '@/utils'
 import { ReactNode, memo } from 'react'
-import { InstanceRowLayout, ConfigSection, InstanceDetailsSection, ChainAndPairSection } from '../shared/InstanceRowLayout'
+import { InstanceRowLayout, ConfigSection, InstanceDetailsSection, ChainAndPairSection } from './InstancesTableRowLayout'
 import { AppInstanceStatus } from '@/enums'
 import { ChainImage, SymbolImage } from '@/components/common/ImageWrapper'
+import InstanceStatus from '../InstanceStatus'
 
 export const Cell = memo(function Cell({ className, children }: { className?: string; children: ReactNode }) {
     return <div className={cn('h-full flex items-center justify-center py-2 px-1 truncate', className)}>{children}</div>
@@ -30,16 +31,8 @@ export const InstanceRow = memo(function InstanceRow(props: {
     }
     className?: string
 }) {
-    // Status color mapping
-    const statusColors = {
-        running: 'text-green-600 bg-green-50',
-        stopped: 'text-gray-600 bg-gray-50',
-        paused: 'text-yellow-600 bg-yellow-50',
-        error: 'text-red-600 bg-red-50',
-    } as const
-
     return (
-        <div className={cn('w-full border-b border-milk-200 transition-all duration-200 ease-in-out h-14 flex items-center', props.className)}>
+        <div className={cn('w-full transition-all duration-200 ease-in-out h-14 flex items-center', props.className)}>
             <InstanceRowLayout>
                 {/* Pair section */}
                 <ChainAndPairSection>
@@ -65,9 +58,7 @@ export const InstanceRow = memo(function InstanceRow(props: {
                     <Cell className="col-span-1">{props.instance.startedAt}</Cell>
                     <Cell className="col-span-1">{props.instance.runningTime}</Cell>
                     <Cell className="col-span-1">
-                        <span className={cn('px-2 py-1 rounded-full', statusColors[props.instance.status as keyof typeof statusColors])}>
-                            {props.instance.status}
-                        </span>
+                        <InstanceStatus status={props.instance.status} />
                     </Cell>
                     <Cell className="col-span-1">{props.instance.endedAt || '-'}</Cell>
                     <Cell className="col-span-1">{props.instance.tradeCount}</Cell>

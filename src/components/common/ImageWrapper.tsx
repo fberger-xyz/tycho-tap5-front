@@ -48,25 +48,25 @@ export function SymbolImage(props: { symbol?: string; className?: string; size?:
 export function ImageWithText(props: { symbol?: string; chainId?: number; className?: string; size?: number }) {
     if (props.symbol) {
         return (
-            <StyledTooltip content={props.symbol}>
-                <div className="flex items-center gap-2 border rounded-2xl pl-1 pr-2 w-fit py-1 border-milk-150">
-                    <SymbolImage symbol={props.symbol} size={props.size} className={props.className} />
+            <StyledTooltip disableAnimation={true} content={props.symbol}>
+                <div className="flex items-center gap-2">
+                    <SymbolImage symbol={props.symbol} size={props.size} className={cn('rounded-full', props.className)} />
                     <p>{props.symbol}</p>
                 </div>
             </StyledTooltip>
         )
     } else if (props.chainId) {
         return (
-            <StyledTooltip content={CHAINS_CONFIG[Number(props.chainId)].name}>
-                <div className="flex items-center gap-2 border rounded-2xl pl-1 pr-2 w-fit py-1 border-milk-150">
-                    <ChainImage id={props.chainId} size={props.size ?? 20} className={props.className} />
+            <StyledTooltip disableAnimation={true} content={CHAINS_CONFIG[Number(props.chainId)].name}>
+                <div className="flex items-center gap-2">
+                    <ChainImage id={props.chainId} size={props.size ?? 20} className={cn('rounded-full', props.className)} />
                     <p>{CHAINS_CONFIG[Number(props.chainId)].name}</p>
                 </div>
             </StyledTooltip>
         )
     }
     return (
-        <div className="flex items-center gap-2 border rounded-2xl pl-1 pr-2 w-fit py-1 border-milk-150">
+        <div className="flex items-center gap-2">
             <ChainImage id={props.chainId} size={props.size ?? 20} className={props.className} />
             <p>Unknown</p>
         </div>

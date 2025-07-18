@@ -44,7 +44,11 @@ export enum AppInstanceStatus {
 }
 
 export enum SupportedFilters {
+    CONFIGURATION_CREATED = 'Config Created',
+    // INSTANCE_CREATED = 'Instance Created',
+    INSTANCE_STARTED = 'Started At',
     RUNNING_TIME = 'Running Time',
+    INSTANCE_ENDED = 'Ended At',
     TRADE_COUNT = 'Trade Count',
     PRICES_COUNT_CALLED = 'Prices Called',
 }
@@ -52,4 +56,9 @@ export enum SupportedFilters {
 export enum SupportedFilterDirections {
     ASCENDING = 'Ascending',
     DESCENDING = 'Descending',
+}
+
+export enum InstanceDisplayMode {
+    LIST = 'list',
+    GROUPED = 'grouped',
 }

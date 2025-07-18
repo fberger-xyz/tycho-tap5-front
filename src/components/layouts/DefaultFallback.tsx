@@ -1,6 +1,6 @@
 import PageWrapper from '../common/PageWrapper'
-import { TableHeaders } from '../app/InstancesTable/headers/TableHeaders'
-import { LoadingRows } from '../app/InstancesTable/rows/LoadingRows'
+import { TableHeaders } from '../app/InstancesTable/InstancesTableHeader'
+import { LoadingRows } from '../app/InstancesTable/InstancesTableLoadingRow'
 
 export function DefaultFallbackContent() {
     return (
