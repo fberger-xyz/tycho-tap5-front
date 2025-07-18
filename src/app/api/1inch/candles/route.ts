@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithTimeout } from '@/utils/requests.util'
+import { createCachedFunction } from '@/services/cache/shared-cache.service'
 
 // Supported parameters
 const SUPPORTED_SECONDS = [300, 900, 3600, 14400, 86400, 604800]
 const SUPPORTED_CHAINS = [1, 56, 137, 42161, 43114, 100, 10, 8453, 324, 59144, 146, 130]
+
+// Cache TTL based on period
+const CACHE_TTL_MAP: Record<number, number> = {
+    300: 15, // 5 min candles -> 15s cache
+    900: 15, // 15 min candles -> 15s cache
+    3600: 30, // 1 hour candles -> 30s cache
+    14400: 30, // 4 hour candles -> 30s cache
+    86400: 30, // 1 day candles -> 30s cache
+    604800: 30, // 1 week candles -> 30s cache
+}
 
 interface CandleData {
     time: number
@@ -17,11 +28,11 @@ interface CandlesResponse {
     data: CandleData[]
 }
 
-// Configure route segment config for caching
+// Configure route segment config
 export const dynamic = 'force-dynamic'
-export const revalidate = 300 // 5 minutes
 
-async function fetchCandles(token0: string, token1: string, seconds: string, chainId: string): Promise<CandlesResponse> {
+// Base fetch function
+async function fetchCandlesBase(token0: string, token1: string, seconds: string, chainId: string): Promise<CandlesResponse> {
     const apiKey = process.env.ONEINCH_API_KEY || 'xiOxR6YUX5KPRsD53kcI10BYj6yrDL8I'
     const apiUrl = `https://api.1inch.dev/charts/v1.0/chart/aggregated/candle/${token0}/${token1}/${seconds}/${chainId}`
 
@@ -36,6 +47,15 @@ async function fetchCandles(token0: string, token1: string, seconds: string, cha
     })
 
     return response.json()
+}
+
+// Create cached version of the fetch function
+function getCachedFetchCandles(seconds: number) {
+    const ttl = CACHE_TTL_MAP[seconds] || 15
+    return createCachedFunction(fetchCandlesBase, ['1inch-candles'], {
+        tags: ['1inch-candles', `period-${seconds}`],
+        revalidate: ttl,
+    })
 }
 
 export async function GET(request: NextRequest) {
@@ -71,12 +91,17 @@ export async function GET(request: NextRequest) {
         }
 
         try {
-            const data = await fetchCandles(token0, token1, seconds, chainId)
+            // Get cached fetch function with appropriate TTL
+            const cachedFetchCandles = getCachedFetchCandles(secondsNum)
+            const data = await cachedFetchCandles(token0, token1, seconds, chainId)
 
-            // Return response with cache headers
+            // Get TTL for cache headers
+            const ttl = CACHE_TTL_MAP[secondsNum] || 15
+
+            // Return response with cache headers as per guidelines
             return NextResponse.json(data, {
                 headers: {
-                    'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=59',
+                    'Cache-Control': `public, s-maxage=${ttl}, stale-while-revalidate=30`,
                 },
             })
         } catch (fetchError) {
