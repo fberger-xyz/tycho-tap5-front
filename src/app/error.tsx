@@ -11,7 +11,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
     useEffect(() => console.error(error), [error])
     return (
         <PageWrapper>
-            <div className="mx-auto mt-10 flex flex-col items-center gap-4">
+            <div className="mx-auto mt-10 flex flex-col items-center gap-4 max-w-lg">
                 <p className="font-semibold text-lg">
                     Sorry, something went <span className="text-orange-500">wrong</span>
                 </p>
@@ -24,13 +24,13 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                 <div className="flex w-full flex-col items-center gap-2">
                     <button
                         onClick={() => reset()}
-                        className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-milk-100 hover:bg-milk-100 px-3 py-3 font-semibold sm:py-2"
+                        className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-milk-100 hover:bg-milk-100 px-4 py-4 font-semibold sm:py-2"
                     >
                         <p className="font-semibold">Reload page</p>
                         <IconWrapper id={IconIds.UPDATE_NOW} className="size-5" />
                     </button>
 
-                    <p className="font-light text-xs">
+                    <p className="font-light text-xs mt-4">
                         Or reach out for help on telegram:
                         <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="hover:underline px-1">
                             @fberger_xyz

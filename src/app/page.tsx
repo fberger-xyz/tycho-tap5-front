@@ -1,10 +1,10 @@
-import AppStoreLoader from '@/components/stores/AppStoreLoader'
-import Home from '@/components/app/Home'
+import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
+import ListInstances from '@/components/app/ListInstances'
 
 export default function Page() {
     return (
-        <AppStoreLoader>
-            <Home />
-        </AppStoreLoader>
+        <HydratedPageWrapper>
+            <ListInstances />
+        </HydratedPageWrapper>
     )
 }

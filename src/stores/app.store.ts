@@ -3,6 +3,18 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
+import type { Configuration, Instance } from '@prisma/client'
+
+type InstanceWithCounts = Instance & {
+    _count: {
+        Trade: number
+        Price: number
+    }
+}
+
+type ConfigurationWithInstances = Configuration & {
+    Instance: InstanceWithCounts[]
+}
 
 export const useAppStore = create<{
     /**
@@ -22,11 +34,24 @@ export const useAppStore = create<{
     setShowMobileMenu: (showMobileMenu: boolean) => void
 
     /**
+     * instances
+     */
+
+    configurations: ConfigurationWithInstances[]
+    lastInstancesFetchedAt: number
+    refetchInstancesInterval: number
+
+    setConfigurations: (configurations: ConfigurationWithInstances[]) => void
+    setLastInstancesFetchedAt: (timestamp: number) => void
+
+    /**
      * computeds
      */
+
+    getConfigurationsWithInstances: () => ConfigurationWithInstances[]
 }>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             /**
              * store
              */
@@ -42,10 +67,34 @@ export const useAppStore = create<{
             setAppStoreRefreshedAt: (appStoreRefreshedAt) => set(() => ({ appStoreRefreshedAt })),
             showMobileMenu: false,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
+
+            /**
+             * instances
+             */
+
+            configurations: [],
+            lastInstancesFetchedAt: -1,
+            refetchInstancesInterval: 30000, // 30 seconds
+
+            setConfigurations: (configurations) =>
+                set(() => ({
+                    configurations,
+                    lastInstancesFetchedAt: Date.now(),
+                })),
+
+            setLastInstancesFetchedAt: (timestamp) => set(() => ({ lastInstancesFetchedAt: timestamp })),
+
+            /**
+             * computeds
+             */
+
+            getConfigurationsWithInstances: () => {
+                return get().configurations.filter((config) => config.Instance.length > 0)
+            },
         }),
         {
             name: `${APP_METADATA.SITE_DOMAIN}-app-store-${IS_DEV ? 'dev' : 'prod'}-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
-            storage: createJSONStorage(() => sessionStorage),
+            storage: createJSONStorage(() => localStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {
                 if (state && !state.hasHydrated) state.setHasHydrated(true)

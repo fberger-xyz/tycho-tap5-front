@@ -3,4 +3,6 @@ export enum FileIds {
     THEME_LIGHT = 'THEME_LIGHT',
     THEME_DARK = 'THEME_DARK',
     APP_LOGO = 'APP_LOGO',
+    MAINNET = 'MAINNET',
+    UNICHAIN = 'UNICHAIN',
 }

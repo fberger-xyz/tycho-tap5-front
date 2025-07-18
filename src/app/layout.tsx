@@ -16,7 +16,7 @@ import { ThemeProvider } from 'next-themes'
 import { AppThemes } from '@/enums'
 import { ReactQueryProvider } from '@/providers/react-query.providers'
 import PWAProvider from '@/providers/pwa.provider'
-import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme'
+import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme.config'
 import { AppUrls } from '@/enums'
 
 const image = {
@@ -149,6 +149,7 @@ export default async function RootLayout({
                                 <HeaderDesktop />
                                 <HeaderMobile />
                             </Suspense>
+                            {/* <DefaultFallback /> */}
                             <Suspense fallback={<DefaultFallback />}>
                                 <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>
                             </Suspense>

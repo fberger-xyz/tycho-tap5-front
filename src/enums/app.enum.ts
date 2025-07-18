@@ -30,3 +30,26 @@ export enum AppThemes {
     LIGHT = 'light',
     DARK = 'dark',
 }
+
+export enum AppSupportedChainIds {
+    ETHEREUM = 1,
+    UNICHAIN = 8453,
+}
+
+export enum AppInstanceStatus {
+    RUNNING = 'running',
+    STOPPED = 'stopped',
+    PAUSED = 'paused',
+    ERROR = 'error',
+}
+
+export enum SupportedFilters {
+    RUNNING_TIME = 'Running Time',
+    TRADE_COUNT = 'Trade Count',
+    PRICES_COUNT_CALLED = 'Prices Called',
+}
+
+export enum SupportedFilterDirections {
+    ASCENDING = 'Ascending',
+    DESCENDING = 'Descending',
+}

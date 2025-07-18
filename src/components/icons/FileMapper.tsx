@@ -22,5 +22,5 @@ export default function FileMapper({
     if (props.id === FileIds.THEME_DARK) return <DarkThemeSVG className={className} />
 
     // fallback
-    return <div className={cn('bg-gray-500 rounded-full', className)} />
+    return <div className={cn('bg-milk rounded-full', className)} />
 }
