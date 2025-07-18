@@ -4,7 +4,7 @@ import { useAppStore } from '@/stores/app.store'
 import { ReactNode, useEffect } from 'react'
 import PageWrapper from '../common/PageWrapper'
 
-export default function AppStoreLoader(props: { children: ReactNode }) {
+export default function HydratedPageWrapper(props: { children: ReactNode }) {
     const { hasHydrated } = useAppStore()
     const loadAppStore = () => useAppStore.persist.rehydrate()
     useEffect(() => {

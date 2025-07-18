@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next'
 import { APP_METADATA } from '@/config/app.config'
-import { AppColors } from '@/config/theme'
 import { AppUrls } from '@/enums'
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -10,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
         description: APP_METADATA.SITE_DESCRIPTION,
         start_url: AppUrls.MARKET_MAKER,
         display: 'standalone',
-        background_color: AppColors.background,
-        theme_color: AppColors.primary,
+        background_color: '#ffffff',
+        theme_color: '#000000',
         lang: 'en',
         categories: ['tycho', 'market maker', 'defi', 'orderbook'],
     }

@@ -27,7 +27,7 @@ export default function PWAProvider({ children }: { children: React.ReactNode })
         <>
             {children}
             {!isStandalone && isIOS && (
-                <div className="fixed bottom-0 left-0 right-0 bg-primary/10 p-4 text-center">
+                <div className="fixed bottom-0 left-0 right-0 p-4 text-center">
                     <p className="text-sm">
                         To install this app on your iOS device, tap the share button
                         <span role="img" aria-label="share icon">

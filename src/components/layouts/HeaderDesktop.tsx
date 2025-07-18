@@ -40,7 +40,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                     >
                         <div className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center">
                             <p className="text-sm text-gray-500 text-left">Explorer</p>
-                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
+                            <p className="bg-milk-100 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                         </div>
                         <LinkWrapper
                             href={AppUrls.ORDERBOOK}
@@ -50,7 +50,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                             <p className="text-sm text-milk text-left">Orderbook</p>
                             <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 hidden group-hover:flex text-milk" />
                         </LinkWrapper>
-                        <div onClick={() => setOpenGridDropdown(false)} className="bg-gray-600/20 p-2.5 w-full rounded-xl">
+                        <div onClick={() => setOpenGridDropdown(false)} className="bg-milk-100 p-2.5 w-full rounded-xl">
                             <p className="text-sm text-milk text-left">Market Maker</p>
                         </div>
                     </div>
