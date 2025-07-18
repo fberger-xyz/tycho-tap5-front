@@ -42,12 +42,22 @@ curl "http://localhost:3000/api/1inch/candles?token0=0xA0b86991c6218b36c1d19D4a2
 
 ## Caching
 
-This endpoint uses Next.js App Router caching best practices:
+This endpoint implements the project's caching architecture:
 
-- **Cache-Control**: `public, s-maxage=300, stale-while-revalidate=59`
-- **Revalidation**: Data is cached for 5 minutes (300 seconds)
-- **Stale-while-revalidate**: Serves stale data while fetching fresh data in the background
-- **Dynamic Route**: Configured as `force-dynamic` to ensure fresh data on each request
+### Server-side Caching
+
+- **Shared Cache**: Uses Next.js `unstable_cache` with tag-based invalidation
+- **Dynamic TTL**: Cache duration varies by candle period:
+    - 5-15 minute candles: 15s TTL
+    - 1 hour+ candles: 30s TTL
+- **Cache Tags**: `['1inch-candles', 'period-{seconds}']` for granular invalidation
+- **HTTP Headers**: `Cache-Control: public, s-maxage={ttl}, stale-while-revalidate=30`
+
+### Cache Headers
+
+- **s-maxage**: Dynamic based on period (15s or 30s)
+- **stale-while-revalidate**: 30 seconds for all periods
+- **Dynamic Route**: Configured as `force-dynamic` for fresh data
 
 ## Request Configuration
 
