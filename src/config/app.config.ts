@@ -45,10 +45,6 @@ export const APP_PAGES: InterfaceAppLink[] = [
         name: SITE_NAME,
         path: AppUrls.MARKET_MAKER,
     },
-    // {
-    //     name: 'Changelog',
-    //     path: AppUrls.LOGS,
-    // },
 ] as const
 
 /**

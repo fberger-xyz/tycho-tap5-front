@@ -51,9 +51,7 @@ export const AboutFeatures = () => {
     return (
         <div className="flex flex-col w-full items-start gap-4 max-w-[1050px] mx-auto">
             <p className="text-sm text-aquamarine">Features</p>
-            <p className="text-[48px] leading-none font-bold max-w-[688px] text-left font-inter-tight">
-                Everything Tycho Market Maker brings to your stack
-            </p>
+            <p className="text-[48px] leading-none font-bold max-w-[688px] text-left">Everything Tycho Market Maker brings to your stack</p>
             <div className="relative w-full mt-10">
                 <div className="w-full grid grid-cols-2 lg:grid-cols-6 gap-4 pb-4">
                     {features.map((feature, index) => (

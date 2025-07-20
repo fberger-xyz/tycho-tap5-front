@@ -39,6 +39,25 @@ export const AppColors = fullConfig.theme.colors as DefaultColors & {
     background: string
     primary: string
     default: string
+    jagger: {
+        DEFAULT: string
+        800: string
+        500: string
+        400: string
+        300: string
+        200: string
+    }
+    folly: string
+    aquamarine: string
+    milk: {
+        DEFAULT: string
+        600: string
+        400: string
+        200: string
+        150: string
+        100: string
+        50: string
+    }
 }
 
 /**

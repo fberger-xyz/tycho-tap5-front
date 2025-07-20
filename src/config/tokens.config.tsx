@@ -1,10 +1,14 @@
 import { AppSupportedChainIds } from '@/enums/app.enum'
 
-export const getToken = (chainId: number, address: string) => {
-    return hardcodedTokensList[chainId].find((token) => token.address.toLowerCase() === address.toLowerCase())
+export const getTokenByAddress = (chainId: number, address: string) => {
+    return TOKENS_CONFIG[chainId].find((token) => token.address.toLowerCase() === address.toLowerCase())
 }
 
-export const hardcodedTokensList: Record<
+export const getTokenBySymbol = (chainId: number, symbol: string) => {
+    return TOKENS_CONFIG[chainId].find((token) => token.symbol.toLowerCase() === symbol.toLowerCase())
+}
+
+export const TOKENS_CONFIG: Record<
     number,
     {
         address: string

@@ -17,7 +17,7 @@ export default function Page() {
             <div className="flex flex-col w-full gap-28 items-center">
                 {/* tagline */}
                 <div className="flex max-w-[570px] flex-col gap-6 items-center">
-                    <p className="text-[64px] leading-none font-bold text-center font-inter-tight">{TITLE}</p>
+                    <p className="text-[64px] leading-none font-bold text-center">{TITLE}</p>
                     <p className="text-center max-w-[648px] font-light px-10">{SUBTITLE}</p>
                     <div className="flex gap-2">
                         <LinkWrapper

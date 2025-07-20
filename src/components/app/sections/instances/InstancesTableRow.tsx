@@ -1,0 +1,180 @@
+'use client'
+
+import { ReactNode } from 'react'
+import { cn, formatDateShort, getDurationBetween, shortenValue } from '@/utils'
+import { memo } from 'react'
+import { EnrichedInstance } from '@/types'
+import { ChainImage, SymbolImage } from '@/components/common/ImageWrapper'
+import { LiveDate } from '@/components/common/LiveDate'
+import StyledTooltip from '@/components/common/StyledTooltip'
+
+/**
+ * ------------------------ 1 template
+ */
+
+export const InstanceRowTemplate = (props: {
+    index: ReactNode
+    instance: ReactNode
+    chain: ReactNode
+    pair: ReactNode
+    configurationId: ReactNode
+    broadcast: ReactNode
+    reference: ReactNode
+    targetSpread: ReactNode
+    startedAt: ReactNode
+    endedAt: ReactNode
+    duration: ReactNode
+    trades: ReactNode
+    eoa: ReactNode
+    className?: string
+}) => {
+    return (
+        <div className={cn('w-full grid grid-cols-12 items-center text-sm', props.className)}>
+            {/* A */}
+            <div className="grid grid-cols-12 gap-2 items-center col-span-2">
+                <div className="col-span-2 pl-2">{props.index}</div>
+                <div className="col-span-4 mx-auto">{props.instance}</div>
+                <div className="col-span-3 mx-auto">{props.chain}</div>
+                <div className="col-span-3 mx-auto">{props.pair}</div>
+            </div>
+
+            {/* B */}
+            <div className="grid grid-cols-12 gap-2 items-center col-span-4">
+                <div className="col-span-3 mx-auto">{props.configurationId}</div>
+                <div className="col-span-3 mx-auto capitalize">{props.broadcast}</div>
+                <div className="col-span-3 mx-auto capitalize">{props.reference}</div>
+                <div className="col-span-3 mx-auto">{props.targetSpread}</div>
+            </div>
+
+            {/* C */}
+            <div className="grid grid-cols-12 gap-2 items-center col-span-6">
+                <div className="col-span-3 mx-auto">{props.startedAt}</div>
+                <div className="col-span-3 mx-auto">{props.endedAt}</div>
+                <div className="col-span-2 mx-auto">{props.duration}</div>
+                <div className="col-span-2 mx-auto">{props.trades}</div>
+                <div className="col-span-2 mx-auto">{props.eoa}</div>
+            </div>
+        </div>
+    )
+}
+
+/**
+ * ------------------------ 2 header
+ */
+
+export function InstancesTableHeaders() {
+    return (
+        <InstanceRowTemplate
+            index={<p className="pl-2">#</p>}
+            instance={<p>Instance</p>}
+            chain={<p>Chain</p>}
+            pair={<p>Pair</p>}
+            configurationId={<p>Configuration</p>}
+            broadcast={<p>Broadcast</p>}
+            reference={<p>Reference</p>}
+            targetSpread={<p>Target Spread</p>}
+            startedAt={<p>Started At</p>}
+            endedAt={<p>Ended At</p>}
+            duration={<p>Duration</p>}
+            trades={<p>Trades</p>}
+            eoa={<p>EOA</p>}
+            className="text-milk-200 px-4"
+        />
+    )
+}
+
+/**
+ * ------------------------ 3 loading row
+ */
+
+export function LoadingInstanceRows() {
+    const loadingParagraph = <p className="w-1/2 skeleton-loading h-6 rounded-full">Loading...</p>
+    return (
+        <div className="overflow-hidden flex flex-col gap-1">
+            {Array.from({ length: 8 }, (_, i) => (
+                <InstanceRowTemplate
+                    key={i}
+                    index={<p>{i + 1}</p>}
+                    instance={loadingParagraph}
+                    chain={loadingParagraph}
+                    pair={loadingParagraph}
+                    configurationId={loadingParagraph}
+                    broadcast={loadingParagraph}
+                    reference={loadingParagraph}
+                    targetSpread={loadingParagraph}
+                    startedAt={loadingParagraph}
+                    endedAt={loadingParagraph}
+                    duration={loadingParagraph}
+                    trades={loadingParagraph}
+                    eoa={loadingParagraph}
+                    className="bg-milk-50 px-3 py-2 rounded-lg text-transparent"
+                />
+            ))}
+        </div>
+    )
+}
+
+/**
+ * ------------------------ 4 content row
+ */
+
+export const InstanceRow = memo(function InstanceRow({ data, index }: { data: EnrichedInstance; index: number }) {
+    const broadcast = data.config?.values.broadcast_url ? String(data.config?.values.broadcast_url) : 'unknown'
+    const reference = data.config?.values.price_feed_config.source ? String(data.config?.values.price_feed_config.type) : 'unknown'
+    const targetSpread = data.config?.values.target_spread_bps ? `${String(data.config?.values.target_spread_bps)} bps` : 'unknown'
+    const eoa = data.config?.values.wallet_public_key ? String(data.config?.values.wallet_public_key) : ''
+    return (
+        <InstanceRowTemplate
+            index={<p className="text-milk-200">{index + 1}</p>}
+            instance={
+                <StyledTooltip content={data.instance.id}>
+                    <p>{shortenValue(data.instance.id)}</p>
+                </StyledTooltip>
+            }
+            chain={
+                <div className="flex gap-1 items-center">
+                    <ChainImage id={data.chainId} size={24} />
+                    {/* <p>{data.chain.name}</p> */}
+                </div>
+            }
+            pair={
+                <div className="flex gap-1 items-center">
+                    <SymbolImage symbol={data.baseSymbol} size={24} />
+                    <SymbolImage symbol={data.quoteSymbol} size={24} />
+                </div>
+            }
+            configurationId={
+                <StyledTooltip content={<pre className="text-xs">{JSON.stringify(data.config, null, 2)}</pre>}>
+                    <div className="truncate" title={data.config.id}>
+                        {shortenValue(data.config.id)}
+                    </div>
+                </StyledTooltip>
+            }
+            broadcast={<p>{broadcast}</p>}
+            reference={<p>{reference}</p>}
+            targetSpread={<p>{targetSpread}</p>}
+            startedAt={<LiveDate date={data.instance.startedAt}>{formatDateShort(data.instance.startedAt)}</LiveDate>}
+            endedAt={
+                data.instance.endedAt ? (
+                    <LiveDate date={data.instance.endedAt}>{formatDateShort(data.instance.endedAt)}</LiveDate>
+                ) : (
+                    <p className="truncate">Running</p>
+                )
+            }
+            // status={<div className="truncate">{data.instance.endedAt ? 'Stopped' : 'Running'}</div>}
+            duration={
+                <div className="truncate">
+                    {
+                        getDurationBetween({
+                            endTs: data.instance.endedAt ? new Date(data.instance.endedAt).getTime() : Date.now(),
+                            startTs: new Date(data.instance.startedAt).getTime(),
+                        }).humanize
+                    }
+                </div>
+            }
+            trades={<div className="truncate">{data.instance._count.Trade}</div>}
+            eoa={<div className="truncate">{shortenValue(eoa)}</div>}
+            className="bg-milk-50 px-3 py-2 rounded-lg hover:bg-milk-100 transition-colors duration-200"
+        />
+    )
+})

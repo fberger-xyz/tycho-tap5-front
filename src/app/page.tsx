@@ -1,10 +1,14 @@
+'use client'
+
 import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
-import ListInstances from '@/components/app/ListInstances'
+import ActivitySection from '@/components/app/sections/activity/ActivitySection'
+import InstancesSection from '@/components/app/sections/instances/InstancesSection'
 
 export default function Page() {
     return (
         <HydratedPageWrapper>
-            <ListInstances />
+            <InstancesSection />
+            <ActivitySection />
         </HydratedPageWrapper>
     )
 }

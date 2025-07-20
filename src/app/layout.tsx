@@ -8,8 +8,6 @@ import { Toaster } from 'react-hot-toast'
 import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorBoundaryFallback } from '@/components/common/ErrorBoundaryFallback'
 import Footer from '@/components/layouts/Footer'
-// import { Analytics } from '@/components/analytics/GoogleAnalytics'
-// import { Hotjar } from '@/components/analytics/Hotjar'
 import HeaderDesktop from '@/components/layouts/HeaderDesktop'
 import HeaderMobile from '@/components/layouts/HeaderMobile'
 import { ThemeProvider } from 'next-themes'
@@ -18,6 +16,7 @@ import { ReactQueryProvider } from '@/providers/react-query.providers'
 import PWAProvider from '@/providers/pwa.provider'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme.config'
 import { AppUrls } from '@/enums'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 const image = {
     url: '/market-maker.png',
@@ -95,7 +94,9 @@ export const metadata: Metadata = {
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
     <ThemeProvider attribute="class" defaultTheme="system" disableTransitionOnChange themes={Object.values(AppThemes)}>
-        <ReactQueryProvider>{children}</ReactQueryProvider>
+        <ReactQueryProvider>
+            <NuqsAdapter>{children}</NuqsAdapter>
+        </ReactQueryProvider>
     </ThemeProvider>
 )
 
@@ -136,9 +137,9 @@ export default async function RootLayout({
             </head>
             <body
                 className={cn(
-                    INTER_FONT.className,
-                    INTER_FONT.variable,
+                    INTER_TIGHT_FONT.className,
                     INTER_TIGHT_FONT.variable,
+                    INTER_FONT.variable,
                     'min-h-screen w-full overflow-x-auto overflow-y-auto text-base text-milk',
                 )}
             >
@@ -149,7 +150,6 @@ export default async function RootLayout({
                                 <HeaderDesktop />
                                 <HeaderMobile />
                             </Suspense>
-                            {/* <DefaultFallback /> */}
                             <Suspense fallback={<DefaultFallback />}>
                                 <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>
                             </Suspense>

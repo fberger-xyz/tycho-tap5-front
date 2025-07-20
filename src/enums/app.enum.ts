@@ -62,3 +62,9 @@ export enum InstanceDisplayMode {
     LIST = 'list',
     GROUPED = 'grouped',
 }
+
+export enum TradeStatus {
+    PENDING = 'pending',
+    SUCCESS = 'success',
+    FAILED = 'failed',
+}

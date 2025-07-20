@@ -33,6 +33,10 @@ export const useAppStore = create<{
     setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
     showMobileMenu: boolean
     setShowMobileMenu: (showMobileMenu: boolean) => void
+    showActivitySection: boolean
+    setShowActivitySection: (showActivitySection: boolean) => void
+    showInstancesSection: boolean
+    setShowInstancesSection: (showInstancesSection: boolean) => void
 
     /**
      * instances
@@ -84,6 +88,10 @@ export const useAppStore = create<{
             setAppStoreRefreshedAt: (appStoreRefreshedAt) => set(() => ({ appStoreRefreshedAt })),
             showMobileMenu: false,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
+            showActivitySection: true,
+            setShowActivitySection: (showActivitySection) => set(() => ({ showActivitySection })),
+            showInstancesSection: true,
+            setShowInstancesSection: (showInstancesSection) => set(() => ({ showInstancesSection })),
 
             /**
              * instances
