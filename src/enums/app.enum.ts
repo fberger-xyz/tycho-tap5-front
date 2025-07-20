@@ -68,3 +68,9 @@ export enum TradeStatus {
     SUCCESS = 'success',
     FAILED = 'failed',
 }
+
+export enum ReactQueryKeys {
+    INSTANCES = 'instances',
+    TRADES = 'trades',
+    CANDLES = 'candles',
+}

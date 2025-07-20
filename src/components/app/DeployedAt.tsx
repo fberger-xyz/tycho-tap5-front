@@ -1,6 +1,6 @@
 'use client'
 
-import useTimeAgo from '@/hooks/useTimeAgo'
+import useTimeAgo from '@/hooks/helpers/useTimeAgo'
 import StyledTooltip from '../common/StyledTooltip'
 import dayjs from 'dayjs'
 

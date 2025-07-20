@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { useClickOutside } from '@/hooks/useClickOutside'
+import { useClickOutside } from '@/hooks/helpers/useClickOutside'
 import Image from 'next/image'
 import { FileIds } from '@/enums'
 import GridDropdown from './GridDropdown'

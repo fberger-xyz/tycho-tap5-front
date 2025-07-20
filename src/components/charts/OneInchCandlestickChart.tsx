@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
-import { use1inchCandles } from '@/hooks/use1inchCandles'
+import { use1inchCandles } from '@/hooks/fetchs/use1inchCandles'
 import { AppColors } from '@/config'
 
 interface OneInchCandlestickChartProps {

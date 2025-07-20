@@ -1,9 +1,9 @@
 'use client'
 
 import { ReactNode } from 'react'
-import type { TradeData } from './TradesTable'
 import { cn } from '@/utils'
 import { memo } from 'react'
+import { FormattedTrade } from '@/interfaces'
 
 /**
  * ------------------------ 1 template
@@ -81,14 +81,7 @@ export function LoadingTradeRows() {
  * ------------------------ 4 content row
  */
 
-export const TradeRow = memo(function TradeRow({
-    trade,
-}: {
-    trade: TradeData & {
-        formattedTimestamp: string
-        formattedTimeAgo: string
-    }
-}) {
+export const TradeRow = memo(function TradeRow({ trade }: { trade: FormattedTrade }) {
     return (
         <TradeRowTemplate
             instance={<div className="font-medium">{trade.instanceId}</div>}

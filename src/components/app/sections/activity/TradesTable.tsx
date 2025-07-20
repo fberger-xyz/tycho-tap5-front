@@ -6,48 +6,10 @@ import { LoadingTradeRows as LoadingRows } from './TradesTableRow'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, memo } from 'react'
-import { TradeStatus } from '@/enums'
-import { useTradesData } from '@/hooks/useTradesData'
+import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { FormattedTrade } from '@/interfaces'
 
 dayjs.extend(relativeTime)
-
-export interface TradeData {
-    id: string
-    instanceId: string
-    chain: string
-    chainName?: string
-    tokenIn: {
-        symbol: string
-        amount: string
-        valueUsd?: number
-    }
-    tokenOut: {
-        symbol: string
-        amount: string
-        valueUsd?: number
-    }
-    pool: {
-        protocol: string
-        address: string
-        fee?: number
-    }
-    status: TradeStatus
-    gasCost?: {
-        amount: string
-        valueUsd?: number
-    }
-    netProfit?: {
-        amount: string
-        valueUsd?: number
-    }
-    timestamp: Date | string
-    txHash?: string
-}
-
-interface FormattedTrade extends TradeData {
-    formattedTimestamp: string
-    formattedTimeAgo: string
-}
 
 // Simple rows without virtualization
 const TradeRows = memo(function TradeRows({ trades }: { trades: FormattedTrade[] }) {

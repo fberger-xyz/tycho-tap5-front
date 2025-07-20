@@ -126,7 +126,7 @@ export function InstancesTableHeaders() {
  */
 
 export function LoadingInstanceRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-full">Loading...</p>
+    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">

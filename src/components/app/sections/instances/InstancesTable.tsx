@@ -27,7 +27,7 @@ export function InstancesTable({ data, isLoading }: { data?: EnrichedInstance[];
             <div className="overflow-x-auto">
                 <div className="flex min-w-[1420px] w-full flex-col overflow-hidden gap-2">
                     <InstancesTableHeaders />
-                    {!isLoading ? (
+                    {isLoading ? (
                         <LoadingInstanceRows />
                     ) : !data || data.length === 0 ? (
                         <div className="bg-milk-50 px-3 rounded-lg text-transparent flex items-center justify-center py-8">

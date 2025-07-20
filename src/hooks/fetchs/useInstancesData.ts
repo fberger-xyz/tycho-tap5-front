@@ -1,16 +1,15 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useRef } from 'react'
+import { useEffect } from 'react'
 import superjson from 'superjson'
 import type { ConfigurationWithInstances } from '@/types'
 import { useAppStore } from '@/stores/app.store'
+import { ReactQueryKeys } from '@/enums'
 
 async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
     const response = await fetch('/api/dashboard')
-    if (!response.ok) {
-        throw new Error('Failed to fetch dashboard data')
-    }
+    if (!response.ok) throw new Error('Failed to fetch dashboard data')
     const text = await response.text()
     const data = superjson.parse<{ configurations: ConfigurationWithInstances[] }>(text)
     return data.configurations
@@ -18,35 +17,21 @@ async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
 
 export function useInstancesData() {
     const { refetchInstancesInterval, setConfigurations } = useAppStore()
-    const isFetchingRef = useRef(false)
-
     const { data, isLoading, error, refetch } = useQuery({
-        queryKey: ['instances'],
-        queryFn: async () => {
-            if (isFetchingRef.current) return null
-
-            try {
-                isFetchingRef.current = true
-                const fetchedConfigurations = await fetchDashboardData()
-
-                if (fetchedConfigurations) {
-                    setConfigurations(fetchedConfigurations)
-                }
-
-                return fetchedConfigurations
-            } catch (error) {
-                console.error('Error fetching instances:', error)
-                throw error
-            } finally {
-                isFetchingRef.current = false
-            }
-        },
-        enabled: !isFetchingRef.current,
+        queryKey: [ReactQueryKeys.INSTANCES],
+        queryFn: fetchDashboardData,
         refetchInterval: refetchInstancesInterval,
         refetchOnWindowFocus: true,
         refetchOnMount: true,
         refetchOnReconnect: true,
     })
+
+    // Update store when data changes, but only in an effect to avoid render cycle
+    useEffect(() => {
+        if (data) {
+            setConfigurations(data)
+        }
+    }, [data, setConfigurations])
 
     return {
         configurations: data || [],
