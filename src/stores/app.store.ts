@@ -115,9 +115,7 @@ export const useAppStore = create<{
 
             instancesSortedBy: SupportedFilters.INSTANCE_STARTED,
             instancesSortedByFilterDirection: SupportedFilterDirections.DESCENDING,
-
             sortInstancesBy: (filter) => set(() => ({ instancesSortedBy: filter })),
-
             toggleFilterDirection: () =>
                 set((state) => ({
                     instancesSortedByFilterDirection:

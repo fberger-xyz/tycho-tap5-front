@@ -7,6 +7,9 @@ import { EnrichedInstance } from '@/types'
 import { ChainImage, SymbolImage } from '@/components/common/ImageWrapper'
 import { LiveDate } from '@/components/common/LiveDate'
 import StyledTooltip from '@/components/common/StyledTooltip'
+import { useAppStore } from '@/stores/app.store'
+import { SupportedFilters, SupportedFilterDirections, IconIds } from '@/enums'
+import IconWrapper from '@/components/icons/IconWrapper'
 
 /**
  * ------------------------ 1 template
@@ -63,6 +66,40 @@ export const InstanceRowTemplate = (props: {
  */
 
 export function InstancesTableHeaders() {
+    const { instancesSortedBy, sortInstancesBy, toggleFilterDirection, instancesSortedByFilterDirection } = useAppStore()
+    const SortableHeader = ({ children, sortKey }: { children: ReactNode; sortKey?: SupportedFilters }) => {
+        if (!sortKey) return <>{children}</>
+        const isActive = instancesSortedBy === sortKey
+        const isAscending = instancesSortedByFilterDirection === SupportedFilterDirections.ASCENDING
+        return (
+            <button
+                onClick={() => {
+                    if (isActive) toggleFilterDirection()
+                    else sortInstancesBy(sortKey)
+                }}
+                className="flex items-center gap-1 hover:text-milk-300 transition-colors min-w-fit"
+            >
+                <span>{children}</span>
+                <div className="flex flex-col w-5 h-8 relative">
+                    <IconWrapper
+                        id={IconIds.TRIANGLE_UP}
+                        className={cn(
+                            'size-5 absolute top-1 transition-opacity duration-200',
+                            isActive && isAscending ? 'text-aquamarine opacity-100' : 'text-milk-400',
+                        )}
+                    />
+                    <IconWrapper
+                        id={IconIds.TRIANGLE_DOWN}
+                        className={cn(
+                            'size-5 absolute bottom-0.5 transition-opacity duration-200',
+                            isActive && !isAscending ? 'text-aquamarine opacity-100' : 'text-milk-400',
+                        )}
+                    />
+                </div>
+            </button>
+        )
+    }
+
     return (
         <InstanceRowTemplate
             index={<p className="pl-2">#</p>}
@@ -73,10 +110,10 @@ export function InstancesTableHeaders() {
             broadcast={<p>Broadcast</p>}
             reference={<p>Reference</p>}
             targetSpread={<p>Target Spread</p>}
-            startedAt={<p>Started At</p>}
-            endedAt={<p>Ended At</p>}
-            duration={<p>Duration</p>}
-            trades={<p>Trades</p>}
+            startedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_STARTED}>Started At</SortableHeader>}
+            endedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_ENDED}>Ended At</SortableHeader>}
+            duration={<SortableHeader sortKey={SupportedFilters.RUNNING_TIME}>Duration</SortableHeader>}
+            trades={<SortableHeader sortKey={SupportedFilters.TRADE_COUNT}>Trades</SortableHeader>}
             eoa={<p>EOA</p>}
             className="text-milk-200 px-4"
         />

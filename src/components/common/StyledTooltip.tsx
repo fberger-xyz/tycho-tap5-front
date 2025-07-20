@@ -43,7 +43,7 @@ export default function StyledTooltip({
     disableAnimation = true,
     className,
     delay = 200,
-    closeDelay = 0,
+    closeDelay = 200,
     showArrow = true,
     isDisabled = false,
 }: StyledTooltipProps) {

@@ -59,7 +59,7 @@ const TradeRows = memo(function TradeRows({
     parentRef: React.RefObject<HTMLDivElement | null>
 }) {
     return (
-        <div ref={parentRef} className="max-h-[60vh] overflow-y-auto transition-all duration-200 ease-in-out">
+        <div ref={parentRef} className="max-h-[50vh] overflow-y-auto transition-all duration-200 ease-in-out">
             <div
                 style={{
                     height: `${virtualizer.getTotalSize()}px`,
@@ -116,7 +116,7 @@ export function TradesTable({ data, isLoading }: { data?: TradeData[]; isLoading
     return (
         <div className="w-full border border-milk-150 p-4 rounded-xl">
             <div className="overflow-x-scroll">
-                <div className="flex min-w-[1500px] w-full flex-col overflow-hidden gap-2">
+                <div className="flex min-w-[1420px] w-full flex-col overflow-hidden gap-2">
                     <TradesTableHeaders />
                     {isLoading ? (
                         <LoadingRows />
