@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithTimeout } from '@/utils/requests.util'
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
+import { env } from '@/env/t3-env'
 
 // Supported parameters
 const SUPPORTED_SECONDS = [300, 900, 3600, 14400, 86400, 604800]
@@ -33,7 +34,7 @@ export const dynamic = 'force-dynamic'
 
 // Base fetch function
 async function fetchCandlesBase(token0: string, token1: string, seconds: string, chainId: string): Promise<CandlesResponse> {
-    const apiKey = process.env.ONEINCH_API_KEY || 'xiOxR6YUX5KPRsD53kcI10BYj6yrDL8I'
+    const apiKey = env.ONEINCH_API_KEY || 'xiOxR6YUX5KPRsD53kcI10BYj6yrDL8I'
     const apiUrl = `https://api.1inch.dev/charts/v1.0/chart/aggregated/candle/${token0}/${token1}/${seconds}/${chainId}`
 
     const response = await fetchWithTimeout(apiUrl, {

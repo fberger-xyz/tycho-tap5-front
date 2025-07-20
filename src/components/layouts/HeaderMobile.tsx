@@ -29,7 +29,8 @@ export default function HeaderMobile() {
                     <GridDropdownButton />
 
                     {/* logo */}
-                    <Image src={FileIds.APP_LOGO_MOBILE_WINTERCUTE} alt={FileIds.APP_LOGO_MOBILE_WINTERCUTE} width={160} height={24} />
+                    {/* <Image src={FileIds.APP_LOGO_MOBILE_WINTERCUTE} alt={FileIds.APP_LOGO_MOBILE_WINTERCUTE} width={160} height={24} /> */}
+                    <Image src={FileIds.APP_LOGO_MOBILE_TYCHO} alt={FileIds.APP_LOGO_MOBILE_TYCHO} width={160} height={24} />
                 </div>
 
                 {/* right */}

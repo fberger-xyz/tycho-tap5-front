@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import type { Configuration, Instance } from '@prisma/client'
 import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode } from '@/enums'
+import { env } from '@/env/t3-env'
 
 type InstanceWithCounts = Instance & {
     _count: {
@@ -140,7 +141,7 @@ export const useAppStore = create<{
             },
         }),
         {
-            name: `${APP_METADATA.SITE_DOMAIN}-app-store-${IS_DEV ? 'dev' : 'prod'}-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
+            name: `${APP_METADATA.SITE_DOMAIN}-app-store-${IS_DEV ? 'dev' : 'prod'}-${env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
             storage: createJSONStorage(() => localStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {

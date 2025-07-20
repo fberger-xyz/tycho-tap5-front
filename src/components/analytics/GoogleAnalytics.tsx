@@ -1,18 +1,18 @@
 'use client'
 
-import { GOOGLE_ANALYTICS_ID } from '@/config/app.config'
 import Script from 'next/script'
+import { env } from '@/env/t3-env'
 
 export const Analytics = () =>
-    GOOGLE_ANALYTICS_ID ? (
+    env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID ? (
         <>
-            <Script src={`https://www.googletagmanager.com/gtag/js?id=G-${GOOGLE_ANALYTICS_ID}`} strategy="lazyOnload" />
+            <Script src={`https://www.googletagmanager.com/gtag/js?id=G-${env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}`} strategy="lazyOnload" />
             <Script id="gtag-init" strategy="lazyOnload">
                 {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', 'G-${GOOGLE_ANALYTICS_ID}');
+        gtag('config', 'G-${env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID}');
       `}
             </Script>
         </>

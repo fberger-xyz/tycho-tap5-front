@@ -20,13 +20,14 @@ export default function HeaderDesktop(props: { className?: string }) {
                 <GridDropdownButton />
 
                 {/* logo */}
-                <Image
+                {/* <Image
                     src={FileIds.APP_LOGO_DESKTOP_WINTERCUTE}
                     alt={FileIds.APP_LOGO_DESKTOP_WINTERCUTE}
                     width={240}
                     height={24}
                     className="block"
-                />
+                /> */}
+                <Image src={FileIds.APP_LOGO_DESKTOP_TYCHO} alt={FileIds.APP_LOGO_DESKTOP_TYCHO} width={240} height={24} className="block" />
             </div>
 
             {/* middle */}

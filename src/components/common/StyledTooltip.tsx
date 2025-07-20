@@ -1,28 +1,10 @@
 'use client'
 
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import utc from 'dayjs/plugin/utc'
-import { Tooltip } from '@nextui-org/tooltip'
 import { ReactNode } from 'react'
+import { Tooltip, TooltipProps } from '@heroui/tooltip'
 import { cn } from '@/utils'
 
-dayjs.extend(utc)
-dayjs.extend(relativeTime)
-
-type TooltipPlacement =
-    | 'top'
-    | 'bottom'
-    | 'right'
-    | 'left'
-    | 'top-start'
-    | 'top-end'
-    | 'bottom-start'
-    | 'bottom-end'
-    | 'left-start'
-    | 'left-end'
-    | 'right-start'
-    | 'right-end'
+type TooltipPlacement = TooltipProps['placement']
 
 interface StyledTooltipProps {
     content: ReactNode
@@ -58,7 +40,7 @@ export default function StyledTooltip({
             content={
                 <div
                     className={cn(
-                        'z-[9999] rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 text-milk text-sm flex will-change-transform',
+                        'z-[9999] rounded-xl bg-milk-100 backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 text-milk text-sm flex will-change-transform',
                         className,
                     )}
                     role="tooltip"
@@ -71,3 +53,39 @@ export default function StyledTooltip({
         </Tooltip>
     )
 }
+
+// export default function StyledTooltip({
+//     content,
+//     children,
+//     placement = 'top',
+//     disableAnimation = true,
+//     className,
+//     delay = 200,
+//     closeDelay = 200,
+//     showArrow = true,
+//     isDisabled = false,
+// }: StyledTooltipProps) {
+//     return (
+//         <Tooltip
+//             placement={placement}
+//             disableAnimation={disableAnimation}
+//             delay={delay}
+//             closeDelay={closeDelay}
+//             showArrow={showArrow}
+//             isDisabled={isDisabled}
+//             content={
+//                 <div
+//                     className={cn(
+//                         'z-[9999] rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 text-milk text-sm flex will-change-transform',
+//                         className,
+//                     )}
+//                     role="tooltip"
+//                 >
+//                     {content}
+//                 </div>
+//             }
+//         >
+//             {children}
+//         </Tooltip>
+//     )
+// }

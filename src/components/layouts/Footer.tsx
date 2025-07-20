@@ -4,19 +4,19 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
-dayjs.extend(utc)
-dayjs.extend(relativeTime)
-
 import { cn } from '@/utils'
 import StyledTooltip from '../common/StyledTooltip'
 import IframeWrapper from '../common/IframeWrapper'
 import { AppUrls } from '@/enums'
 import LinkWrapper from '../common/LinkWrapper'
+import { env } from '@/env/t3-env'
+dayjs.extend(utc)
+dayjs.extend(relativeTime)
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
     useEffect(() => {
-        const timestamp = process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP
+        const timestamp = env.NEXT_PUBLIC_COMMIT_TIMESTAMP
         if (timestamp) {
             const date = new Date(parseInt(timestamp, 10) * 1000)
             setCommitDate(date)

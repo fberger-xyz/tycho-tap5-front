@@ -5,14 +5,12 @@ import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { TradesTable } from '@/components/app/sections/activity/TradesTable'
-import { useTradesData } from '@/hooks/useTradesData'
 
 const TITLE = 'Activity'
 const DESCRIPTION = 'Latest trades of all instances'
 
 export default function ActivitySection() {
     const { showActivitySection, setShowActivitySection } = useAppStore()
-    const { trades, isLoading, error } = useTradesData()
     return (
         <SectionLayout
             title={
@@ -32,13 +30,7 @@ export default function ActivitySection() {
                 showActivitySection ? (
                     <div className="flex flex-col gap-2">
                         <p className="text-milk-400">{DESCRIPTION}</p>
-                        {error ? (
-                            <div className="w-full border border-red-200 bg-red-50 p-4 rounded-xl">
-                                <p className="text-red-600 text-sm">Failed to load trades. Please try again later.</p>
-                            </div>
-                        ) : (
-                            <TradesTable data={trades} isLoading={isLoading} />
-                        )}
+                        <TradesTable />
                     </div>
                 ) : null
             }

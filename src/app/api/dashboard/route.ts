@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/db'
+import prisma from '@/clients/prisma'
 import superjson from 'superjson'
 
 export async function GET() {

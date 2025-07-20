@@ -18,18 +18,18 @@ export const TradeRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('w-full grid grid-cols-12 items-center text-sm', props.className)}>
+        <div className={cn('w-full grid grid-cols-12 items-center text-sm gap-3', props.className)}>
             {/* A */}
-            <div className="grid grid-cols-12 gap-2 items-center col-span-6">
-                <div className="text-xs col-span-4">{props.instance}</div>
-                <div className="text-xs col-span-4">{props.chain}</div>
-                <div className="text-xs col-span-4">{props.pair}</div>
+            <div className="grid grid-cols-12 gap-3 items-center col-span-6">
+                <div className="w-full col-span-4">{props.instance}</div>
+                <div className="w-full col-span-4">{props.chain}</div>
+                <div className="w-full col-span-4">{props.pair}</div>
             </div>
 
             {/* B */}
-            <div className="grid grid-cols-12 gap-2 items-center col-span-6">
-                <div className="text-xs col-span-6">{props.amountIn}</div>
-                <div className="text-xs col-span-6">{props.amountOut}</div>
+            <div className="grid grid-cols-12 gap-3 items-center col-span-6">
+                <div className="w-full col-span-6">{props.amountIn}</div>
+                <div className="w-full col-span-6">{props.amountOut}</div>
             </div>
         </div>
     )
@@ -47,7 +47,7 @@ export function TradesTableHeaders() {
             pair={<p>Pair</p>}
             amountIn={<p>Amount In</p>}
             amountOut={<p>Amount Out</p>}
-            className="text-milk-200"
+            className="text-milk-200 px-4"
         />
     )
 }
@@ -59,18 +59,20 @@ export function TradesTableHeaders() {
 export function LoadingTradeRows() {
     const loadingParagraph = <p className="w-1/2 skeleton-loading h-6 rounded-full">Loading...</p>
     return (
-        <div className="overflow-hidden flex flex-col gap-1">
-            {Array.from({ length: 8 }, (_, i) => (
-                <TradeRowTemplate
-                    key={i}
-                    instance={loadingParagraph}
-                    chain={loadingParagraph}
-                    pair={loadingParagraph}
-                    amountIn={loadingParagraph}
-                    amountOut={loadingParagraph}
-                    className="bg-milk-50 px-3 py-2 rounded-lg text-transparent"
-                />
-            ))}
+        <div className="max-h-[50vh] overflow-y-auto">
+            <div className="flex flex-col gap-1 px-4 pb-2">
+                {Array.from({ length: 8 }, (_, i) => (
+                    <TradeRowTemplate
+                        key={i}
+                        instance={loadingParagraph}
+                        chain={loadingParagraph}
+                        pair={loadingParagraph}
+                        amountIn={loadingParagraph}
+                        amountOut={loadingParagraph}
+                        className="bg-milk-50 px-3 py-2 rounded-lg text-transparent"
+                    />
+                ))}
+            </div>
         </div>
     )
 }
