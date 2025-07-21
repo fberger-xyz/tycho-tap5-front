@@ -41,7 +41,7 @@ export default function CandlesSection({ instance }: { instance: EnrichedInstanc
                         <p className="text-milk-400">{DESCRIPTION}</p>
                         <div className="h-[250px]">
                             <Suspense fallback={<div className="flex items-center justify-center h-full text-milk">Loading chart...</div>}>
-                                <OneInchCandlestickChart instance={instance} />
+                                <OneInchCandlestickChart instance={instance} chainId={instance.chainId} />
                             </Suspense>
                         </div>
                     </div>

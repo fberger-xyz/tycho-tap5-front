@@ -34,7 +34,7 @@ export const dynamic = 'force-dynamic'
 
 // Base fetch function
 async function fetchCandlesBase(token0: string, token1: string, seconds: string, chainId: string): Promise<CandlesResponse> {
-    const apiKey = env.ONEINCH_API_KEY || 'xiOxR6YUX5KPRsD53kcI10BYj6yrDL8I'
+    const apiKey = env.ONEINCH_API_KEY
     const apiUrl = `https://api.1inch.dev/charts/v1.0/chart/aggregated/candle/${token0}/${token1}/${seconds}/${chainId}`
 
     const response = await fetchWithTimeout(apiUrl, {
