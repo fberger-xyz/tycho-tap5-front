@@ -30,14 +30,21 @@ export const useAppStore = create<{
      * ui
      */
 
+    // list
     appStoreRefreshedAt: number
     setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
     showMobileMenu: boolean
     setShowMobileMenu: (showMobileMenu: boolean) => void
-    showActivitySection: boolean
-    setShowActivitySection: (showActivitySection: boolean) => void
     showInstancesSection: boolean
     setShowInstancesSection: (showInstancesSection: boolean) => void
+    showActivitySection: boolean
+    setShowActivitySection: (showActivitySection: boolean) => void
+
+    // instance
+    showCandlesSection: boolean
+    setShowCandlesSection: (showCandlesSection: boolean) => void
+    showInventorySection: boolean
+    setShowInventorySection: (showInventorySection: boolean) => void
 
     /**
      * instances
@@ -85,6 +92,7 @@ export const useAppStore = create<{
              * ui
              */
 
+            // list
             appStoreRefreshedAt: -1,
             setAppStoreRefreshedAt: (appStoreRefreshedAt) => set(() => ({ appStoreRefreshedAt })),
             showMobileMenu: false,
@@ -93,6 +101,12 @@ export const useAppStore = create<{
             setShowActivitySection: (showActivitySection) => set(() => ({ showActivitySection })),
             showInstancesSection: true,
             setShowInstancesSection: (showInstancesSection) => set(() => ({ showInstancesSection })),
+
+            // instance
+            showCandlesSection: true,
+            setShowCandlesSection: (showCandlesSection) => set(() => ({ showCandlesSection })),
+            showInventorySection: true,
+            setShowInventorySection: (showInventorySection) => set(() => ({ showInventorySection })),
 
             /**
              * instances

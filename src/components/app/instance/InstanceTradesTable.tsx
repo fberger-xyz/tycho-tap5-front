@@ -1,12 +1,10 @@
 'use client'
 
-import { TradesTableHeaders } from './TradesTableRow'
-import { TradeRow } from './TradesTableRow'
-import { LoadingTradeRows as LoadingRows } from './TradesTableRow'
+import { TradesTableHeaders, TradeRow, LoadingTradeRows as LoadingRows } from '@/components/app/sections/activity/TradesTableRow'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, memo } from 'react'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { useInstanceTradesData } from '@/hooks/fetchs/useInstanceTradesData'
 import { FormattedTrade } from '@/interfaces'
 
 dayjs.extend(relativeTime)
@@ -24,8 +22,12 @@ const TradeRows = memo(function TradeRows({ trades }: { trades: FormattedTrade[]
     )
 })
 
-export function TradesTable() {
-    const { trades, isLoading } = useTradesData()
+interface InstanceTradesTableProps {
+    instanceId: string
+}
+
+export function InstanceTradesTable({ instanceId }: InstanceTradesTableProps) {
+    const { trades, isLoading } = useInstanceTradesData(instanceId)
 
     // format trades
     const formattedTrades = useMemo((): FormattedTrade[] => {
@@ -49,7 +51,7 @@ export function TradesTable() {
                         <LoadingRows />
                     ) : !trades || trades.length === 0 ? (
                         <div className="bg-milk-50 px-3 rounded-lg text-transparent flex items-center justify-center py-8">
-                            <p className="m-auto text-folly">No recent trades</p>
+                            <p className="m-auto text-folly">No recent trades for this instance</p>
                         </div>
                     ) : (
                         <TradeRows trades={formattedTrades} />

@@ -3,14 +3,15 @@
 import { SectionLayout } from '@/components/app/sections/SectionLayout'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
+import { InstanceTradesTable } from './InstanceTradesTable'
+import { shortenValue } from '@/utils'
 import { useAppStore } from '@/stores/app.store'
-import { TradesTable } from '@/components/app/sections/activity/TradesTable'
 
-const TITLE = 'Tradebook'
-const DESCRIPTION = 'Latest trades of all instances'
+const DESCRIPTION = 'Live tradebook of this instance'
 
-export default function ActivitySection() {
+export default function InstanceActivitySection({ instanceId }: { instanceId: string }) {
     const { showActivitySection, setShowActivitySection } = useAppStore()
+
     return (
         <SectionLayout
             title={
@@ -21,7 +22,7 @@ export default function ActivitySection() {
                         aria-expanded={showActivitySection}
                         aria-label={`${showActivitySection ? 'Collapse' : 'Expand'} activity section`}
                     >
-                        <p className="text-milk font-semibold">{TITLE}</p>
+                        <p className="text-milk font-semibold">{`${shortenValue(instanceId)} activity`}</p>
                         <IconWrapper id={showActivitySection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-5" />
                     </button>
                 </div>
@@ -30,7 +31,7 @@ export default function ActivitySection() {
                 showActivitySection ? (
                     <div className="flex flex-col gap-2">
                         <p className="text-milk-400">{DESCRIPTION}</p>
-                        <TradesTable />
+                        <InstanceTradesTable instanceId={instanceId} />
                     </div>
                 ) : null
             }

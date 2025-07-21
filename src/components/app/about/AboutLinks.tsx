@@ -15,7 +15,7 @@ const links: LinkItem[] = [
         href: AppUrls.MARKET_MAKER,
         target: '_self',
         icon: IconIds.OPEN_LINK_IN_NEW_TAB,
-        text: 'Run a market maker',
+        text: 'Run your market maker',
         className: 'bg-folly/95 hover:bg-folly/100 cursor-pointer',
     },
     {

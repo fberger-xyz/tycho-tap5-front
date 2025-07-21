@@ -35,28 +35,28 @@ export const InstanceRowTemplate = (props: {
     return (
         <div className={cn('w-full grid grid-cols-12 items-center text-sm gap-3', props.className)}>
             {/* A */}
-            <div className="grid grid-cols-12 gap-3 items-center col-span-2">
+            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-3">
                 <div className="w-full col-span-2 pl-2">{props.index}</div>
-                <div className="w-full col-span-4 mx-auto">{props.instance}</div>
-                <div className="w-full col-span-3 mx-auto">{props.chain}</div>
-                <div className="w-full col-span-3 mx-auto">{props.pair}</div>
+                <div className="w-full col-span-3">{props.instance}</div>
+                <div className="w-full col-span-2">{props.chain}</div>
+                <div className="w-full col-span-5">{props.pair}</div>
             </div>
 
             {/* B */}
-            <div className="grid grid-cols-12 gap-3 items-center col-span-4">
-                <div className="w-full col-span-3 mx-auto">{props.configurationId}</div>
-                <div className="w-full col-span-3 mx-auto capitalize">{props.broadcast}</div>
-                <div className="w-full col-span-3 mx-auto capitalize">{props.reference}</div>
-                <div className="w-full col-span-3 mx-auto">{props.targetSpread}</div>
+            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-4">
+                <div className="w-full col-span-3">{props.configurationId}</div>
+                <div className="w-full col-span-3 capitalize">{props.broadcast}</div>
+                <div className="w-full col-span-3 capitalize">{props.reference}</div>
+                <div className="w-full col-span-3">{props.targetSpread}</div>
             </div>
 
             {/* C */}
-            <div className="grid grid-cols-12 gap-3 items-center col-span-6">
-                <div className="w-full col-span-3 mx-auto">{props.startedAt}</div>
-                <div className="w-full col-span-3 mx-auto">{props.endedAt}</div>
-                <div className="w-full col-span-2 mx-auto">{props.duration}</div>
-                <div className="w-full col-span-2 mx-auto">{props.trades}</div>
-                <div className="w-full col-span-2 mx-auto">{props.eoa}</div>
+            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-5">
+                <div className="w-full col-span-3">{props.startedAt}</div>
+                <div className="w-full col-span-3">{props.endedAt}</div>
+                <div className="w-full col-span-2">{props.duration}</div>
+                <div className="w-full col-span-2">{props.trades}</div>
+                <div className="w-full col-span-2">{props.eoa}</div>
             </div>
         </div>
     )
@@ -80,7 +80,7 @@ export function InstancesTableHeaders() {
                 }}
                 className="flex items-center gap-1 hover:text-milk-300 transition-colors min-w-fit"
             >
-                <span>{children}</span>
+                <p className="truncate text-center">{children}</p>
                 <div className="flex flex-col w-5 h-8 relative">
                     <IconWrapper
                         id={IconIds.TRIANGLE_UP}
@@ -104,18 +104,18 @@ export function InstancesTableHeaders() {
     return (
         <InstanceRowTemplate
             index={<p className="pl-2">#</p>}
-            instance={<p>Instance</p>}
-            chain={<p>Chain</p>}
-            pair={<p>Pair</p>}
-            configurationId={<p>Configuration</p>}
-            broadcast={<p>Broadcast</p>}
-            reference={<p>Reference</p>}
-            targetSpread={<p>Target Spread</p>}
+            instance={<p className="truncate text-center">Instance</p>}
+            chain={<p className="truncate text-center">Chain</p>}
+            pair={<p className="truncate text-center">Pair</p>}
+            configurationId={<p className="truncate text-center">Configuration</p>}
+            broadcast={<p className="truncate text-center">Broadcast</p>}
+            reference={<p className="truncate text-center">Reference</p>}
+            targetSpread={<p className="truncate text-center">Target Spread</p>}
             startedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_STARTED}>Started At</SortableHeader>}
             endedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_ENDED}>Ended At</SortableHeader>}
             duration={<SortableHeader sortKey={SupportedFilters.RUNNING_TIME}>Duration</SortableHeader>}
             trades={<SortableHeader sortKey={SupportedFilters.TRADE_COUNT}>Trades</SortableHeader>}
-            eoa={<p>EOA</p>}
+            eoa={<p className="truncate text-center">EOA</p>}
             className="text-milk-200 px-4"
         />
     )
@@ -181,15 +181,18 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                 pair={
                     <div className="flex gap-1 items-center">
                         <SymbolImage symbol={data.baseSymbol} size={22} />
-                        <SymbolImage symbol={data.quoteSymbol} size={22} />
+                        <SymbolImage symbol={data.quoteSymbol} size={22} className="-ml-2 rounded-full" />
+                        <p className="truncate">
+                            {data.baseSymbol ? data.baseSymbol : '?'}/{data.quoteSymbol ? data.quoteSymbol : '?'}
+                        </p>
                     </div>
                 }
                 configurationId={
-                    <StyledTooltip content={<pre className="text-xs">{JSON.stringify(data.config, null, 2)}</pre>}>
-                        <div className="truncate" title={data.config.id}>
-                            {shortenValue(data.config.id)}
-                        </div>
-                    </StyledTooltip>
+                    // <StyledTooltip content={<pre className="text-xs">{JSON.stringify(data.config, null, 2)}</pre>}>
+                    <div className="truncate" title={data.config.id}>
+                        {shortenValue(data.config.id)}
+                    </div>
+                    // </StyledTooltip>
                 }
                 broadcast={<p>{broadcast}</p>}
                 reference={<p>{reference}</p>}

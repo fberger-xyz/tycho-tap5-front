@@ -4,16 +4,7 @@ import { useMemo } from 'react'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { use1inchCandles } from '@/hooks/fetchs/use1inchCandles'
 import { AppColors } from '@/config'
-
-interface OneInchCandlestickChartProps {
-    token0: string
-    token1: string
-    seconds?: number
-    chainId?: number
-    symbol?: string
-    upColor?: string
-    downColor?: string
-}
+import { OneInchCandlestickChartProps } from '@/interfaces'
 
 export default function OneInchCandlestickChart({
     token0,
@@ -34,7 +25,6 @@ export default function OneInchCandlestickChart({
 
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
         if (!data?.data) return null
-
         return data.data.map((candle) => ({
             time: candle.time * 1000, // Convert to milliseconds
             open: candle.open,
@@ -46,16 +36,7 @@ export default function OneInchCandlestickChart({
     }, [data])
 
     const displaySymbol = symbol || `${token0.slice(0, 6)}.../${token1.slice(0, 6)}...`
-
     return (
-        <CandlestickChart
-            data={candlestickData}
-            isLoading={isLoading}
-            error={error}
-            symbol={displaySymbol}
-            upColor={upColor}
-            downColor={downColor}
-            loadingMessage="Loading 1inch chart data..."
-        />
+        <CandlestickChart data={candlestickData} isLoading={isLoading} error={error} symbol={displaySymbol} upColor={upColor} downColor={downColor} />
     )
 }

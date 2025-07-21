@@ -16,12 +16,11 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                     Sorry, something went <span className="text-orange-500">wrong</span>
                 </p>
                 <div className="flex w-full flex-col items-center gap-2 rounded-xl">
-                    <pre className="text-orange-500 max-h-96 overflow-y-auto border border-dashed border-orange-500 rounded-xl p-8 w-full text-xs text-center text-wrap">
+                    <pre className="text-orange-500 max-h-96 overflow-y-auto border border-dashed border-orange-500/20 rounded-xl px-8 py-10 w-full text-xs text-center text-wrap">
                         {JSON.stringify(extractErrorMessage(error), null, 2)}
                     </pre>
                 </div>
-                <br />
-                <div className="flex w-full flex-col items-center gap-2">
+                <div className="flex w-full flex-col items-center gap-3">
                     <button
                         onClick={() => reset()}
                         className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-milk-100 hover:bg-milk-100 px-4 py-4 font-semibold sm:py-2"
@@ -30,9 +29,17 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                         <IconWrapper id={IconIds.UPDATE_NOW} className="size-5" />
                     </button>
 
-                    <p className="font-light text-xs mt-4">
+                    <p className="text-sm text-milk">
                         Or reach out for help on telegram:
-                        <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="hover:underline px-1">
+                        <LinkWrapper href={AppUrls.PROPELLERHEADS_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine pl-1">
+                            PropellerHeads
+                        </LinkWrapper>
+                        ,
+                        <LinkWrapper href={AppUrls.MERSO_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                            @xMerso
+                        </LinkWrapper>
+                        and
+                        <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                             @fberger_xyz
                         </LinkWrapper>
                     </p>

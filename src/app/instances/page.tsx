@@ -1,9 +1,6 @@
-import InstancesSection from '@/components/app/sections/instances/InstancesSection'
+import { redirect } from 'next/navigation'
 
 export default function InstancesPage() {
-    return (
-        <div className="container mx-auto py-6">
-            <InstancesSection />
-        </div>
-    )
+    redirect('/') // TODO: remove this
+    return null
 }

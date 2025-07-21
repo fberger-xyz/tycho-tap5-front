@@ -73,4 +73,5 @@ export enum ReactQueryKeys {
     INSTANCES = 'instances',
     TRADES = 'trades',
     CANDLES = 'candles',
+    PRICES = 'prices',
 }

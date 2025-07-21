@@ -12,6 +12,7 @@ import GridDropdownButton from './GridDropdownButton'
 
 export default function HeaderDesktop(props: { className?: string }) {
     const pathname = usePathname()
+    const isInstancePage = pathname.includes('/instances/')
 
     return (
         <header className={cn('hidden lg:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
@@ -36,9 +37,9 @@ export default function HeaderDesktop(props: { className?: string }) {
                     <LinkWrapper
                         key={page.path}
                         href={page.path}
-                        className={cn('flex items-center gap-1 transition-colors duration-300 rounded-xl h-9 px-3', {
-                            'hover:bg-milk-100 cursor-pointer': pathname !== page.path,
-                            'bg-milk-100 cursor-text': pathname === page.path,
+                        className={cn('flex items-center gap-1 transition-colors duration-300 rounded-xl h-9 px-3 cursor-pointer', {
+                            'hover:bg-milk-100': pathname !== page.path || !(isInstancePage && page.path === AppUrls.MARKET_MAKER),
+                            'bg-milk-100': pathname === page.path || (isInstancePage && page.path === AppUrls.MARKET_MAKER),
                         })}
                     >
                         <p className="text-sm text-milk">{page.name}</p>
