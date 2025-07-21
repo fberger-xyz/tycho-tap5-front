@@ -3,11 +3,12 @@
 import { SectionLayout } from '@/components/app/sections/SectionLayout'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
-import { shortenValue } from '@/utils'
+// import { shortenValue } from '@/utils'
 import { useAppStore } from '@/stores/app.store'
 
 export default function InventorySection({ instanceId }: { instanceId: string }) {
     const { showInventorySection, setShowInventorySection } = useAppStore()
+    console.log('instanceId', instanceId)
 
     return (
         <SectionLayout
@@ -19,7 +20,8 @@ export default function InventorySection({ instanceId }: { instanceId: string })
                         aria-expanded={showInventorySection}
                         aria-label={`${showInventorySection ? 'Collapse' : 'Expand'} inventory section`}
                     >
-                        <p className="text-milk font-semibold">{`${shortenValue(instanceId)} inventory`}</p>
+                        {/* <p className="text-milk font-semibold">{`${shortenValue(instanceId)} inventory`}</p> */}
+                        <p className="text-milk font-semibold">Inventory</p>
                         <IconWrapper id={showInventorySection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-5" />
                     </button>
                 </div>

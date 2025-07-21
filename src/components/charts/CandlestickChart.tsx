@@ -335,7 +335,7 @@ export default function CandlestickChart({
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-[450px]">
+                <ChartBackground className="relative h-full">
                     {isLoading || !options ? <LoadingArea /> : <EchartWrapper options={options} />}
                 </ChartBackground>
             </ErrorBoundary>

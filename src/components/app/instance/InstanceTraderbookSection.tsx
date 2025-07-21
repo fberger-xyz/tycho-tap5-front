@@ -4,13 +4,14 @@ import { SectionLayout } from '@/components/app/sections/SectionLayout'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
 import { InstanceTradesTable } from './InstanceTradesTable'
-import { shortenValue } from '@/utils'
+// import { shortenValue } from '@/utils'
 import { useAppStore } from '@/stores/app.store'
 
 const DESCRIPTION = 'Live tradebook of this instance'
 
 export default function InstanceActivitySection({ instanceId }: { instanceId: string }) {
     const { showActivitySection, setShowActivitySection } = useAppStore()
+    console.log('instanceId', instanceId)
 
     return (
         <SectionLayout
@@ -22,7 +23,8 @@ export default function InstanceActivitySection({ instanceId }: { instanceId: st
                         aria-expanded={showActivitySection}
                         aria-label={`${showActivitySection ? 'Collapse' : 'Expand'} activity section`}
                     >
-                        <p className="text-milk font-semibold">{`${shortenValue(instanceId)} activity`}</p>
+                        {/* <p className="text-milk font-semibold">{`${shortenValue(instanceId)} activity`}</p> */}
+                        <p className="text-milk font-semibold">Tradebook</p>
                         <IconWrapper id={showActivitySection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-5" />
                     </button>
                 </div>

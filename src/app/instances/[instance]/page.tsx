@@ -41,10 +41,10 @@ export default async function InstancePage({
     const enrichedInstance = await getInstanceData(instanceId)
     return (
         <PageWrapper>
-            <div>
+            {/* <div>
                 <h1 className="text-3xl font-bold text-milk-800">Instance Details</h1>
                 <p className="text-milk-400 mt-1">Monitor and analyze the performance of your market maker instance</p>
-            </div>
+            </div> */}
             <InstanceKPIs instance={enrichedInstance} />
             <CandlesSection baseToken={enrichedInstance.baseSymbol} quoteToken={enrichedInstance.quoteSymbol} chainId={enrichedInstance.chainId} />
             <InstanceActivitySection instanceId={instanceId} />
