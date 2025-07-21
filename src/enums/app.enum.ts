@@ -9,6 +9,7 @@ export enum AppUrls {
     // external links
     DOCUMENTATION = 'DOCUMENTATION-to-be-added',
     SPECS = 'https://github.com/propeller-heads/tycho-x/blob/main/TAP-5.md',
+    BUILDERNET = 'https://buildernet.org/docs/',
 
     // PropellerHeads
     PROPELLERHEADS_WEBSITE = 'https://www.propellerheads.xyz/',

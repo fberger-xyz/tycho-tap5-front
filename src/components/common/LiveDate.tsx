@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, formatDate, getDurationBetween } from '@/utils'
+import { cn, dateHelpers, getDurationBetween } from '@/utils'
 import StyledTooltip from './StyledTooltip'
 // import useTimeAgo from '@/hooks/useTimeAgo'
 
@@ -11,7 +11,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
             disableAnimation={true}
             content={
                 <div>
-                    <p>{formatDate(props.date)}</p>
+                    <p>{dateHelpers.formatDate(props.date)}</p>
                     <p>
                         {
                             getDurationBetween({

@@ -1,26 +1,31 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { use1inchCandles } from '@/hooks/fetchs/use1inchCandles'
-import { AppColors } from '@/config'
-import { OneInchCandlestickChartProps } from '@/interfaces'
+import { ChartColors } from '@/config/chart-colors.config'
+import { EnrichedInstance } from '@/types'
 
 export default function OneInchCandlestickChart({
-    token0,
-    token1,
+    instance,
     seconds = 300, // Default to 5 minute candles
     chainId = 1, // Default to Ethereum mainnet
     symbol,
-    upColor = AppColors.aquamarine,
-    downColor = AppColors.folly,
-}: OneInchCandlestickChartProps) {
+}: {
+    instance: EnrichedInstance
+    seconds?: number
+    chainId?: number
+    symbol?: string
+}) {
+    const { resolvedTheme } = useTheme()
+    const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const { data, isLoading, error } = use1inchCandles({
-        token0,
-        token1,
+        token0: instance.base?.address?.toLowerCase() ?? '',
+        token1: instance.quote?.address?.toLowerCase() ?? '',
         seconds,
         chainId,
-        enabled: !!token0 && !!token1,
+        enabled: !!instance.base?.address && !!instance.quote?.address,
     })
 
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
@@ -35,8 +40,18 @@ export default function OneInchCandlestickChart({
         }))
     }, [data])
 
-    const displaySymbol = symbol || `${token0.slice(0, 6)}.../${token1.slice(0, 6)}...`
+    const displaySymbol = symbol || `${instance.baseSymbol}/${instance.quoteSymbol}`
+
     return (
-        <CandlestickChart data={candlestickData} isLoading={isLoading} error={error} symbol={displaySymbol} upColor={upColor} downColor={downColor} />
+        <CandlestickChart
+            data={candlestickData}
+            isLoading={isLoading}
+            error={error}
+            symbol={displaySymbol}
+            baseSymbol={instance.baseSymbol}
+            quoteSymbol={instance.quoteSymbol}
+            upColor={colors.aquamarine}
+            downColor={colors.folly}
+        />
     )
 }

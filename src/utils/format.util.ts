@@ -34,3 +34,18 @@ export const formatDateShort = (date: Date | number | string): string => {
 export const formatDay = (date: Date | number | string): string => {
     return dayjs(date).utc().format(DAY_FORMAT)
 }
+
+export const formatTradeTimestamp = (timestamp: Date | string | number) => ({
+    formattedTimestamp: dayjs(timestamp).format('MMM D, HH:mm:ss'),
+    formattedTimeAgo: dayjs(timestamp).fromNow(),
+})
+
+export const dateHelpers = {
+    formatDate: (date: Date | string | number) => dayjs(date).format('MMM D, HH:mm:ss'),
+    formatDateShort: (date: Date | string | number) => dayjs(date).format('MMM D, HH:mm:ss'),
+    formatDay: (date: Date | string | number) => dayjs(date).format('MMM D'),
+    formatTradeTimestamp: (timestamp: Date | string | number) => ({
+        formattedTimestamp: dayjs(timestamp).format('MMM D, HH:mm:ss'),
+        formattedTimeAgo: dayjs(timestamp).fromNow(),
+    }),
+}

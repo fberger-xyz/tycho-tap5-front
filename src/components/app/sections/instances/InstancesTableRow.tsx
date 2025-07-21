@@ -104,18 +104,18 @@ export function InstancesTableHeaders() {
     return (
         <InstanceRowTemplate
             index={<p className="pl-2">#</p>}
-            instance={<p className="truncate text-center">Instance</p>}
-            chain={<p className="truncate text-center">Chain</p>}
+            instance={<p className="truncate">Instance</p>}
+            chain={<p className="truncate">Chain</p>}
             pair={<p className="truncate text-center">Pair</p>}
-            configurationId={<p className="truncate text-center">Configuration</p>}
-            broadcast={<p className="truncate text-center">Broadcast</p>}
-            reference={<p className="truncate text-center">Reference</p>}
-            targetSpread={<p className="truncate text-center">Target Spread</p>}
+            configurationId={<p className="truncate">Configuration</p>}
+            broadcast={<p className="truncate">Broadcast</p>}
+            reference={<p className="truncate">Reference</p>}
+            targetSpread={<p className="truncate">Target Spread</p>}
             startedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_STARTED}>Started At</SortableHeader>}
             endedAt={<SortableHeader sortKey={SupportedFilters.INSTANCE_ENDED}>Ended At</SortableHeader>}
             duration={<SortableHeader sortKey={SupportedFilters.RUNNING_TIME}>Duration</SortableHeader>}
             trades={<SortableHeader sortKey={SupportedFilters.TRADE_COUNT}>Trades</SortableHeader>}
-            eoa={<p className="truncate text-center">EOA</p>}
+            eoa={<p className="truncate">EOA</p>}
             className="text-milk-200 px-4"
         />
     )
@@ -189,10 +189,11 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                 }
                 configurationId={
                     // <StyledTooltip content={<pre className="text-xs">{JSON.stringify(data.config, null, 2)}</pre>}>
-                    <div className="truncate" title={data.config.id}>
-                        {shortenValue(data.config.id)}
-                    </div>
-                    // </StyledTooltip>
+                    <StyledTooltip content={data.config.id}>
+                        <div className="truncate" title={data.config.id}>
+                            {shortenValue(data.config.id)}
+                        </div>
+                    </StyledTooltip>
                 }
                 broadcast={<p>{broadcast}</p>}
                 reference={<p>{reference}</p>}

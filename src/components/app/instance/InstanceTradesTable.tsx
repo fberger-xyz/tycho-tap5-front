@@ -1,13 +1,10 @@
 'use client'
 
 import { TradesTableHeaders, TradeRow, LoadingTradeRows as LoadingRows } from '@/components/app/sections/activity/TradesTableRow'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, memo } from 'react'
 import { useInstanceTradesData } from '@/hooks/fetchs/useInstanceTradesData'
 import { FormattedTrade } from '@/interfaces'
-
-dayjs.extend(relativeTime)
+import { formatTradeTimestamp } from '@/utils'
 
 // Simple rows without virtualization
 const TradeRows = memo(function TradeRows({ trades }: { trades: FormattedTrade[] }) {
@@ -35,8 +32,7 @@ export function InstanceTradesTable({ instanceId }: InstanceTradesTableProps) {
         return trades.map((trade): FormattedTrade => {
             return {
                 ...trade,
-                formattedTimestamp: dayjs(trade.timestamp).format('MMM D, HH:mm:ss'),
-                formattedTimeAgo: dayjs(trade.timestamp).fromNow(),
+                ...formatTradeTimestamp(trade.timestamp),
             }
         })
     }, [trades])

@@ -1,15 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import * as echarts from 'echarts'
-import numeral from 'numeral'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense } from 'react'
-import EchartWrapper, { ChartBackground, CustomFallback, LoadingArea } from './EchartWrapper'
+import { useTheme } from 'next-themes'
+import EchartWrapper, { ChartBackground, CustomFallback } from './EchartWrapper'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { AppColors, INTER_FONT } from '@/config'
+import { INTER_FONT } from '@/config'
+import { APP_METADATA } from '@/config/app.config'
+import { ChartColors } from '@/config/chart-colors.config'
 
 dayjs.extend(timezone)
 
@@ -33,6 +35,7 @@ interface CandlestickChartProps {
     downColor?: string
 }
 
+// https://app.1inch.io/advanced/limit?network=1&src=WETH&dst=USDC
 export default function CandlestickChart({
     data,
     isLoading = false,
@@ -40,11 +43,20 @@ export default function CandlestickChart({
     symbol = 'Chart',
     baseSymbol = '',
     quoteSymbol = '',
-    upColor = AppColors.aquamarine,
-    downColor = AppColors.folly,
-    // loadingMessage = 'Loading chart data...',
+    upColor,
+    downColor,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
+    const { resolvedTheme } = useTheme()
+    const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+
+    // Check for mobile
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+
+    // Data state checks
+    const hasData = data && data.length > 0
+    const showLoading = isLoading && !hasData
+    const showNoData = !isLoading && !hasData && !error
 
     useEffect(() => {
         if (isLoading || error || !data || data.length === 0) {
@@ -54,88 +66,19 @@ export default function CandlestickChart({
 
         const timestamps = data.map((item) => item.time)
         const ohlc = data.map((item) => [item.open, item.close, item.low, item.high])
-        const volumes = data.map((item, index) => [index, item.volume || 0, item.open > item.close ? 1 : -1])
 
         const chartOptions: echarts.EChartsOption = {
             animation: true,
+            grid: { top: 5, left: 5, right: 50, bottom: 70 },
+            legend: {
+                show: false,
+            },
             tooltip: {
                 trigger: 'axis',
                 appendToBody: true,
                 triggerOn: 'mousemove|click',
                 backgroundColor: '#FFF4E005',
                 borderRadius: 12,
-                axisPointer: {
-                    type: 'cross',
-                    lineStyle: {
-                        color: AppColors.milk.DEFAULT,
-                        width: 2,
-                        type: 'dotted',
-                    },
-                    label: {
-                        backgroundColor: AppColors.milk[200],
-                    },
-                },
-                borderColor: AppColors.milk[200],
-                textStyle: {
-                    fontSize: 12,
-                    color: AppColors.milk.DEFAULT,
-                },
-                extraCssText: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding:12px;',
-                formatter: (params) => {
-                    if (!Array.isArray(params) || params.length === 0) return ''
-
-                    const candleData = params[0]
-                    const volumeData = params[1]
-
-                    if (!candleData || !candleData.data) return ''
-
-                    const [open, close, low, high] = candleData.data as number[]
-                    const timestamp = timestamps[candleData.dataIndex]
-                    const volume = (volumeData?.data as number[])?.[1] || 0
-
-                    const priceChange = close - open
-                    const priceChangePercent = (priceChange / open) * 100
-                    const changeColor = priceChange >= 0 ? AppColors.aquamarine : AppColors.folly
-
-                    const pairDisplay = baseSymbol && quoteSymbol ? `${baseSymbol}/${quoteSymbol}` : symbol
-
-                    return [
-                        `<strong>${pairDisplay}</strong>`,
-                        `<span style="color:${AppColors.milk[200]}">${dayjs(timestamp).format('MMM D, YYYY HH:mm')} UTC</span>`,
-                        `<br/>`,
-                        `<strong>Open</strong> <span style="color:${AppColors.milk[600]}">${numeral(open).format('0,0.[00000000]')}</span>`,
-                        `<strong>High</strong> <span style="color:${AppColors.milk[600]}">${numeral(high).format('0,0.[00000000]')}</span>`,
-                        `<strong>Low</strong> <span style="color:${AppColors.milk[600]}">${numeral(low).format('0,0.[00000000]')}</span>`,
-                        `<strong>Close</strong> <span style="color:${AppColors.milk[600]}">${numeral(close).format('0,0.[00000000]')}</span>`,
-                        `<br/>`,
-                        `<strong>Change</strong> <span style="color:${changeColor}">${priceChange >= 0 ? '+' : ''}${numeral(priceChange).format('0,0.[00000000]')} (${priceChange >= 0 ? '+' : ''}${numeral(priceChangePercent).format('0,0.[00]')}%)</span>`,
-                        volume > 0
-                            ? `<strong>Volume</strong> <span style="color:${AppColors.milk[600]}">${numeral(volume).format('0,0.[00]')}</span>`
-                            : '',
-                    ]
-                        .filter(Boolean)
-                        .join('<br/>')
-                },
-            },
-            grid: [
-                { top: '5%', left: '1%', right: '8%', height: '65%' },
-                { top: '75%', left: '1%', right: '8%', height: '12%' },
-            ],
-            toolbox: {
-                top: -5,
-                show: false,
-                feature: {
-                    dataZoom: {
-                        yAxisIndex: 'none',
-                    },
-                    restore: { show: true },
-                    saveAsImage: { show: true },
-                    dataView: { show: true, readOnly: false },
-                },
-                itemSize: 8,
-            },
-            legend: {
-                show: false,
             },
             xAxis: [
                 {
@@ -144,15 +87,16 @@ export default function CandlestickChart({
                     data: timestamps,
                     boundaryGap: false,
                     splitLine: {
-                        show: false,
+                        show: true,
+                        lineStyle: { color: colors.milkOpacity[100], type: 'dashed' },
                     },
                     axisLabel: {
-                        formatter: (value) => dayjs(Number(value)).format('MMM D'),
-                        color: AppColors.milk[200],
+                        formatter: (value) => dayjs.utc(Number(value)).format('HH:mm A UTC'),
+                        color: colors.milkOpacity[200],
                         fontSize: 10,
                         margin: 15,
                         hideOverlap: true,
-                        showMinLabel: true,
+                        showMinLabel: false,
                         showMaxLabel: true,
                     },
                     axisPointer: {
@@ -164,34 +108,14 @@ export default function CandlestickChart({
                             fontSize: 11,
                             borderRadius: 4,
                             formatter: ({ value }) => dayjs(Number(value)).format('MMM D, HH:mm UTC'),
-                            backgroundColor: '#FFF4E005',
-                            color: AppColors.milk.DEFAULT,
+                            backgroundColor: colors.milkOpacity[50],
+                            color: colors.milk,
                             borderColor: 'transparent',
                         },
                     },
                     axisLine: {
                         lineStyle: {
-                            color: AppColors.milk[150],
-                        },
-                    },
-                    axisTick: {
-                        show: false,
-                    },
-                    min: 'dataMin',
-                    max: 'dataMax',
-                },
-                {
-                    id: 'volume',
-                    type: 'category',
-                    gridIndex: 1,
-                    data: timestamps,
-                    axisLabel: { show: false },
-                    splitLine: {
-                        show: false,
-                    },
-                    axisLine: {
-                        lineStyle: {
-                            color: AppColors.milk[150],
+                            color: colors.milkOpacity[150],
                         },
                     },
                     axisTick: {
@@ -206,8 +130,9 @@ export default function CandlestickChart({
                     scale: true,
                     position: 'right',
                     axisLabel: {
-                        formatter: (value: string) => numeral(value).format('0,0.[00000000]'),
-                        color: AppColors.milk[200],
+                        show: true,
+                        // formatter: (value: string) => numeral(value).format('0,0.[00000000]'),
+                        color: colors.milkOpacity[200],
                         fontSize: 11,
                         margin: 10,
                         hideOverlap: true,
@@ -216,29 +141,7 @@ export default function CandlestickChart({
                     },
                     splitLine: {
                         show: true,
-                        lineStyle: { color: AppColors.milk[50], type: 'dashed' },
-                    },
-                    axisLine: {
-                        show: false,
-                    },
-                },
-                {
-                    scale: true,
-                    position: 'right',
-                    gridIndex: 1,
-                    axisLabel: {
-                        formatter: (value: string) => {
-                            const num = Number(value)
-                            if (num >= 1000000) return numeral(num / 1000000).format('0.[0]') + 'M'
-                            if (num >= 1000) return numeral(num / 1000).format('0.[0]') + 'K'
-                            return numeral(num).format('0.[0]')
-                        },
-                        color: AppColors.milk[200],
-                        fontSize: 10,
-                        margin: 10,
-                    },
-                    splitLine: {
-                        show: false,
+                        lineStyle: { color: colors.milkOpacity[100], type: 'dashed' },
                     },
                     axisLine: {
                         show: false,
@@ -257,34 +160,45 @@ export default function CandlestickChart({
                     xAxisIndex: 0,
                     show: true,
                     type: 'slider',
-                    height: 25,
-                    bottom: 25,
-                    backgroundColor: AppColors.milk[50],
-                    fillerColor: 'transparent',
-                    borderColor: AppColors.milk[200],
+                    height: 20,
+                    bottom: 5,
+                    backgroundColor: colors.milkOpacity[50],
+                    fillerColor: 'rgba(144, 238, 144, 0.1)',
+                    borderColor: colors.milkOpacity[200],
                     labelFormatter: (valueIndex) => dayjs(timestamps[valueIndex]).format('MMM D'),
-                    textStyle: { color: AppColors.milk[200], fontSize: 10 },
+                    textStyle: { color: colors.milkOpacity[200], fontSize: 10 },
                     handleLabel: { show: true },
-                    dataBackground: { lineStyle: { color: 'transparent' }, areaStyle: { color: 'transparent' } },
-                    selectedDataBackground: { lineStyle: { color: AppColors.milk[200] }, areaStyle: { color: AppColors.milk[50] } },
-                    brushStyle: { color: 'transparent' },
-                    handleStyle: { color: AppColors.milk[600], borderColor: AppColors.milk[600] },
-                    moveHandleStyle: { color: AppColors.milk[200] },
+                    dataBackground: {
+                        lineStyle: { color: colors.milkOpacity[200], opacity: 0.3 },
+                        areaStyle: { color: colors.milkOpacity[50], opacity: 0.3 },
+                    },
+                    selectedDataBackground: {
+                        lineStyle: { color: colors.aquamarine },
+                        areaStyle: { color: colors.aquamarine, opacity: 0.2 },
+                    },
+                    brushStyle: { color: 'rgba(144, 238, 144, 0.2)' },
+                    handleStyle: { color: colors.milkOpacity[600], borderColor: colors.milkOpacity[600] },
+                    moveHandleStyle: { color: colors.milkOpacity[400] },
                     emphasis: {
                         handleLabel: { show: true },
-                        moveHandleStyle: { color: AppColors.milk[400] },
+                        moveHandleStyle: { color: colors.milkOpacity[400] },
                     },
                     rangeMode: ['value', 'value'],
-                    left: 60,
+                    left: 90,
                     right: 90,
+                    brushSelect: false,
                 },
                 {
                     xAxisIndex: 0,
                     type: 'inside',
+                    zoomOnMouseWheel: 'ctrl',
+                    moveOnMouseMove: 'ctrl',
+                    moveOnMouseWheel: false,
+                    preventDefaultMouseMove: false,
                 },
             ],
             textStyle: {
-                color: AppColors.milk[600],
+                color: colors.milkOpacity[600],
                 fontFamily: INTER_FONT.style.fontFamily,
             },
             series: [
@@ -293,10 +207,10 @@ export default function CandlestickChart({
                     type: 'candlestick',
                     data: ohlc,
                     itemStyle: {
-                        color: upColor,
-                        color0: downColor,
-                        borderColor: upColor,
-                        borderColor0: downColor,
+                        color: upColor || colors.aquamarine,
+                        color0: downColor || colors.folly,
+                        borderColor: upColor || colors.aquamarine,
+                        borderColor0: downColor || colors.folly,
                         borderWidth: 1,
                     },
                     emphasis: {
@@ -305,38 +219,172 @@ export default function CandlestickChart({
                         },
                     },
                 },
-                {
-                    name: 'Volume',
-                    type: 'bar',
-                    xAxisIndex: 1,
-                    yAxisIndex: 1,
-                    data: volumes,
-                    itemStyle: {
-                        opacity: 0.5,
-                    },
-                },
             ],
-            visualMap: [
-                {
-                    show: false,
-                    seriesIndex: 1,
-                    dimension: 2,
-                    pieces: [
-                        { value: 1, color: downColor },
-                        { value: -1, color: upColor },
-                    ],
-                },
-            ],
+            // graphic: {
+            //     type: 'text',
+            //     right: 10,
+            //     top: 10,
+            //     style: {
+            //         text: APP_METADATA.SITE_URL,
+            //         fontSize: 16,
+            //         fontWeight: 'normal',
+            //         fill: 'rgba(156, 163, 175, 0.15)',
+            //         fontFamily: INTER_FONT.style.fontFamily,
+            //     },
+            //     z: 0,
+            //     silent: true,
+            // },
         }
 
         setOptions(chartOptions)
-    }, [data, isLoading, error, symbol, baseSymbol, quoteSymbol, upColor, downColor])
+    }, [data, isLoading, error, symbol, baseSymbol, quoteSymbol, colors, isMobile, upColor, downColor])
+
+    // Loading state options
+    const loadingOptions = useMemo((): echarts.EChartsOption => {
+        return {
+            tooltip: { show: false },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                axisLine: { lineStyle: { color: colors.milkOpacity[150] } },
+                axisLabel: { color: colors.milkOpacity[200] },
+                splitLine: { show: false },
+            },
+            yAxis: {
+                type: 'value',
+                position: 'right',
+                axisLine: { show: false },
+                axisLabel: { color: colors.milkOpacity[200] },
+                splitLine: {
+                    show: true,
+                    lineStyle: { color: colors.milkOpacity[50], type: 'dashed' },
+                },
+            },
+            grid: { top: '10%', left: '1%', right: '8%', bottom: '15%' },
+            graphic: [
+                {
+                    type: 'text',
+                    left: 'center',
+                    top: 'center',
+                    style: {
+                        text: 'Loading chart data...',
+                        fontSize: isMobile ? 24 : 32,
+                        fontWeight: 'bold',
+                        lineDash: [0, 200],
+                        lineDashOffset: 0,
+                        fill: 'transparent',
+                        stroke: colors.aquamarine,
+                        lineWidth: 1.5,
+                        fontFamily: INTER_FONT.style.fontFamily,
+                    },
+                    keyframeAnimation: {
+                        duration: 2000,
+                        loop: true,
+                        keyframes: [
+                            {
+                                percent: 0.7,
+                                style: {
+                                    fill: 'transparent',
+                                    lineDashOffset: 200,
+                                    lineDash: [200, 0],
+                                },
+                            },
+                            {
+                                percent: 0.8,
+                                style: {
+                                    fill: 'transparent',
+                                },
+                            },
+                            {
+                                percent: 1,
+                                style: {
+                                    fill: colors.aquamarine,
+                                },
+                            },
+                        ],
+                    },
+                    z: 100,
+                },
+                {
+                    type: 'text',
+                    right: 10,
+                    top: 10,
+                    style: {
+                        text: APP_METADATA.SITE_URL,
+                        fontSize: 16,
+                        fontWeight: 'normal',
+                        fill: 'rgba(156, 163, 175, 0.15)',
+                        fontFamily: INTER_FONT.style.fontFamily,
+                    },
+                    z: 0,
+                    silent: true,
+                },
+            ],
+        }
+    }, [isMobile, colors])
+
+    // No data state options
+    const noDataOptions = useMemo((): echarts.EChartsOption => {
+        return {
+            tooltip: { show: false },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                axisLine: { lineStyle: { color: colors.milkOpacity[150] } },
+                axisLabel: { color: colors.milkOpacity[200] },
+                splitLine: { show: false },
+            },
+            yAxis: {
+                type: 'value',
+                position: 'right',
+                axisLine: { show: false },
+                axisLabel: { color: colors.milkOpacity[200] },
+                splitLine: {
+                    show: true,
+                    lineStyle: { color: colors.milkOpacity[50], type: 'dashed' },
+                },
+            },
+            grid: { top: '10%', left: '1%', right: '8%', bottom: '15%' },
+            graphic: [
+                {
+                    type: 'text',
+                    left: 'center',
+                    top: 'center',
+                    style: {
+                        text: 'No chart data available',
+                        fontSize: isMobile ? 16 : 20,
+                        fontWeight: 'normal',
+                        fill: colors.milkOpacity[400],
+                        fontFamily: INTER_FONT.style.fontFamily,
+                    },
+                    z: 100,
+                },
+                {
+                    type: 'text',
+                    right: 10,
+                    top: 10,
+                    style: {
+                        text: APP_METADATA.SITE_URL,
+                        fontSize: 16,
+                        fontWeight: 'normal',
+                        fill: 'rgba(156, 163, 175, 0.15)',
+                        fontFamily: INTER_FONT.style.fontFamily,
+                    },
+                    z: 0,
+                    silent: true,
+                },
+            ],
+        }
+    }, [isMobile, colors])
+
+    // Determine which options to use
+    const displayOptions = showLoading ? loadingOptions : showNoData ? noDataOptions : options
 
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
                 <ChartBackground className="relative h-full">
-                    {isLoading || !options ? <LoadingArea /> : <EchartWrapper options={options} />}
+                    <EchartWrapper options={displayOptions || loadingOptions} />
                 </ChartBackground>
             </ErrorBoundary>
         </Suspense>

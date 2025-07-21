@@ -23,10 +23,11 @@ interface Use1inchCandlesParams {
     enabled?: boolean
 }
 
+// https://portal.1inch.dev/documentation/apis/charts/swagger?method=get&path=%2Fv1.0%2Fchart%2Faggregated%2Fcandle%2F%7Btoken0%7D%2F%7Btoken1%7D%2F%7Bseconds%7D%2F%7BchainId%7D
 async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<Use1inchCandlesParams, 'enabled'>): Promise<CandlesResponse> {
     const params = new URLSearchParams({
-        token0,
-        token1,
+        token0: token0.toLowerCase(),
+        token1: token1.toLowerCase(),
         seconds: seconds.toString(),
         chainId: chainId.toString(),
     })

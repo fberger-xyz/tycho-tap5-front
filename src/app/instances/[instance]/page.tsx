@@ -46,7 +46,7 @@ export default async function InstancePage({
                 <p className="text-milk-400 mt-1">Monitor and analyze the performance of your market maker instance</p>
             </div> */}
             <InstanceKPIs instance={enrichedInstance} />
-            <CandlesSection baseToken={enrichedInstance.baseSymbol} quoteToken={enrichedInstance.quoteSymbol} chainId={enrichedInstance.chainId} />
+            <CandlesSection instance={enrichedInstance} />
             <InstanceActivitySection instanceId={instanceId} />
             <InventorySection instanceId={instanceId} />
         </PageWrapper>

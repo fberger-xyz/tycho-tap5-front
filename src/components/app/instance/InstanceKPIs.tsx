@@ -120,17 +120,18 @@ export default function InstanceKPIs({ instance }: { instance: EnrichedInstance 
                 content={
                     <LinkWrapper
                         href={`${AppUrls.ORDERBOOK}/?chain=${CHAINS_CONFIG[instance.chainId].oneInchId}&sell=${instance.baseSymbol}&buy=${instance.quoteSymbol}`}
+                        disabled={!instance.baseSymbol || !instance.quoteSymbol}
                         target="_blank"
                         className="flex items-center w-full gap-2"
                     >
                         <div className="flex items-center gap-2 hover:underline">
                             <SymbolImage symbol={instance.baseSymbol} size={20} />
-                            <SymbolImage symbol={instance.quoteSymbol} size={20} className="-ml-3" />
+                            <SymbolImage symbol={instance.quoteSymbol} size={20} className="-ml-3 rounded-full" />
                             <p>
                                 {instance.baseSymbol}/{instance.quoteSymbol}
                             </p>
                         </div>
-                        <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                        {instance.baseSymbol && instance.quoteSymbol && <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />}
                     </LinkWrapper>
                 }
             />
@@ -224,7 +225,16 @@ export default function InstanceKPIs({ instance }: { instance: EnrichedInstance 
                         <p>Broadcast</p>
                     </div>
                 }
-                content={<p className="truncate capitalize">{config?.broadcast_url || 'Unknown'}</p>}
+                content={
+                    config?.broadcast_url === 'buildernet' ? (
+                        <LinkWrapper href={AppUrls.BUILDERNET} target="_blank" className="flex items-center w-full gap-2 hover:underline">
+                            <p className="truncate capitalize">{config?.broadcast_url || 'Unknown'}</p>
+                            <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                        </LinkWrapper>
+                    ) : (
+                        <p className="truncate capitalize">{config?.broadcast_url || 'Unknown'}</p>
+                    )
+                }
             />
 
             {/* Price Feed */}
