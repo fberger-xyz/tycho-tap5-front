@@ -34,7 +34,7 @@ export enum AppThemes {
 
 export enum AppSupportedChainIds {
     ETHEREUM = 1,
-    UNICHAIN = 8453,
+    UNICHAIN = 130,
 }
 
 export enum AppInstanceStatus {
