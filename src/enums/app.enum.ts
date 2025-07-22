@@ -74,6 +74,7 @@ export enum TradeStatus {
 }
 
 export enum ReactQueryKeys {
+    STRATEGIES = 'strategies',
     CONFIGURATIONS = 'configurations',
     INSTANCES = 'instances',
     TRADES = 'trades',

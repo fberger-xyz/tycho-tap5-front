@@ -26,6 +26,9 @@ export async function GET(request: Request) {
                 Instance: {
                     orderBy: { startedAt: 'desc' },
                     include: {
+                        Trade: {
+                            orderBy: { createdAt: 'desc' },
+                        },
                         _count: {
                             select: {
                                 Trade: true,

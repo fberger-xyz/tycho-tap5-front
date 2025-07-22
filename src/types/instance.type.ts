@@ -1,7 +1,8 @@
 import { enrichInstanceWithConfig } from '@/utils'
-import { Configuration, Instance } from '@prisma/client'
+import { Configuration, Instance, Trade } from '@prisma/client'
 
 export type InstanceWithCounts = Instance & {
+    Trade: Trade[]
     _count: {
         Trade: number
         Price: number

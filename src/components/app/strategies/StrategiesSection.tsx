@@ -3,20 +3,18 @@
 import { useAppStore } from '@/stores/app.store'
 import { StrategiesTable } from '@/components/app/strategies/StrategiesTable'
 import { useConfigurations } from '@/hooks/fetchs/all/useConfigurations'
-import { enrichInstanceWithConfig } from '@/utils'
 
 const TITLE = 'Strategies'
 
 function ListStrategies() {
     const { isLoading, error, refetch, hasError, isRefetching } = useConfigurations()
-    const { getConfigurationsWithInstances } = useAppStore()
-    const configurationsWithInstances = getConfigurationsWithInstances()
+    const { getStrategies } = useAppStore()
+    const strategies = getStrategies()
 
     // Transform data for the table format
-    const tableData = configurationsWithInstances.flatMap((config) => config.Instance.map((instance) => enrichInstanceWithConfig(instance, config)))
 
     // Show loading state only on initial load when we don't have data
-    const showLoading = isLoading && configurationsWithInstances.length === 0
+    const showLoading = isLoading && strategies.length === 0
 
     // Show error state only when we have an error and no cached data
     if (hasError && error) {
@@ -47,7 +45,7 @@ function ListStrategies() {
     }
 
     // Show data even if there's an error (cached data)
-    return <StrategiesTable data={tableData} isLoading={showLoading} />
+    return <StrategiesTable data={strategies} isLoading={showLoading} />
 }
 
 export default function StrategiesSection() {

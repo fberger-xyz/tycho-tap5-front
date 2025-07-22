@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import type { ConfigurationWithInstances } from '@/types'
 import { useAppStore } from '@/stores/app.store'
-import { AppUrls, ReactQueryKeys } from '@/enums'
+import { ReactQueryKeys } from '@/enums'
 
 interface ApiResponse {
     configurations?: ConfigurationWithInstances[]
@@ -13,7 +13,7 @@ interface ApiResponse {
 
 async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInstances[]> {
     try {
-        const response = await fetch(`${AppUrls.API_CONFIGURATIONS}?limit=100&skip=0`)
+        const response = await fetch(`/api/strategies?limit=100&skip=0`)
 
         // Handle non-OK responses
         if (!response.ok) {
@@ -41,11 +41,12 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
     }
 }
 
+// todo retrieve all strategies
 export function useConfigurations() {
     const { setConfigurations } = useAppStore()
 
     const queryResult = useQuery({
-        queryKey: [ReactQueryKeys.CONFIGURATIONS],
+        queryKey: [ReactQueryKeys.STRATEGIES],
         queryFn: fetchConfigurationsWithInstances,
         // Retry configuration
         retry: (failureCount, error) => {

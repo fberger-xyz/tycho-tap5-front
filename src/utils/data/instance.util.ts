@@ -1,7 +1,7 @@
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { getTokenByAddress } from '@/config/tokens.config'
 import { SupportedFilters, SupportedFilterDirections } from '@/enums'
-import { UnstableConfigurationValues } from '@/interfaces'
+import { UnstableInstanceConfigValues } from '@/interfaces'
 import type { ConfigurationWithInstances, InstanceWithCounts } from '@/types'
 import { Configuration } from '@prisma/client'
 
@@ -75,7 +75,7 @@ export const enrichInstanceWithConfig = (instance: InstanceWithCounts, config: C
     const quote = getTokenByAddress(config.chainId, config.quoteTokenAddress)
     return {
         // meta
-        config: config as Configuration & { values: UnstableConfigurationValues },
+        config: config as Configuration & { values: UnstableInstanceConfigValues },
         instance,
 
         // enricheds

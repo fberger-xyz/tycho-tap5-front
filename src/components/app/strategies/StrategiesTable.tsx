@@ -1,9 +1,9 @@
 'use client'
 
 import { StrategyRow, LoadingStrategyRows } from './StrategiesTableRow'
-import { EnrichedInstance } from '@/types'
+import { Strategy } from '@/types'
 
-export function StrategiesTable({ data, isLoading }: { data?: EnrichedInstance[]; isLoading?: boolean }) {
+export function StrategiesTable({ data, isLoading }: { data?: Strategy[]; isLoading?: boolean }) {
     return (
         <div className="flex w-full flex-col overflow-hidden gap-5">
             {isLoading ? (
@@ -13,7 +13,7 @@ export function StrategiesTable({ data, isLoading }: { data?: EnrichedInstance[]
                     <p className="m-auto text-folly">No instances</p>
                 </div>
             ) : (
-                data.map((instance) => <StrategyRow key={instance.instance.id} data={instance} />)
+                data.map((strategy, strategyIndex) => <StrategyRow key={`${strategy.pair}-${strategyIndex}`} data={strategy} index={strategyIndex} />)
             )}
         </div>
     )

@@ -13,6 +13,9 @@ async function getInstanceData(instanceId: string): Promise<EnrichedInstance> {
         where: { id: instanceId },
         include: {
             Configuration: true,
+            Trade: {
+                orderBy: { createdAt: 'desc' },
+            },
             _count: {
                 select: {
                     Trade: true,

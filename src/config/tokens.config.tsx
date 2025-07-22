@@ -1,24 +1,22 @@
-import { AppSupportedChainIds } from '@/enums/app.enum'
+import { AppSupportedChainIds } from '@/enums'
+import { TokenConfig } from '@/interfaces'
 
 const unknowToken = { address: 'unknown', decimals: 18, symbol: 'unknown' }
-export const getTokenByAddress = (chainId: number, address: string) => {
+export const getTokenByAddress = (chainId: number, address: string): TokenConfig => {
     if (!TOKENS_CONFIG[chainId]) return unknowToken
-    return TOKENS_CONFIG[chainId].find((token) => token.address.toLowerCase() === address.toLowerCase())
+    const token = TOKENS_CONFIG[chainId].find((token) => token.address.toLowerCase() === address.toLowerCase())
+    if (!token) return unknowToken
+    return token
 }
 
-export const getTokenBySymbol = (chainId: number, symbol: string) => {
+export const getTokenBySymbol = (chainId: number, symbol: string): TokenConfig => {
     if (!TOKENS_CONFIG[chainId]) return unknowToken
-    return TOKENS_CONFIG[chainId].find((token) => token.symbol.toLowerCase() === symbol.toLowerCase())
+    const token = TOKENS_CONFIG[chainId].find((token) => token.symbol.toLowerCase() === symbol.toLowerCase())
+    if (!token) return unknowToken
+    return token
 }
 
-export const TOKENS_CONFIG: Record<
-    number,
-    {
-        address: string
-        decimals: number
-        symbol: string
-    }[]
-> = {
+export const TOKENS_CONFIG: Record<number, TokenConfig[]> = {
     [AppSupportedChainIds.ETHEREUM]: [
         {
             address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',

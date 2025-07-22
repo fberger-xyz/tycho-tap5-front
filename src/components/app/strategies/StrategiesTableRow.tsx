@@ -1,12 +1,13 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { cn } from '@/utils'
+import { cn, shortenValue } from '@/utils'
 import { memo } from 'react'
-import { EnrichedInstance } from '@/types'
+import { Strategy } from '@/types'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { CHAINS_CONFIG } from '@/config/chains.config'
+import numeral from 'numeral'
 
 /**
  * ------------------------ 1 template
@@ -56,23 +57,31 @@ export const StrategyRowTemplate = (props: {
  */
 
 export function LoadingStrategyRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg">Loading...</p>
+    const loadingClass = 'w-3/4 skeleton-loading h-6 rounded-lg'
+    const loadingParagraph = <p className={loadingClass}>Loading...</p>
     return (
-        <div className="max-h-[50vh] overflow-y-auto">
-            <div className="flex flex-col gap-1 px-4 pb-2">
-                {Array.from({ length: 8 }, (_, i) => (
-                    <StrategyRowTemplate
-                        key={i}
-                        pairImages={<DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={48} gap={2} />}
-                        pairSymbols={loadingParagraph}
-                        spread={loadingParagraph}
-                        chains={loadingParagraph}
-                        kpis={loadingParagraph}
-                        className="text-transparent"
-                    />
-                ))}
-            </div>
-        </div>
+        <>
+            {Array.from({ length: 3 }, (_, i) => (
+                <StrategyRowTemplate
+                    key={i}
+                    pairImages={<DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={48} gap={2} />}
+                    pairSymbols={loadingParagraph}
+                    spread={loadingParagraph}
+                    chains={loadingParagraph}
+                    kpis={
+                        <>
+                            {Array.from({ length: 4 }, (_, i) => (
+                                <div key={i} className="flex flex-col gap-1 items-start">
+                                    <p className={loadingClass}>Metric {i + 1}</p>
+                                    <p className={loadingClass}>Todo</p>
+                                </div>
+                            ))}
+                        </>
+                    }
+                    className="text-transparent"
+                />
+            ))}
+        </>
     )
 }
 
@@ -80,40 +89,55 @@ export function LoadingStrategyRows() {
  * ------------------------ 4 content row
  */
 
-export const StrategyRow = memo(function StrategyRow({ data }: { data: EnrichedInstance }) {
-    const targetSpread = data.config?.values.target_spread_bps ? `${String(data.config?.values.target_spread_bps)} bps` : 'unknown'
+export const StrategyRow = memo(function StrategyRow({ data, index }: { data: Strategy; index: number }) {
     return (
-        <LinkWrapper href={`/instances/${data.instance.id}`} className="w-full">
+        <LinkWrapper key={`${data.pair}-${index}`} href={`/instances/${index}`} className="w-full">
             <StrategyRowTemplate
-                pairImages={<DoubleSymbol symbolLeft={data.baseSymbol} symbolRight={data.quoteSymbol} size={48} gap={2} />}
+                pairImages={<DoubleSymbol symbolLeft={data.base.symbol} symbolRight={data.quote.symbol} size={48} gap={2} />}
                 pairSymbols={
                     <p className="truncate font-semibold text-base">
-                        {data.baseSymbol ? data.baseSymbol : '?'} / {data.quoteSymbol ? data.quoteSymbol : '?'}
+                        {data.base.symbol} / {data.quote.symbol}
                     </p>
                 }
                 spread={
-                    <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
-                        <p className="truncate">{targetSpread}</p>
+                    <div className="flex gap-1">
+                        <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
+                            <p className="truncate">target spread: {numeral(data.config.execution.targetSpreadBps).format('0.[0000]')} bps</p>
+                        </div>
+                        <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
+                            <p className="truncate">
+                                max. slippage: {numeral(data.config.execution.maxSlippagePct).multiply(10000).format('0.[0000]')} bps
+                            </p>
+                        </div>
+                        <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
+                            <p className="truncate">min. exec spread: {numeral(data.config.execution.minExecSpreadBps).format('0.[0000]')} bps</p>
+                        </div>
                     </div>
                 }
                 chains={
                     <div className="flex gap-2 items-center">
-                        <ChainImage id={data.chainId} size={18} />
-                        <p className="truncate text-milk-400 text-sm">{CHAINS_CONFIG[data.chainId]?.name ?? 'unknown'}</p>
+                        <ChainImage id={data.config.chain.id} size={18} />
+                        <p className="truncate text-milk-400 text-sm">{CHAINS_CONFIG[data.config.chain.id]?.name ?? 'unknown'}</p>
                     </div>
                 }
                 kpis={
                     <>
                         <div className="flex flex-col gap-1 items-start">
                             <p className="truncate text-milk-400 text-sm">Instances</p>
-                            <p className="truncate">Todo</p>
+                            <p className="truncate">{data.instancesCount}</p>
                         </div>
-                        {Array.from({ length: 3 }, (_, i) => (
-                            <div key={i} className="flex flex-col gap-1 items-start">
-                                <p className="truncate text-milk-400 text-sm">Metric {i + 1}</p>
-                                <p className="truncate">Todo</p>
-                            </div>
-                        ))}
+                        <div className="flex flex-col gap-1 items-start">
+                            <p className="truncate text-milk-400 text-sm">Trades</p>
+                            <p className="truncate">{data.tradesCount}</p>
+                        </div>
+                        <div className="flex flex-col gap-1 items-start">
+                            <p className="truncate text-milk-400 text-sm">P&L</p>
+                            <p className="truncate">${numeral(data.pnl).format('0.[00]')}</p>
+                        </div>
+                        <div className="flex flex-col gap-1 items-start">
+                            <p className="truncate text-milk-400 text-sm">Inventory</p>
+                            <p className="truncate">{shortenValue(data.config.inventory.walletPublicKey)}</p>
+                        </div>
                     </>
                 }
                 className="transition-colors duration-200"

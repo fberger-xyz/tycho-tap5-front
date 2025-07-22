@@ -1,18 +1,8 @@
 import { AppSupportedChainIds } from '@/enums/app.enum'
 import { FileIds } from '@/enums/files.enum'
+import { ChainConfig } from '@/interfaces'
 
-export const CHAINS_CONFIG: Record<
-    number,
-    {
-        id: AppSupportedChainIds
-        fileId: FileIds
-        name: string
-        oneInchId: string
-        supported: boolean
-        explorerRoot: string
-        suggestedTokens: { symbol: string; address: string }[]
-    }
-> = {
+export const CHAINS_CONFIG: Record<number, ChainConfig> = {
     [AppSupportedChainIds.ETHEREUM]: {
         id: AppSupportedChainIds.ETHEREUM,
         fileId: FileIds.MAINNET,

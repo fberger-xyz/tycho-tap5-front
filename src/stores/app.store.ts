@@ -3,20 +3,10 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import type { Configuration, Instance } from '@prisma/client'
 import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode } from '@/enums'
 import { env } from '@/env/t3-env'
-
-type InstanceWithCounts = Instance & {
-    _count: {
-        Trade: number
-        Price: number
-    }
-}
-
-type ConfigurationWithInstances = Configuration & {
-    Instance: InstanceWithCounts[]
-}
+import { Strategy, ConfigurationWithInstances } from '@/types'
+import { groupByStrategies } from '@/utils'
 
 export const useAppStore = create<{
     /**
@@ -79,6 +69,7 @@ export const useAppStore = create<{
      */
 
     getConfigurationsWithInstances: () => ConfigurationWithInstances[]
+    getStrategies: () => Strategy[]
 }>()(
     persist(
         (set, get) => ({
@@ -152,6 +143,9 @@ export const useAppStore = create<{
 
             getConfigurationsWithInstances: () => {
                 return get().configurations.filter((config) => config.Instance.length > 0)
+            },
+            getStrategies: () => {
+                return groupByStrategies(get().configurations)
             },
         }),
         {
