@@ -8,7 +8,8 @@ import { useAppStore } from '@/stores/app.store'
 
 export default function InventorySection({ instanceId }: { instanceId: string }) {
     const { showInventorySection, setShowInventorySection } = useAppStore()
-    console.log('instanceId', instanceId)
+    const debug = false
+    if (debug) console.log('instanceId', instanceId)
 
     return (
         <SectionLayout

@@ -3,7 +3,7 @@
 import { useMemo } from 'react'
 import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
-import { use1inchCandles } from '@/hooks/fetchs/use1inchCandles'
+import { use1inchCandles } from '@/hooks/fetchs/details/use1inchCandles'
 import { ChartColors } from '@/config/chart-colors.config'
 import { EnrichedInstance } from '@/types'
 

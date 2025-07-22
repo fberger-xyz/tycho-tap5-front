@@ -35,10 +35,12 @@ export const useAppStore = create<{
     setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
     showMobileMenu: boolean
     setShowMobileMenu: (showMobileMenu: boolean) => void
-    showInstancesSection: boolean
-    setShowInstancesSection: (showInstancesSection: boolean) => void
     showActivitySection: boolean
     setShowActivitySection: (showActivitySection: boolean) => void
+    showInstancesSection: boolean
+    setShowInstancesSection: (showInstancesSection: boolean) => void
+    showStrategiesSection: boolean
+    setShowStrategiesSection: (showStrategiesSection: boolean) => void
 
     // instance
     showCandlesSection: boolean
@@ -52,7 +54,6 @@ export const useAppStore = create<{
 
     configurations: ConfigurationWithInstances[]
     lastInstancesFetchedAt: number
-    refetchInstancesInterval: number
 
     setConfigurations: (configurations: ConfigurationWithInstances[]) => void
     setLastInstancesFetchedAt: (timestamp: number) => void
@@ -101,6 +102,8 @@ export const useAppStore = create<{
             setShowActivitySection: (showActivitySection) => set(() => ({ showActivitySection })),
             showInstancesSection: true,
             setShowInstancesSection: (showInstancesSection) => set(() => ({ showInstancesSection })),
+            showStrategiesSection: true,
+            setShowStrategiesSection: (showStrategiesSection) => set(() => ({ showStrategiesSection })),
 
             // instance
             showCandlesSection: true,
@@ -114,14 +117,11 @@ export const useAppStore = create<{
 
             configurations: [],
             lastInstancesFetchedAt: -1,
-            refetchInstancesInterval: 30000, // 30 seconds
-
             setConfigurations: (configurations) =>
                 set(() => ({
                     configurations,
                     lastInstancesFetchedAt: Date.now(),
                 })),
-
             setLastInstancesFetchedAt: (timestamp) => set(() => ({ lastInstancesFetchedAt: timestamp })),
 
             /**

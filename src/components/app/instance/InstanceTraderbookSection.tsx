@@ -11,7 +11,8 @@ const DESCRIPTION = 'Live tradebook of this instance'
 
 export default function InstanceActivitySection({ instanceId }: { instanceId: string }) {
     const { showActivitySection, setShowActivitySection } = useAppStore()
-    console.log('instanceId', instanceId)
+    const debug = false
+    if (debug) console.log('instanceId', instanceId)
 
     return (
         <SectionLayout

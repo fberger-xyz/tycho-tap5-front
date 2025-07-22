@@ -7,7 +7,7 @@ import { cn } from '@/utils'
 import { ChainImage, SymbolImage } from '@/components/common/ImageWrapper'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { AppUrls, IconIds } from '@/enums'
-import { useInstancesData } from '@/hooks/fetchs/useInstancesData'
+import { useInstancesData } from '@/hooks/fetchs/details/useInstancesData'
 import { usePricesData } from '@/hooks/fetchs/usePricesData'
 import { EnrichedInstance } from '@/types'
 import { SectionLayout } from '../sections/SectionLayout'
@@ -16,7 +16,7 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 
 export default function InstanceKPIs({ instance }: { instance: EnrichedInstance }) {
     const { refetch: refetchInstances } = useInstancesData()
-    const { data: pricesData, refetch: refetchPrices } = usePricesData(instance.instance.id)
+    const { prices, refetch: refetchPrices } = usePricesData(instance.instance.id)
     // const [lastUpdateTime, setLastUpdateTime] = useState(Date.now())
 
     // Configuration values
@@ -44,7 +44,7 @@ export default function InstanceKPIs({ instance }: { instance: EnrichedInstance 
     )
 
     // Get latest price from prices data
-    const latestPrice = pricesData?.[0]?.price || 0
+    const latestPrice = prices?.[0]?.price || 0
     // TODO: add price change 24h
     // const priceChange24h =
     //     pricesData && pricesData.length > 1

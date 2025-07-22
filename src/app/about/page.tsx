@@ -21,7 +21,7 @@ export default function Page() {
                     <p className="text-center max-w-[648px] font-light px-10">{SUBTITLE}</p>
                     <div className="flex gap-2">
                         <LinkWrapper
-                            href={AppUrls.MARKET_MAKER}
+                            href={AppUrls.STRATEGIES}
                             className="bg-folly px-4 py-2.5 rounded-xl opacity-90 hover:opacity-100 transition-all duration-300 ease-in-out w-fit flex gap-2 items-center"
                         >
                             <p className="text-milk truncate">{CALL_TO_ACTION}</p>

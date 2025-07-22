@@ -17,7 +17,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                 </p>
                 <div className="flex w-full flex-col items-center gap-2 rounded-xl">
                     <pre className="text-orange-500 max-h-96 overflow-y-auto border border-dashed border-orange-500/20 rounded-xl px-8 py-10 w-full text-xs text-center text-wrap">
-                        {JSON.stringify(extractErrorMessage(error), null, 2)}
+                        {extractErrorMessage(error)}
                     </pre>
                 </div>
                 <div className="flex w-full flex-col items-center gap-3">

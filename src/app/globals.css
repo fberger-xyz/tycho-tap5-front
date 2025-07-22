@@ -4,7 +4,7 @@
 
 /* Base styles for html */
 html {
-    background-image: url('/figma/background.svg');
+    background-image: url('/figma/background/light.svg');
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center top;
@@ -13,7 +13,11 @@ html {
 
 /* Dark mode background override */
 html.dark {
-    background-image: none;
+    background-image: url('/figma/background/dark.svg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-attachment: fixed;
 }
 
 /* Default colors (light theme) */
@@ -46,7 +50,7 @@ html.dark {
 /* Dark theme */
 .dark {
     /* Background - deeper purple/black */
-    --color-background: 262 50% 6%; /* #0a0515 */
+    --color-background: 0 0% 7%; /* #121212 */
 
     /* Jagger colors - lighter/more vibrant purples */
     --color-jagger: 285 68% 33%; /* #6b1a8c */

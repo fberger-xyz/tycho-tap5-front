@@ -7,7 +7,7 @@ import { InterfaceAppLink } from '@/interfaces'
  * https://github.com/propeller-heads/tycho-x/blob/main/TAP-5.md
  */
 
-export const SITE_NAME = 'TAP 5'
+export const SITE_NAME = 'Tycho Market Maker'
 export const IS_DEV = process.env.NODE_ENV === 'development'
 // export const SITE_DOMAIN = IS_DEV ? 'http://localhost:3000' : 'https://wintercute.vercel.app'
 export const SITE_DOMAIN = env.NEXT_PUBLIC_APP_URL
@@ -44,7 +44,7 @@ export const APP_PAGES: InterfaceAppLink[] = [
         path: AppUrls.ABOUT,
     },
     {
-        name: SITE_NAME,
-        path: AppUrls.MARKET_MAKER,
+        name: 'Strategies',
+        path: AppUrls.STRATEGIES,
     },
 ] as const

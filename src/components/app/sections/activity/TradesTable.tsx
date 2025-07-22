@@ -4,7 +4,7 @@ import { TradesTableHeaders } from './TradesTableRow'
 import { TradeRow } from './TradesTableRow'
 import { LoadingTradeRows as LoadingRows } from './TradesTableRow'
 import { useMemo, memo } from 'react'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { useTradesData } from '@/hooks/fetchs/all/useTradesData'
 import { FormattedTrade } from '@/interfaces'
 import { formatTradeTimestamp } from '@/utils'
 

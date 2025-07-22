@@ -73,8 +73,6 @@ export const sortInstances = (
 export const enrichInstanceWithConfig = (instance: InstanceWithCounts, config: Configuration) => {
     const base = getTokenByAddress(config.chainId, config.baseTokenAddress)
     const quote = getTokenByAddress(config.chainId, config.quoteTokenAddress)
-    console.log({ instance, config, base, quote })
-
     return {
         // meta
         config: config as Configuration & { values: UnstableConfigurationValues },

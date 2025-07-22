@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 import { cn, formatDateShort, getDurationBetween, shortenValue } from '@/utils'
 import { memo } from 'react'
 import { EnrichedInstance } from '@/types'
-import { ChainImage, SymbolImage } from '@/components/common/ImageWrapper'
+import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import { LiveDate } from '@/components/common/LiveDate'
 import StyledTooltip from '@/components/common/StyledTooltip'
 import { useAppStore } from '@/stores/app.store'
@@ -175,13 +175,11 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                 chain={
                     <div className="flex gap-1 items-center">
                         <ChainImage id={data.chainId} size={22} />
-                        {/* <p>{data.chain.name}</p> */}
                     </div>
                 }
                 pair={
                     <div className="flex gap-1 items-center">
-                        <SymbolImage symbol={data.baseSymbol} size={22} />
-                        <SymbolImage symbol={data.quoteSymbol} size={22} className="-ml-2 rounded-full" />
+                        <DoubleSymbol symbolLeft={data.baseSymbol} symbolRight={data.quoteSymbol} size={23} gap={1} />
                         <p className="truncate">
                             {data.baseSymbol ? data.baseSymbol : '?'}/{data.quoteSymbol ? data.quoteSymbol : '?'}
                         </p>

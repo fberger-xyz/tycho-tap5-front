@@ -1,7 +1,10 @@
 export enum AppUrls {
     // app pages
     ABOUT = '/about',
-    MARKET_MAKER = '/',
+    STRATEGIES = '/',
+
+    // api
+    API_CONFIGURATIONS = '/api/configurations',
 
     // hidden pages
     LOGS = '/logs',
@@ -71,6 +74,7 @@ export enum TradeStatus {
 }
 
 export enum ReactQueryKeys {
+    CONFIGURATIONS = 'configurations',
     INSTANCES = 'instances',
     TRADES = 'trades',
     CANDLES = 'candles',

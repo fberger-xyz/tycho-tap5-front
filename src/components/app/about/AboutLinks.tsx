@@ -12,7 +12,7 @@ interface LinkItem {
 
 const links: LinkItem[] = [
     {
-        href: AppUrls.MARKET_MAKER,
+        href: AppUrls.STRATEGIES,
         target: '_self',
         icon: IconIds.OPEN_LINK_IN_NEW_TAB,
         text: 'Run your market maker',

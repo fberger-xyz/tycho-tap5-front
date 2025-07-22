@@ -72,3 +72,51 @@ export function ImageWithText(props: { symbol?: string; chainId?: number; classN
         </div>
     )
 }
+
+export function DoubleSymbol({
+    size = 20,
+    gap = 2,
+    symbolLeft,
+    symbolRight,
+    className,
+}: {
+    symbolLeft?: string
+    symbolRight?: string
+    className?: string
+    size?: number
+    gap?: number
+}) {
+    return (
+        <div className="relative flex items-center" style={{ width: size + gap, height: size }}>
+            {/* Left half */}
+            <div
+                className={cn('absolute overflow-hidden', className)}
+                style={{
+                    width: (size - gap) / 2,
+                    height: size,
+                    left: 0,
+                    clipPath: `inset(0 0 0 0)`,
+                }}
+            >
+                <div style={{ marginRight: -(size + gap) / 2 }}>
+                    <SymbolImage symbol={symbolLeft} size={size} className="rounded-full" />
+                </div>
+            </div>
+
+            {/* Right half */}
+            <div
+                className={cn('absolute overflow-hidden', className)}
+                style={{
+                    width: (size - gap) / 2,
+                    height: size,
+                    right: 0,
+                    clipPath: `inset(0 0 0 0)`,
+                }}
+            >
+                <div style={{ marginLeft: -(size + gap) / 2 }}>
+                    <SymbolImage symbol={symbolRight} size={size} className="rounded-full" />
+                </div>
+            </div>
+        </div>
+    )
+}

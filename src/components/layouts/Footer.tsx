@@ -47,7 +47,7 @@ export default function Footer(props: { className?: string }) {
                         target="_blank"
                         className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
                     >
-                        Propeller Heads,
+                        PropellerHeads,
                     </LinkWrapper>
                 </StyledTooltip>
                 <LinkWrapper

@@ -2,7 +2,7 @@
 
 import { cn } from '@/utils'
 import { APP_PAGES } from '@/config/app.config'
-import ThemeSwitcher from './ThemeSwitcher'
+// import ThemeSwitcher from './ThemeSwitcher'
 import LinkWrapper from '../common/LinkWrapper'
 import { usePathname } from 'next/navigation'
 import Image from 'next/image'
@@ -28,7 +28,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                     height={24}
                     className="block"
                 /> */}
-                <Image src={FileIds.APP_LOGO_DESKTOP_TYCHO} alt={FileIds.APP_LOGO_DESKTOP_TYCHO} width={240} height={24} className="block" />
+                <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={152} height={24} />
             </div>
 
             {/* middle */}
@@ -38,8 +38,8 @@ export default function HeaderDesktop(props: { className?: string }) {
                         key={page.path}
                         href={page.path}
                         className={cn('flex items-center gap-1 transition-colors duration-300 rounded-xl h-9 px-3 cursor-pointer', {
-                            'hover:bg-milk-100': pathname !== page.path || !(isInstancePage && page.path === AppUrls.MARKET_MAKER),
-                            'bg-milk-100': pathname === page.path || (isInstancePage && page.path === AppUrls.MARKET_MAKER),
+                            'hover:bg-milk-100': pathname !== page.path || !(isInstancePage && page.path === AppUrls.STRATEGIES),
+                            'bg-milk-100': pathname === page.path || (isInstancePage && page.path === AppUrls.STRATEGIES),
                         })}
                     >
                         <p className="text-sm text-milk">{page.name}</p>
@@ -53,13 +53,13 @@ export default function HeaderDesktop(props: { className?: string }) {
                 <LinkWrapper
                     href={AppUrls.DOCUMENTATION}
                     target="_blank"
-                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4 mr-6"
+                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4" // mr-6
                 >
                     <p className="text-milk text-sm truncate">Docs (Run locally)</p>
                     <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
 
-                <ThemeSwitcher />
+                {/* <ThemeSwitcher /> */}
             </div>
         </header>
     )
