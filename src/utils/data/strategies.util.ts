@@ -3,6 +3,7 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import { UnstableInstanceConfigValues } from '@/interfaces'
 import { getTokenByAddress } from '@/config/tokens.config'
 import { jsonConfigParser } from './parser'
+import { Trade } from '@prisma/client'
 
 export const groupByStrategies = (configurations: ConfigurationWithInstances[]): Strategy[] => {
     const strategies: Strategy[] = []
@@ -81,4 +82,18 @@ export const groupByStrategies = (configurations: ConfigurationWithInstances[]):
     }
 
     return strategies
+}
+
+export const listTrades = (strategy: Strategy): Trade[] => {
+    const trades: Trade[] = []
+
+    for (const chain of strategy.chains) {
+        for (const configuration of chain.configurations) {
+            for (const instance of configuration.instances) {
+                trades.push(...instance.value.trades)
+            }
+        }
+    }
+
+    return trades
 }

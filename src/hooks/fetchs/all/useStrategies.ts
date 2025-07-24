@@ -1,10 +1,9 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
 import type { ConfigurationWithInstances } from '@/types'
-import { useAppStore } from '@/stores/app.store'
-import { ReactQueryKeys } from '@/enums'
+import { AppUrls, ReactQueryKeys } from '@/enums'
+import { groupByStrategies } from '@/utils'
 
 interface ApiResponse {
     configurations?: ConfigurationWithInstances[]
@@ -13,7 +12,7 @@ interface ApiResponse {
 
 async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInstances[]> {
     try {
-        const response = await fetch(`/api/strategies?limit=100&skip=0`)
+        const response = await fetch(`${AppUrls.API_STRATEGIES}?limit=100&skip=0`)
 
         // Handle non-OK responses
         if (!response.ok) {
@@ -41,10 +40,7 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
     }
 }
 
-// todo retrieve all strategies
-export function useConfigurations() {
-    const { setConfigurations } = useAppStore()
-
+export function useStrategies() {
     const queryResult = useQuery({
         queryKey: [ReactQueryKeys.STRATEGIES],
         queryFn: fetchConfigurationsWithInstances,
@@ -73,15 +69,9 @@ export function useConfigurations() {
 
     const { data, isLoading, error, refetch, isRefetching } = queryResult
 
-    // Update store when data changes
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setConfigurations(data)
-        }
-    }, [data, setConfigurations])
-
     return {
         configurations: data || [],
+        strategies: data ? groupByStrategies(data) : [],
         isLoading,
         isRefetching,
         error,

@@ -5,6 +5,7 @@ export enum AppUrls {
 
     // api
     API_CONFIGURATIONS = '/api/configurations',
+    API_STRATEGIES = '/api/strategies',
 
     // hidden pages
     LOGS = '/logs',

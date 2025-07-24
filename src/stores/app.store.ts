@@ -5,8 +5,6 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode } from '@/enums'
 import { env } from '@/env/t3-env'
-import { Strategy, ConfigurationWithInstances } from '@/types'
-import { groupByStrategies } from '@/utils'
 
 export const useAppStore = create<{
     /**
@@ -39,16 +37,6 @@ export const useAppStore = create<{
     setShowInventorySection: (showInventorySection: boolean) => void
 
     /**
-     * instances
-     */
-
-    configurations: ConfigurationWithInstances[]
-    lastInstancesFetchedAt: number
-
-    setConfigurations: (configurations: ConfigurationWithInstances[]) => void
-    setLastInstancesFetchedAt: (timestamp: number) => void
-
-    /**
      * sorting
      */
 
@@ -63,16 +51,9 @@ export const useAppStore = create<{
 
     instanceDisplayMode: InstanceDisplayMode
     setInstanceDisplayMode: (mode: InstanceDisplayMode) => void
-
-    /**
-     * computeds
-     */
-
-    getConfigurationsWithInstances: () => ConfigurationWithInstances[]
-    getStrategies: () => Strategy[]
 }>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             /**
              * store
              */
@@ -103,19 +84,6 @@ export const useAppStore = create<{
             setShowInventorySection: (showInventorySection) => set(() => ({ showInventorySection })),
 
             /**
-             * instances
-             */
-
-            configurations: [],
-            lastInstancesFetchedAt: -1,
-            setConfigurations: (configurations) =>
-                set(() => ({
-                    configurations,
-                    lastInstancesFetchedAt: Date.now(),
-                })),
-            setLastInstancesFetchedAt: (timestamp) => set(() => ({ lastInstancesFetchedAt: timestamp })),
-
-            /**
              * sorting
              */
 
@@ -136,17 +104,6 @@ export const useAppStore = create<{
 
             instanceDisplayMode: InstanceDisplayMode.GROUPED,
             setInstanceDisplayMode: (mode) => set(() => ({ instanceDisplayMode: mode })),
-
-            /**
-             * computeds
-             */
-
-            getConfigurationsWithInstances: () => {
-                return get().configurations.filter((config) => config.Instance.length > 0)
-            },
-            getStrategies: () => {
-                return groupByStrategies(get().configurations)
-            },
         }),
         {
             name: `${APP_METADATA.SITE_DOMAIN}-app-store-${IS_DEV ? 'dev' : 'prod'}-${env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,

@@ -125,5 +125,5 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.options])
 
-    return <div ref={chartRef} className={cn('m-0 p-0', props.className)} style={{ width: '100%', height: '100%' }}></div>
+    return <div ref={chartRef} className={cn('m-0 p-0', props.className)} style={{ width: '100%' }}></div>
 }

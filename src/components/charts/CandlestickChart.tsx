@@ -7,7 +7,7 @@ import timezone from 'dayjs/plugin/timezone'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense } from 'react'
 import { useTheme } from 'next-themes'
-import EchartWrapper, { ChartBackground, CustomFallback } from './EchartWrapper'
+import EchartWrapper, { CustomFallback } from './EchartWrapper'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { INTER_FONT } from '@/config'
 import { APP_METADATA } from '@/config/app.config'
@@ -33,6 +33,7 @@ interface CandlestickChartProps {
     quoteSymbol?: string
     upColor?: string
     downColor?: string
+    className?: string
 }
 
 // https://app.1inch.io/advanced/limit?network=1&src=WETH&dst=USDC
@@ -45,6 +46,7 @@ export default function CandlestickChart({
     quoteSymbol = '',
     upColor,
     downColor,
+    className,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
     const { resolvedTheme } = useTheme()
@@ -163,9 +165,9 @@ export default function CandlestickChart({
                     height: 20,
                     bottom: 5,
                     backgroundColor: colors.milkOpacity[50],
-                    fillerColor: 'rgba(144, 238, 144, 0.1)',
+                    fillerColor: 'transparent',
                     borderColor: colors.milkOpacity[200],
-                    labelFormatter: (valueIndex) => dayjs(timestamps[valueIndex]).format('MMM D'),
+                    labelFormatter: (valueIndex) => dayjs.utc(timestamps[valueIndex]).format('MMM D, HH:mm UTC'),
                     textStyle: { color: colors.milkOpacity[200], fontSize: 10 },
                     handleLabel: { show: true },
                     dataBackground: {
@@ -184,8 +186,8 @@ export default function CandlestickChart({
                         moveHandleStyle: { color: colors.milkOpacity[400] },
                     },
                     rangeMode: ['value', 'value'],
-                    left: 90,
-                    right: 90,
+                    left: 110,
+                    right: 110,
                     brushSelect: false,
                 },
                 {
@@ -383,9 +385,7 @@ export default function CandlestickChart({
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-full">
-                    <EchartWrapper options={displayOptions || loadingOptions} />
-                </ChartBackground>
+                <EchartWrapper options={displayOptions || loadingOptions} className={className} />
             </ErrorBoundary>
         </Suspense>
     )

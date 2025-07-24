@@ -13,7 +13,7 @@ const CALL_TO_ACTION = 'Run your market maker'
 
 export default function Page() {
     return (
-        <PageWrapper className="mt-20 lg:mt-16">
+        <PageWrapper>
             <div className="flex flex-col w-full gap-28 items-center">
                 {/* tagline */}
                 <div className="flex max-w-[570px] flex-col gap-6 items-center">

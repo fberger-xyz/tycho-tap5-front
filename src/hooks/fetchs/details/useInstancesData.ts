@@ -1,9 +1,9 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { useEffect } from 'react'
+// import { useEffect } from 'react'
 import type { ConfigurationWithInstances } from '@/types'
-import { useAppStore } from '@/stores/app.store'
+// import { useAppStore } from '@/stores/app.store'
 import { ReactQueryKeys } from '@/enums'
 
 interface ApiResponse {
@@ -42,7 +42,7 @@ async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
 }
 
 export function useInstancesData() {
-    const { setConfigurations } = useAppStore()
+    // const { setConfigurations } = useAppStore()
 
     const queryResult = useQuery({
         queryKey: [ReactQueryKeys.INSTANCES],
@@ -73,11 +73,11 @@ export function useInstancesData() {
     const { data, isLoading, error, refetch, isRefetching } = queryResult
 
     // Update store when data changes
-    useEffect(() => {
-        if (data && data.length > 0) {
-            setConfigurations(data)
-        }
-    }, [data, setConfigurations])
+    // useEffect(() => {
+    //     if (data && data.length > 0) {
+    //         setConfigurations(data)
+    //     }
+    // }, [data, setConfigurations])
 
     return {
         configurations: data || [],

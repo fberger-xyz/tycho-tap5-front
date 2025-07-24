@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/clients/prisma'
+import { getConfigurations } from '@/queries/configuration.query'
 
 export async function GET(request: Request) {
     try {
@@ -16,29 +16,7 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'Invalid skip parameter. Must be non-negative.' }, { status: 400 })
         }
 
-        const configurations = await prisma.configuration.findMany({
-            take: limit,
-            skip: skip,
-            orderBy: {
-                createdAt: 'desc',
-            },
-            include: {
-                Instance: {
-                    orderBy: { startedAt: 'desc' },
-                    include: {
-                        Trade: {
-                            orderBy: { createdAt: 'desc' },
-                        },
-                        _count: {
-                            select: {
-                                Trade: true,
-                                Price: true,
-                            },
-                        },
-                    },
-                },
-            },
-        })
+        const configurations = await getConfigurations({ limit, skip })
 
         return NextResponse.json({ configurations })
     } catch (error) {

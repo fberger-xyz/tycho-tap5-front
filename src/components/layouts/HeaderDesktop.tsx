@@ -12,44 +12,29 @@ import GridDropdownButton from './GridDropdownButton'
 
 export default function HeaderDesktop(props: { className?: string }) {
     const pathname = usePathname()
-    const isInstancePage = pathname.includes('/instances/')
+    const isStrategyPage = pathname.includes('/strategies/')
 
     return (
         <header className={cn('hidden lg:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
-            {/* left */}
             <div className="flex gap-4 items-center">
                 <GridDropdownButton />
-
-                {/* logo */}
-                {/* <Image
-                    src={FileIds.APP_LOGO_DESKTOP_WINTERCUTE}
-                    alt={FileIds.APP_LOGO_DESKTOP_WINTERCUTE}
-                    width={240}
-                    height={24}
-                    className="block"
-                /> */}
                 <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={152} height={24} />
             </div>
-
-            {/* middle */}
             <div className="flex gap-2 items-center mx-auto">
                 {APP_PAGES.map((page) => (
                     <LinkWrapper
                         key={page.path}
                         href={page.path}
                         className={cn('flex items-center gap-1 transition-colors duration-300 rounded-xl h-9 px-3 cursor-pointer', {
-                            'hover:bg-milk-100': pathname !== page.path || !(isInstancePage && page.path === AppUrls.STRATEGIES),
-                            'bg-milk-100': pathname === page.path || (isInstancePage && page.path === AppUrls.STRATEGIES),
+                            'hover:bg-milk-100': pathname !== page.path || !(isStrategyPage && page.path === AppUrls.STRATEGIES),
+                            'bg-milk-100': pathname === page.path || (isStrategyPage && page.path === AppUrls.STRATEGIES),
                         })}
                     >
                         <p className="text-sm text-milk">{page.name}</p>
                     </LinkWrapper>
                 ))}
             </div>
-
-            {/* right */}
             <div className="flex z-20 items-center justify-end">
-                {/* docs */}
                 <LinkWrapper
                     href={AppUrls.DOCUMENTATION}
                     target="_blank"
@@ -58,8 +43,6 @@ export default function HeaderDesktop(props: { className?: string }) {
                     <p className="text-milk text-sm truncate">Docs (Run locally)</p>
                     <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
-
-                {/* <ThemeSwitcher /> */}
             </div>
         </header>
     )

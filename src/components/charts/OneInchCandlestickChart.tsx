@@ -5,27 +5,25 @@ import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { use1inchCandles } from '@/hooks/fetchs/details/use1inchCandles'
 import { ChartColors } from '@/config/chart-colors.config'
-import { EnrichedInstance } from '@/types'
+import { Configuration } from '@prisma/client'
 
 export default function OneInchCandlestickChart({
-    instance,
+    configuration,
     seconds = 300, // Default to 5 minute candles
-    chainId = 1, // Default to Ethereum mainnet
-    symbol,
+    className,
 }: {
-    instance: EnrichedInstance
+    configuration: Configuration
     seconds?: number
-    chainId?: number
-    symbol?: string
+    className?: string
 }) {
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const { data, isLoading, error } = use1inchCandles({
-        token0: instance.base?.address?.toLowerCase() ?? '',
-        token1: instance.quote?.address?.toLowerCase() ?? '',
+        token0: configuration.baseTokenAddress?.toLowerCase() ?? '',
+        token1: configuration.quoteTokenAddress?.toLowerCase() ?? '',
         seconds,
-        chainId,
-        enabled: !!instance.base?.address && !!instance.quote?.address,
+        chainId: configuration.chainId,
+        enabled: !!configuration.baseTokenAddress && !!configuration.quoteTokenAddress,
     })
 
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
@@ -40,18 +38,16 @@ export default function OneInchCandlestickChart({
         }))
     }, [data])
 
-    const displaySymbol = symbol || `${instance.baseSymbol}/${instance.quoteSymbol}`
-
     return (
         <CandlestickChart
             data={candlestickData}
             isLoading={isLoading}
             error={error}
-            symbol={displaySymbol}
-            baseSymbol={instance.baseSymbol}
-            quoteSymbol={instance.quoteSymbol}
+            baseSymbol={configuration.baseTokenSymbol}
+            quoteSymbol={configuration.quoteTokenSymbol}
             upColor={colors.aquamarine}
             downColor={colors.folly}
+            className={className}
         />
     )
 }
