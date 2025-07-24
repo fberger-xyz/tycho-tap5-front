@@ -98,7 +98,7 @@ export default function CandlestickChart({
 
         const chartOptions: echarts.EChartsOption = {
             animation: true,
-            grid: { top: 5, left: 10, right: 50, bottom: 90 },
+            grid: { top: 5, left: 0, right: 50, bottom: 90 },
             legend: {
                 show: false,
             },
@@ -350,7 +350,7 @@ export default function CandlestickChart({
                     lineStyle: { color: colors.milkOpacity[50], type: 'dashed' },
                 },
             },
-            grid: { top: '10%', left: '1%', right: '8%', bottom: '15%' },
+            grid: { top: 5, left: 0, right: 50, bottom: 90 },
             graphic: [
                 {
                     type: 'text',
@@ -434,7 +434,7 @@ export default function CandlestickChart({
                     lineStyle: { color: colors.milkOpacity[50], type: 'dashed' },
                 },
             },
-            grid: { top: '10%', left: '1%', right: '8%', bottom: '15%' },
+            grid: { top: 5, left: 0, right: 50, bottom: 90 },
             graphic: [
                 {
                     type: 'text',

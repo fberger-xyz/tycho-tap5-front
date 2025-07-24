@@ -13,6 +13,10 @@ export const env = createEnv({
 
         // OneInch
         ONEINCH_API_KEY: z.string().min(1),
+
+        // rpc
+        INFURA_API_KEY: z.string().optional(),
+        ALCHEMY_API_KEY: z.string().optional(),
     },
 
     /**
@@ -34,6 +38,8 @@ export const env = createEnv({
         // Server
         DATABASE_URL: process.env.DATABASE_URL,
         ONEINCH_API_KEY: process.env.ONEINCH_API_KEY,
+        INFURA_API_KEY: process.env.INFURA_API_KEY,
+        ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
 
         // Client
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,

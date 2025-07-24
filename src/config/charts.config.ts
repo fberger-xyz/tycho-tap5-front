@@ -55,16 +55,16 @@ export const CHART_CONFIG: Record<
             ChartIntervalInSeconds.ONE_DAY,
         ],
     },
-    [ChartType.INVENTORY]: {
-        name: 'Inventory',
-        enabled: false,
-        defaultInterval: ChartIntervalInSeconds.ONE_HOUR,
-        allowedIntervals: [
-            ChartIntervalInSeconds.FIVE_MINUTES,
-            ChartIntervalInSeconds.FIFTEEN_MINUTES,
-            ChartIntervalInSeconds.ONE_HOUR,
-            ChartIntervalInSeconds.FOUR_HOURS,
-            ChartIntervalInSeconds.ONE_DAY,
-        ],
-    },
+    // [ChartType.INVENTORY]: {
+    //     name: 'Inventory',
+    //     enabled: false,
+    //     defaultInterval: ChartIntervalInSeconds.ONE_HOUR,
+    //     allowedIntervals: [
+    //         ChartIntervalInSeconds.FIVE_MINUTES,
+    //         ChartIntervalInSeconds.FIFTEEN_MINUTES,
+    //         ChartIntervalInSeconds.ONE_HOUR,
+    //         ChartIntervalInSeconds.FOUR_HOURS,
+    //         ChartIntervalInSeconds.ONE_DAY,
+    //     ],
+    // },
 }

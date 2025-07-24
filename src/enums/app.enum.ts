@@ -87,7 +87,7 @@ export enum ChartType {
     CANDLES = 'Candles',
     PNL = 'P&L',
     SPREAD = 'Spread',
-    INVENTORY = 'Inventory',
+    // INVENTORY = 'Inventory',
 }
 
 export enum ChartIntervalInSeconds {

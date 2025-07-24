@@ -47,7 +47,7 @@ export interface useOneInchCandlesParams {
     enabled?: boolean
 }
 
-export interface OneInchCandlestickChartProps {
+export interface ChartForPairOnChainProps {
     token0: string
     token1: string
     seconds?: number

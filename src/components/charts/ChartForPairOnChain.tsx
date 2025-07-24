@@ -10,7 +10,7 @@ import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartIntervalInSeconds, ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 
-export default function OneInchCandlestickChart({
+export default function ChartForPairOnChain({
     configuration,
     trades,
     className,
