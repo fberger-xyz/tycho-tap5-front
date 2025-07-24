@@ -49,7 +49,7 @@ export function TradeEntry({ trade, chain, index }: { trade: Trade; chain: AppSu
 export function StrategyChain({ chain }: { chain: Strategy['chains'][number] }) {
     const [activeTab, setActiveTab] = useState<'trades' | 'configurations' | 'inventory'>('trades')
     return (
-        <div key={chain.value.id} className="flex flex-col gap-2 mt-4 text-xs pl-5">
+        <div key={chain.value.id} className="flex flex-col gap-2 text-xs pl-5 pt-3">
             {chain.configurations.map((configuration) => (
                 <div key={configuration.value.id} className="grid grid-cols-12 w-full gap-10">
                     <OneInchCandlestickChart configuration={configuration.value} trades={listTradesByChain(chain)} className="h-[400px] col-span-7" />
@@ -135,42 +135,53 @@ export default function ListStrategyChains() {
             {/* top lg:left */}
             <div className="col-span-1 lg:col-span-12 flex flex-col h-fit">
                 {/* pair */}
-                <div className="flex flex-row gap-3 center items-center">
+                <div className="flex flex-row gap-3 center items-center mb-4">
                     <DoubleSymbol symbolLeft={strategy.base.symbol} symbolRight={strategy.quote.symbol} size={56} gap={2} />
                     <div className="flex flex-col">
                         <p className="truncate font-semibold text-xl">
                             {strategy.base.symbol} / {strategy.quote.symbol}
                         </p>
                         <div className="flex items-center">
-                            <p className="text-milk-400">
-                                strategy deployed on {strategy.chains.length} chain{strategy.chains.length > 1 ? 's' : ''}
+                            <p className="text-milk-400 text-xs">
+                                deployed on {strategy.chains.length} chain{strategy.chains.length > 1 ? 's' : ''}
                             </p>
                         </div>
                     </div>
                 </div>
 
                 {/* for each chain */}
+                {/* {[...strategy.chains, ...strategy.chains].map((chain, chainIndex, chains) => ( */}
                 {strategy.chains.map((chain, chainIndex, chains) => (
-                    <div key={chain.value.id} className="w-full flex flex-col pl-7 border-milk-200 overflow-hidden">
+                    <div key={`${chain.value.id}-${chainIndex}`} className="w-full flex flex-col pl-7 overflow-hidden">
                         {/* row chain */}
-                        <div className="flex items-center w-full gap-4">
-                            <div className="flex flex-col items-start h-full">
-                                <div className="border-l border-milk-200 h-6" />
-                                <div className="border-l border-b border-milk-200 pb-4 w-8 h-4" />
-                                {chainIndex < chains.length - 1 && <div className="border-l border-milk-200 pb-4 w-10 h-4" />}
-                            </div>
-                            <div className="flex gap-2 items-center mt-10">
-                                <ChainImage id={chain.value.id} size={24} />
-                                <p className="font-semibold text-xl pr-3">{chain.value.name}</p>
-                                <p className="text-milk-400">
-                                    {listTradesByChain(chain).length} trade
-                                    {listTradesByChain(chain).length > 1 ? 's' : ''}
-                                </p>
-                            </div>
-                        </div>
+                        <div className={cn('flex flex-col', chainIndex < chains.length - 1 ? 'border-l border-milk-200' : '')}>
+                            {/* header */}
+                            <div className={cn('flex items-end w-full gap-4')}>
+                                {/* row */}
+                                <div className="flex flex-col items-start h-full">
+                                    <div
+                                        className={cn(
+                                            'border-b border-milk-200 pb-4 w-10 h-0 pt-4',
+                                            chainIndex === chains.length - 1 ? 'border-l' : '',
+                                        )}
+                                    />
+                                    <div className={cn('h-3')} />
+                                </div>
 
-                        {/* content */}
-                        <StrategyChain chain={chain} />
+                                {/* chain with details */}
+                                <div className="flex gap-2 items-center">
+                                    <ChainImage id={chain.value.id} size={24} />
+                                    <p className="font-semibold text-xl pr-3">{chain.value.name}</p>
+                                    <p className="text-milk-400">
+                                        {listTradesByChain(chain).length} trade
+                                        {listTradesByChain(chain).length > 1 ? 's' : ''}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* content */}
+                            <StrategyChain chain={chain} />
+                        </div>
                     </div>
                 ))}
             </div>

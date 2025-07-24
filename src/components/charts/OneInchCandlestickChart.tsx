@@ -6,24 +6,9 @@ import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { ChartColors } from '@/config/chart-colors.config'
 import { Configuration, Trade } from '@prisma/client'
 import { cn } from '@/utils'
-import { CHART_CONFIG } from '@/config/charts.config'
+import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartIntervalInSeconds, ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
-
-const intervalToLabel = (interval: ChartIntervalInSeconds) => {
-    switch (interval) {
-        case ChartIntervalInSeconds.FIVE_MINUTES:
-            return '5m'
-        case ChartIntervalInSeconds.FIFTEEN_MINUTES:
-            return '15m'
-        case ChartIntervalInSeconds.ONE_HOUR:
-            return '1h'
-        case ChartIntervalInSeconds.FOUR_HOURS:
-            return '4h'
-        case ChartIntervalInSeconds.ONE_DAY:
-            return '1d'
-    }
-}
 
 export default function OneInchCandlestickChart({
     configuration,
@@ -35,7 +20,7 @@ export default function OneInchCandlestickChart({
     className?: string
 }) {
     const [chartType, setChartType] = useState<ChartType>(ChartType.CANDLES)
-    const [selectedInterval, selectInterval] = useState<ChartIntervalInSeconds>(ChartIntervalInSeconds.FIVE_MINUTES)
+    const [selectedInterval, selectInterval] = useState<ChartIntervalInSeconds>(CHART_CONFIG[ChartType.CANDLES].defaultInterval)
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const { data, isLoading, error } = useOneInchCandles({
@@ -62,13 +47,18 @@ export default function OneInchCandlestickChart({
         <div className={cn('w-full flex flex-col', className)}>
             <div className="flex justify-between items-center mb-2 text-xs">
                 <div className="flex items-center gap-2">
-                    {Object.values(CHART_CONFIG).map(({ name }) => (
+                    {Object.values(CHART_CONFIG).map((config) => (
                         <button
-                            key={name}
-                            className={cn('px-2 py-1 rounded-lg', chartType === name ? 'bg-milk-100' : 'text-milk-400 hover:bg-milk-50')}
-                            onClick={() => setChartType(name as ChartType)}
+                            key={config.name}
+                            disabled={!config.enabled}
+                            className={cn(
+                                'px-2 py-1 rounded-lg',
+                                chartType === config.name ? 'bg-milk-100' : 'text-milk-400 hover:bg-milk-50',
+                                !config.enabled && 'cursor-not-allowed',
+                            )}
+                            onClick={() => setChartType(config.name as ChartType)}
                         >
-                            {name}
+                            {config.name}
                         </button>
                     ))}
                 </div>
@@ -79,7 +69,7 @@ export default function OneInchCandlestickChart({
                             className={cn('px-2 py-1 rounded-lg', selectedInterval === interval ? 'bg-milk-100' : 'text-milk-400 hover:bg-milk-50')}
                             onClick={() => selectInterval(interval)}
                         >
-                            {intervalToLabel(interval)}
+                            {INTERVAL_LABELS(interval)}
                         </button>
                     ))}
                 </div>
