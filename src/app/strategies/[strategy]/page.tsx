@@ -1,10 +1,10 @@
 import PageWrapper from '@/components/common/PageWrapper'
-import StrategyDetails from '@/components/app/strategies/StrategyDetails'
+import ListStrategyChains from '@/components/app/strategies/strategy/ListStrategyChains'
 
 export default function StrategyPage() {
     return (
         <PageWrapper>
-            <StrategyDetails />
+            <ListStrategyChains />
         </PageWrapper>
     )
 }

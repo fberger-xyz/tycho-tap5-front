@@ -39,7 +39,7 @@ export interface CandlesResponse {
     data: CandleData[]
 }
 
-export interface Use1inchCandlesParams {
+export interface useOneInchCandlesParams {
     token0: string
     token1: string
     seconds: number

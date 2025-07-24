@@ -97,3 +97,15 @@ export const listTrades = (strategy: Strategy): Trade[] => {
 
     return trades
 }
+
+export const listTradesByChain = (chain: Strategy['chains'][number]): Trade[] => {
+    const trades: Trade[] = []
+
+    for (const configuration of chain.configurations) {
+        for (const instance of configuration.instances) {
+            trades.push(...instance.value.trades)
+        }
+    }
+
+    return trades
+}

@@ -2,10 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { ReactQueryKeys } from '@/enums'
-import { CandlesResponse, Use1inchCandlesParams } from '@/interfaces/candles.interface'
+import { CandlesResponse, useOneInchCandlesParams } from '@/interfaces/candles.interface'
 
 // https://portal.1inch.dev/documentation/apis/charts/swagger?method=get&path=%2Fv1.0%2Fchart%2Faggregated%2Fcandle%2F%7Btoken0%7D%2F%7Btoken1%7D%2F%7Bseconds%7D%2F%7BchainId%7D
-async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<Use1inchCandlesParams, 'enabled'>): Promise<CandlesResponse> {
+async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<useOneInchCandlesParams, 'enabled'>): Promise<CandlesResponse> {
     try {
         const params = new URLSearchParams({
             token0: token0.toLowerCase(),
@@ -52,7 +52,7 @@ async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<Use1
     }
 }
 
-export function use1inchCandles({ token0, token1, seconds, chainId, enabled = true }: Use1inchCandlesParams) {
+export function useOneInchCandles({ token0, token1, seconds, chainId, enabled = true }: useOneInchCandlesParams) {
     const queryResult = useQuery({
         queryKey: [ReactQueryKeys.CANDLES, token0, token1, seconds, chainId],
         queryFn: () => fetch1inchCandles({ token0, token1, seconds, chainId }),

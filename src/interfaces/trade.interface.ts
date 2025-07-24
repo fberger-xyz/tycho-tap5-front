@@ -61,3 +61,69 @@ export interface FormattedTrade extends TradeData {
     formattedTimestamp: string
     formattedTimeAgo: string
 }
+
+/**
+ * --------------- new
+ */
+
+export interface TradeValues {
+    block: number
+    payload: {
+        swap: {
+            hash: string
+            sent: boolean
+            error: null
+            status: boolean
+            receipt: {
+                to: string
+                from: string
+                logs: unknown[]
+                type: string
+                status: string
+                gasUsed: string
+                blockHash: string
+                logsBloom: string
+                blockNumber: string
+                contractAddress: null
+                transactionHash: string
+                transactionIndex: string
+                cumulativeGasUsed: string
+                effectiveGasPrice: string
+            }
+        }
+        approval: {
+            hash: string
+            sent: boolean
+            error: null
+            status: boolean
+            receipt: {
+                to: string
+                from: string
+                logs: {
+                    data: string
+                    topics: string[]
+                    address: string
+                    removed: boolean
+                    logIndex: string
+                    blockHash: string
+                    blockNumber: string
+                    transactionHash: string
+                    transactionIndex: string
+                }[]
+                type: string
+                status: string
+                gasUsed: string
+                blockHash: string
+                logsBloom: string
+                blockNumber: string
+                contractAddress: null
+                transactionHash: string
+                transactionIndex: string
+                cumulativeGasUsed: string
+                effectiveGasPrice: string
+            }
+        }
+    }
+    identifier: string
+    trade_data: null
+}
