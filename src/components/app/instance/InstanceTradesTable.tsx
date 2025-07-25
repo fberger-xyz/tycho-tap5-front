@@ -4,7 +4,7 @@ import { TradesTableHeaders, TradeRow, LoadingTradeRows as LoadingRows } from '@
 import { useMemo, memo } from 'react'
 import { useInstanceTradesData } from '@/hooks/fetchs/details/useInstanceTradesData'
 import { FormattedTrade } from '@/interfaces'
-import { formatTradeTimestamp } from '@/utils'
+import { DAYJS_FORMATS } from '@/utils'
 
 // Simple rows without virtualization
 const TradeRows = memo(function TradeRows({ trades }: { trades: FormattedTrade[] }) {
@@ -32,7 +32,8 @@ export function InstanceTradesTable({ instanceId }: InstanceTradesTableProps) {
         return trades.map((trade): FormattedTrade => {
             return {
                 ...trade,
-                ...formatTradeTimestamp(trade.timestamp),
+                formattedTimestamp: DAYJS_FORMATS.date(trade.timestamp),
+                formattedTimeAgo: DAYJS_FORMATS.timeAgo(trade.timestamp),
             }
         })
     }, [trades])

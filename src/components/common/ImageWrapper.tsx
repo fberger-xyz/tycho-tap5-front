@@ -22,7 +22,7 @@ export function ImageWrapper({
     return <Image src={src} alt={alt} width={size} height={size} className={cn('object-cover', className)} onError={() => setImgError(true)} />
 }
 
-export function ChainImage({ id, size, className = 'rounded-full' }: { id?: string | number; size?: number; className?: string }) {
+export function ChainImage({ id, size, className = 'rounded-lg' }: { id?: string | number; size?: number; className?: string }) {
     const src = id
         ? CHAINS_CONFIG[Number(id)]?.oneInchId
             ? `https://app.1inch.io/assets/images/network-logos/${CHAINS_CONFIG[Number(id)]?.oneInchId}.svg`
@@ -59,7 +59,7 @@ export function ImageWithText(props: { symbol?: string; chainId?: number; classN
         return (
             <StyledTooltip disableAnimation={true} content={CHAINS_CONFIG[Number(props.chainId)].name}>
                 <div className="flex items-center gap-2">
-                    <ChainImage id={props.chainId} size={props.size ?? 20} className={cn('rounded-full', props.className)} />
+                    <ChainImage id={props.chainId} size={props.size ?? 20} className={cn('rounded-lg', props.className)} />
                     <p>{CHAINS_CONFIG[Number(props.chainId)].name}</p>
                 </div>
             </StyledTooltip>
@@ -79,12 +79,16 @@ export function DoubleSymbol({
     symbolLeft,
     symbolRight,
     className,
+    marginLeft = -(size + gap) / 2,
+    marginRight = -(size + gap) / 2,
 }: {
     symbolLeft?: string
     symbolRight?: string
     className?: string
     size?: number
     gap?: number
+    marginLeft?: number
+    marginRight?: number
 }) {
     return (
         <div className="relative flex items-center" style={{ width: size + gap, height: size }}>
@@ -98,7 +102,7 @@ export function DoubleSymbol({
                     clipPath: `inset(0 0 0 0)`,
                 }}
             >
-                <div style={{ marginRight: -(size + gap) / 2 }}>
+                <div style={{ marginRight }}>
                     <SymbolImage symbol={symbolLeft} size={size} className="rounded-full" />
                 </div>
             </div>
@@ -113,7 +117,7 @@ export function DoubleSymbol({
                     clipPath: `inset(0 0 0 0)`,
                 }}
             >
-                <div style={{ marginLeft: -(size + gap) / 2 }}>
+                <div style={{ marginLeft }}>
                     <SymbolImage symbol={symbolRight} size={size} className="rounded-full" />
                 </div>
             </div>

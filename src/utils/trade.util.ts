@@ -1,6 +1,10 @@
 import { ApiTrade, TradeData } from '@/interfaces'
 import { TradeStatus } from '@/enums'
 
+/**
+ * v1
+ */
+
 export function transformTrade(trade: ApiTrade): TradeData {
     return {
         id: trade.id,
@@ -40,3 +44,14 @@ export function transformTrade(trade: ApiTrade): TradeData {
         txHash: trade.transactionHash,
     }
 }
+
+/**
+ * v2
+ */
+
+// export function transformTradeV2(trade: ApiTrade): TradeData {
+//     return {
+//         id: trade.id,
+//         instanceId: trade.instanceId,
+//     }
+// }

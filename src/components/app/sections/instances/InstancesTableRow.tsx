@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { cn, formatDateShort, getDurationBetween, shortenValue } from '@/utils'
+import { cn, DAYJS_FORMATS, getDurationBetween, shortenValue } from '@/utils'
 import { memo } from 'react'
 import { EnrichedInstance } from '@/types'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
@@ -196,10 +196,10 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                 broadcast={<p>{broadcast}</p>}
                 reference={<p>{reference}</p>}
                 targetSpread={<p>{targetSpread}</p>}
-                startedAt={<LiveDate date={data.instance.startedAt}>{formatDateShort(data.instance.startedAt)}</LiveDate>}
+                startedAt={<LiveDate date={data.instance.startedAt}>{DAYJS_FORMATS.dateShort(data.instance.startedAt)}</LiveDate>}
                 endedAt={
                     data.instance.endedAt ? (
-                        <LiveDate date={data.instance.endedAt}>{formatDateShort(data.instance.endedAt)}</LiveDate>
+                        <LiveDate date={data.instance.endedAt}>{DAYJS_FORMATS.dateShort(data.instance.endedAt)}</LiveDate>
                     ) : (
                         <p className="truncate">Running</p>
                     )

@@ -1,6 +1,6 @@
 'use client'
 
-import { cn, dateHelpers, getDurationBetween } from '@/utils'
+import { cn, DAYJS_FORMATS, getDurationBetween } from '@/utils'
 import StyledTooltip from './StyledTooltip'
 // import useTimeAgo from '@/hooks/useTimeAgo'
 
@@ -11,7 +11,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
             disableAnimation={true}
             content={
                 <div>
-                    <p>{dateHelpers.formatDate(props.date)}</p>
+                    <p>{DAYJS_FORMATS.date(props.date)}</p>
                     <p>
                         {
                             getDurationBetween({
@@ -24,11 +24,11 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
                         }{' '}
                         ago
                     </p>
-                    {/* <p>{timeago}</p> */}
+                    <p>{DAYJS_FORMATS.timeAgo(props.date)}</p>
                 </div>
             }
         >
-            <p className={cn('truncate', props.className)}>{props.children}</p>
+            <p className={cn('truncate hover:underline', props.className)}>{props.children}</p>
         </StyledTooltip>
     )
 }

@@ -1,4 +1,4 @@
-import { ChainConfig, TokenConfig } from './app.interface'
+import { ChainConfig, TokenConfig } from '../app.interface'
 
 export interface UnstableInstanceConfigValues {
     rpc_url: string

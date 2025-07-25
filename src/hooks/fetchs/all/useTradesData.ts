@@ -6,14 +6,6 @@ import { transformTrade } from '@/utils'
 import { ApiTrade, TradeData } from '@/interfaces'
 
 /**
- * ------------------------ 2 api response
- */
-
-interface ApiResponse {
-    trades: ApiTrade[]
-}
-
-/**
  * ------------------------ 3 fetch trades
  */
 
@@ -29,7 +21,7 @@ async function fetchTrades(): Promise<TradeData[]> {
         }
 
         // Parse response safely
-        const data: ApiResponse = await response.json()
+        const data: { trades: ApiTrade[] } = await response.json()
 
         // Validate response structure
         if (!data.trades || !Array.isArray(data.trades)) {

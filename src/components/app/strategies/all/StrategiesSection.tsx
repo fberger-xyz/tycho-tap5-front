@@ -1,7 +1,7 @@
 'use client'
 
 import { useStrategies } from '@/hooks/fetchs/all/useStrategies'
-import { StrategyRow, LoadingStrategyRows } from './StrategiesTable'
+import { StrategyRow, LoadingStrategyRows } from '../all/StrategiesTable'
 
 export default function StrategiesSection() {
     const { isLoading, error, refetch, hasError, isRefetching, strategies } = useStrategies()
