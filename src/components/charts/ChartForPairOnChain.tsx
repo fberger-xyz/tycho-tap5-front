@@ -4,18 +4,22 @@ import { useMemo, useState } from 'react'
 import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { ChartColors } from '@/config/chart-colors.config'
-import { Configuration, Trade } from '@prisma/client'
+import { Trade } from '@prisma/client'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartIntervalInSeconds, ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 
 export default function ChartForPairOnChain({
-    configuration,
+    baseTokenAddress,
+    quoteTokenAddress,
+    chainId,
     trades,
     className,
 }: {
-    configuration: Configuration
+    baseTokenAddress: string
+    quoteTokenAddress: string
+    chainId: number
     trades: Trade[]
     className?: string
 }) {
@@ -24,11 +28,11 @@ export default function ChartForPairOnChain({
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const { data, isLoading, error } = useOneInchCandles({
-        token0: configuration.baseTokenAddress?.toLowerCase() ?? '',
-        token1: configuration.quoteTokenAddress?.toLowerCase() ?? '',
+        token0: baseTokenAddress?.toLowerCase() ?? '',
+        token1: quoteTokenAddress?.toLowerCase() ?? '',
         seconds: selectedInterval,
-        chainId: configuration.chainId,
-        enabled: !!configuration.baseTokenAddress && !!configuration.quoteTokenAddress,
+        chainId,
+        enabled: !!baseTokenAddress && !!quoteTokenAddress,
     })
 
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
@@ -79,8 +83,8 @@ export default function ChartForPairOnChain({
                     data={candlestickData}
                     isLoading={isLoading}
                     error={error}
-                    baseSymbol={configuration.baseTokenSymbol}
-                    quoteSymbol={configuration.quoteTokenSymbol}
+                    baseSymbol={baseTokenAddress}
+                    quoteSymbol={quoteTokenAddress}
                     upColor={colors.aquamarine}
                     downColor={colors.folly}
                     trades={trades}

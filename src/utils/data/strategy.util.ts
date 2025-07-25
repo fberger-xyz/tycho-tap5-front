@@ -56,7 +56,11 @@ export const groupByStrategies = (configurations: ConfigurationWithInstances[]):
                 (currConfig) => currConfig.value.id === configuration.id,
             )
             if (configIndex < 0) {
-                strategies[strategyIndex].chains[chainIndex].configurations.push({ value: configuration, instances: [] })
+                strategies[strategyIndex].chains[chainIndex].configurations.push({
+                    value: configuration,
+                    instances: [],
+                    parsedConfiguration: jsonConfigParser(configuration.values),
+                })
                 configIndex = strategies[strategyIndex].chains[chainIndex].configurations.length - 1
             }
 

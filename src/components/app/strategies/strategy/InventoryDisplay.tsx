@@ -1,38 +1,23 @@
 'use client'
 
-import { Configuration } from '@prisma/client'
 import { Strategy } from '@/types'
 import { shortenValue } from '@/utils'
 import { SymbolImage } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { useInventories, formatTokenBalance } from '@/hooks/useInventories'
+import { getTokenByAddress } from '@/config/tokens.config'
 
-export function InventoryDisplay({ configuration, chain }: { configuration: Configuration; chain: Strategy['chains'][number] }) {
-    // Get wallet address and tokens from configuration
-    const configValues = configuration.values as { wallet_public_key?: string; inventory?: { walletPublicKey?: string } }
-    const walletAddress = configValues?.wallet_public_key || configValues?.inventory?.walletPublicKey
-
-    // Get token addresses - include native ETH (0x0000...) to check ETH balance
-    const baseTokenAddress = configuration.baseTokenAddress
-    const quoteTokenAddress = configuration.quoteTokenAddress
-
-    // Also include WETH if not already included
-    const wethAddress =
-        chain.value.id === 1
-            ? '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2' // Ethereum WETH
-            : '0x4200000000000000000000000000000000000006' // Unichain WETH
-
-    const tokenAddresses = Array.from(
-        new Set(
-            [
-                baseTokenAddress,
-                quoteTokenAddress,
-                wethAddress,
-                '0x0000000000000000000000000000000000000000', // Native ETH
-            ].filter(Boolean),
-        ),
-    )
-
+export function InventoryDisplay({
+    baseTokenAddress,
+    quoteTokenAddress,
+    chain,
+    walletAddress,
+}: {
+    baseTokenAddress: string
+    quoteTokenAddress: string
+    chain: Strategy['chains'][number]
+    walletAddress: string
+}) {
     // Debug - log chain info
     console.log('Chain info:', { chainId: chain.value.id, chainName: chain.value.name })
 
@@ -43,9 +28,9 @@ export function InventoryDisplay({ configuration, chain }: { configuration: Conf
         error,
     } = useInventories({
         walletAddress,
-        tokenAddresses,
+        tokenAddresses: [baseTokenAddress, quoteTokenAddress],
         chainId: chain.value.id,
-        enabled: !!walletAddress && tokenAddresses.length > 0,
+        enabled: !!walletAddress,
     })
 
     if (isLoading) {
@@ -72,16 +57,6 @@ export function InventoryDisplay({ configuration, chain }: { configuration: Conf
         )
     }
 
-    const getTokenSymbol = (address: string) => {
-        const lowerAddress = address.toLowerCase()
-        if (lowerAddress === baseTokenAddress?.toLowerCase()) return configuration.baseTokenSymbol
-        if (lowerAddress === quoteTokenAddress?.toLowerCase()) return configuration.quoteTokenSymbol
-        if (lowerAddress === '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2') return 'WETH'
-        if (lowerAddress === '0x4200000000000000000000000000000000000006') return 'WETH'
-        if (lowerAddress === '0x0000000000000000000000000000000000000000') return 'ETH'
-        return 'Unknown'
-    }
-
     return (
         <div className="flex flex-col gap-3">
             <LinkWrapper
@@ -99,7 +74,7 @@ export function InventoryDisplay({ configuration, chain }: { configuration: Conf
                 <p className="text-right">Total value</p>
             </div>
             {balances.map((balance) => {
-                const symbol = balance.symbol || getTokenSymbol(balance.address)
+                const symbol = getTokenByAddress(chain.value.id, balance.address)?.symbol || balance.symbol
                 const formattedBalance = formatTokenBalance(balance.balance, balance.decimals)
                 const displayBalance = parseFloat(formattedBalance).toFixed(6)
 
@@ -107,7 +82,7 @@ export function InventoryDisplay({ configuration, chain }: { configuration: Conf
                     <div key={balance.address} className="grid grid-cols-4 gap-2 text-xs py-2 hover:bg-milk-50 rounded-lg px-1">
                         <div className="flex items-center gap-2">
                             <SymbolImage symbol={symbol} size={16} />
-                            <p>{symbol.toUpperCase()}</p>
+                            <p>{symbol?.toUpperCase() || 'Unknown'}</p>
                         </div>
                         <p className="text-right font-mono">{displayBalance}</p>
                         <p className="text-right text-milk-400">$-</p>

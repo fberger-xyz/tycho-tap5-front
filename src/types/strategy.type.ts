@@ -20,6 +20,7 @@ export type Strategy = {
         value: ChainConfig
         configurations: {
             value: Configuration
+            parsedConfiguration: ParsedConfigurationValues
             instances: {
                 value: InstanceWithCounts & { trades: Trade[] }
             }[]
