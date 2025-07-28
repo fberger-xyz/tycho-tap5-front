@@ -33,6 +33,7 @@ const BalancesRequestSchema = z.object({
     walletAddress: z.string().regex(/^0x[a-fA-F0-9]{40}$/),
     tokenAddresses: z.array(z.string().regex(/^0x[a-fA-F0-9]{40}$/)),
     chainId: z.number(),
+    includeNative: z.boolean().optional().default(false),
 })
 
 export async function POST(request: NextRequest): Promise<NextResponse<BalancesApiResponse | BalancesApiError>> {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<BalancesA
             return NextResponse.json({ error: 'Invalid request parameters: ' + validationResult.error.message }, { status: 400 })
         }
 
-        const { walletAddress, tokenAddresses, chainId } = validationResult.data
+        const { walletAddress, tokenAddresses, chainId, includeNative } = validationResult.data
 
         // Get chain configuration
         const chainConfig = CHAINS_CONFIG[chainId]
@@ -73,8 +74,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<BalancesA
             return NextResponse.json({ error: 'Failed to connect to blockchain network' }, { status: 500 })
         }
 
-        // Fetch balances using direct RPC calls
-        const balancePromises = tokenAddresses.map(async (tokenAddress): Promise<TokenBalance> => {
+        // If includeNative is true, fetch native ETH balance first
+        const balancePromises: Promise<TokenBalance>[] = []
+
+        if (includeNative) {
+            const nativeSymbol = chainConfig.nativeToken?.symbol || 'ETH'
+            const nativeDecimals = chainConfig.nativeToken?.decimals || 18
+
+            balancePromises.push(
+                makeRpcCall(workingRpcUrl, 'eth_getBalance', [walletAddress, 'latest']).then((balance) => ({
+                    address: ethers.constants.AddressZero,
+                    balance: ethers.BigNumber.from(balance).toString(),
+                    decimals: nativeDecimals,
+                    symbol: nativeSymbol,
+                })),
+            )
+        }
+
+        // Fetch ERC20 token balances
+        const tokenBalancePromises = tokenAddresses.map(async (tokenAddress): Promise<TokenBalance> => {
             try {
                 // Handle native token (ETH)
                 if (tokenAddress === ethers.constants.AddressZero) {
@@ -82,8 +100,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<BalancesA
                     return {
                         address: tokenAddress,
                         balance: ethers.BigNumber.from(balance).toString(),
-                        decimals: 18,
-                        symbol: 'ETH',
+                        decimals: chainConfig.nativeToken?.decimals || 18,
+                        symbol: chainConfig.nativeToken?.symbol || 'ETH',
                     }
                 }
 
@@ -104,7 +122,23 @@ export async function POST(request: NextRequest): Promise<NextResponse<BalancesA
                 try {
                     const symbolData = ethers.utils.id('symbol()').slice(0, 10)
                     const symbolResult = await makeRpcCall(workingRpcUrl, 'eth_call', [{ to: tokenAddress, data: symbolData }, 'latest'])
-                    symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult)[0]
+
+                    // Decode the symbol properly
+                    if (symbolResult && symbolResult !== '0x') {
+                        // Try to decode as string
+                        try {
+                            symbol = ethers.utils.defaultAbiCoder.decode(['string'], symbolResult)[0]
+                        } catch {
+                            // If string decoding fails, try bytes32
+                            try {
+                                const bytes32Result = ethers.utils.defaultAbiCoder.decode(['bytes32'], symbolResult)[0]
+                                // Convert bytes32 to string, removing null bytes
+                                symbol = ethers.utils.parseBytes32String(bytes32Result)
+                            } catch {
+                                symbol = undefined
+                            }
+                        }
+                    }
                 } catch {
                     symbol = undefined
                 }
@@ -125,6 +159,8 @@ export async function POST(request: NextRequest): Promise<NextResponse<BalancesA
             }
         })
 
+        // Combine native and token balances
+        balancePromises.push(...tokenBalancePromises)
         const balances = await Promise.all(balancePromises)
 
         return NextResponse.json({ balances })

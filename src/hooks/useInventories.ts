@@ -2,9 +2,15 @@ import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
 import { UseInventoriesParams, TokenBalance, BalancesApiResponse } from '@/interfaces'
 
-export function useInventories({ walletAddress, tokenAddresses, chainId, enabled = true }: UseInventoriesParams) {
+export function useInventories({
+    walletAddress,
+    tokenAddresses,
+    chainId,
+    enabled = true,
+    includeNative = true,
+}: UseInventoriesParams & { includeNative?: boolean }) {
     const fetchBalances = async (): Promise<TokenBalance[]> => {
-        if (!walletAddress || !tokenAddresses.length) {
+        if (!walletAddress) {
             return []
         }
 
@@ -18,6 +24,7 @@ export function useInventories({ walletAddress, tokenAddresses, chainId, enabled
                     walletAddress,
                     tokenAddresses,
                     chainId,
+                    includeNative, // Pass this to the API
                 }),
             })
 
@@ -35,9 +42,9 @@ export function useInventories({ walletAddress, tokenAddresses, chainId, enabled
     }
 
     return useQuery({
-        queryKey: ['inventories', walletAddress, tokenAddresses, chainId],
+        queryKey: ['inventories', walletAddress, tokenAddresses, chainId, includeNative],
         queryFn: fetchBalances,
-        enabled: enabled && !!walletAddress && tokenAddresses.length > 0,
+        enabled: enabled && !!walletAddress,
         refetchInterval: 15000, // Refetch every 15 seconds
         staleTime: 10000, // Consider data stale after 10 seconds
     })

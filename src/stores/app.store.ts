@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode } from '@/enums'
+import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode, SupportedStrategyChainsFilters } from '@/enums'
 import { env } from '@/env/t3-env'
 
 export const useAppStore = create<{
@@ -40,10 +40,17 @@ export const useAppStore = create<{
      * sorting
      */
 
+    // instances
     instancesSortedBy: SupportedFilters
     instancesSortedByFilterDirection: SupportedFilterDirections
     sortInstancesBy: (filter: SupportedFilters) => void
     toggleFilterDirection: () => void
+
+    // strategy chains
+    strategyChainsSortedBy: SupportedStrategyChainsFilters
+    strategyChainsSortedByFilterDirection: SupportedFilterDirections
+    sortStrategyChainsBy: (filter: SupportedStrategyChainsFilters) => void
+    toggleStrategyChainsFilterDirection: () => void
 
     /**
      * display mode
@@ -87,6 +94,7 @@ export const useAppStore = create<{
              * sorting
              */
 
+            // instances
             instancesSortedBy: SupportedFilters.INSTANCE_STARTED,
             instancesSortedByFilterDirection: SupportedFilterDirections.DESCENDING,
             sortInstancesBy: (filter) => set(() => ({ instancesSortedBy: filter })),
@@ -94,6 +102,18 @@ export const useAppStore = create<{
                 set((state) => ({
                     instancesSortedByFilterDirection:
                         state.instancesSortedByFilterDirection === SupportedFilterDirections.ASCENDING
+                            ? SupportedFilterDirections.DESCENDING
+                            : SupportedFilterDirections.ASCENDING,
+                })),
+
+            // strategy
+            strategyChainsSortedBy: SupportedStrategyChainsFilters.TRADE_COUNT,
+            strategyChainsSortedByFilterDirection: SupportedFilterDirections.DESCENDING,
+            sortStrategyChainsBy: (filter) => set(() => ({ strategyChainsSortedBy: filter })),
+            toggleStrategyChainsFilterDirection: () =>
+                set((state) => ({
+                    strategyChainsSortedByFilterDirection:
+                        state.strategyChainsSortedByFilterDirection === SupportedFilterDirections.ASCENDING
                             ? SupportedFilterDirections.DESCENDING
                             : SupportedFilterDirections.ASCENDING,
                 })),

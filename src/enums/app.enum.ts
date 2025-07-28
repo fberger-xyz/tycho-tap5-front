@@ -39,6 +39,7 @@ export enum AppThemes {
 export enum AppSupportedChainIds {
     ETHEREUM = 1,
     UNICHAIN = 130,
+    BASE = 8453,
 }
 
 export enum AppInstanceStatus {
@@ -56,6 +57,13 @@ export enum SupportedFilters {
     INSTANCE_ENDED = 'Ended At',
     TRADE_COUNT = 'Trade Count',
     PRICES_COUNT_CALLED = 'Prices Called',
+}
+
+export enum SupportedStrategyChainsFilters {
+    CHAIN_NAME = 'Chain Name',
+    TRADE_COUNT = 'Trade Count',
+    AUM = 'AUM',
+    INSTANCES = 'Instances',
 }
 
 export enum SupportedFilterDirections {

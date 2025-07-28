@@ -12,6 +12,7 @@ export const groupByStrategies = (configurations: ConfigurationWithInstances[]):
     for (const configuration of configurations) {
         // get chain
         const chain = CHAINS_CONFIG[configuration.chainId]
+        if (!chain) continue
 
         // for each instance
         for (const instance of configuration.Instance) {

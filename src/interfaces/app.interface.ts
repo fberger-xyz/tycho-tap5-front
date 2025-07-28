@@ -1,4 +1,4 @@
-import { AppSupportedChainIds, AppUrls, FileIds } from '../enums'
+import { AppSupportedChainIds, AppUrls } from '../enums'
 
 export interface InterfaceAppLink {
     name: string
@@ -13,12 +13,14 @@ export interface StructuredOutput<Data> {
 
 export interface ChainConfig {
     id: AppSupportedChainIds
-    fileId: FileIds
     name: string
     oneInchId: string
     supported: boolean
     explorerRoot: string
-    suggestedTokens: { symbol: string; address: string }[]
+    nativeToken?: {
+        symbol: string
+        decimals: number
+    }
 }
 
 export interface TokenConfig {

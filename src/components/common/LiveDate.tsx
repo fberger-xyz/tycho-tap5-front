@@ -24,7 +24,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
                         }{' '}
                         ago
                     </p>
-                    <p>{DAYJS_FORMATS.timeAgo(props.date)}</p>
+                    {/* <p>{DAYJS_FORMATS.timeAgo(props.date)}</p> */}
                 </div>
             }
         >

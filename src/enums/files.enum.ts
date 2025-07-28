@@ -4,6 +4,7 @@ export enum FileIds {
     THEME_DARK = 'THEME_DARK',
     MAINNET = 'MAINNET',
     UNICHAIN = 'UNICHAIN',
+    BASE = 'BASE',
 
     // logos
     APP_LOGO_DESKTOP_WINTERCUTE = '/figma/logo/desktop/wintercute.svg',
