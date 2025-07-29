@@ -1,11 +1,16 @@
-import { NextResponse } from 'next/server'
 import prisma from '@/clients/prisma'
+import { parsePaginationParams } from '@/utils/api/params.util'
+import { createApiError, createApiSuccess, handleApiError } from '@/utils/api/response.util'
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url)
-        const limit = parseInt(searchParams.get('limit') || '10')
-        const skip = parseInt(searchParams.get('skip') || '0')
+        const { limit, skip, error } = parsePaginationParams(searchParams)
+
+        if (error) {
+            return createApiError(error, { status: 400 })
+        }
+
         const trades = await prisma.trade.findMany({
             take: limit,
             skip: skip,
@@ -16,9 +21,8 @@ export async function GET(request: Request) {
                 Instance: true,
             },
         })
-        return NextResponse.json({ trades })
+        return createApiSuccess({ trades })
     } catch (error) {
-        console.error('Failed to fetch trades:', error)
-        return NextResponse.json({ error: 'Failed to fetch trades' }, { status: 500 })
+        return handleApiError(error, 'fetch trades')
     }
 }

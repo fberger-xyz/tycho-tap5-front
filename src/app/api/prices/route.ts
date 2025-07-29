@@ -1,12 +1,16 @@
-import { NextResponse } from 'next/server'
 import prisma from '@/clients/prisma'
+import { parsePaginationParams } from '@/utils/api/params.util'
+import { createApiSuccess, createApiError, handleApiError } from '@/utils/api/response.util'
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url)
-        const limit = parseInt(searchParams.get('limit') || '10')
-        const skip = parseInt(searchParams.get('skip') || '0')
+        const { limit, skip, error } = parsePaginationParams(searchParams)
         const instanceId = searchParams.get('instanceId')
+
+        if (error) {
+            return createApiError(error, { status: 400 })
+        }
 
         const where = instanceId ? { instanceId } : {}
 
@@ -22,9 +26,8 @@ export async function GET(request: Request) {
             },
         })
 
-        return NextResponse.json({ prices })
+        return createApiSuccess({ prices })
     } catch (error) {
-        console.error('Failed to fetch prices:', error)
-        return NextResponse.json({ error: 'Failed to fetch prices' }, { status: 500 })
+        return handleApiError(error, 'fetch prices')
     }
 }

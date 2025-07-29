@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers'
 import { UseInventoriesParams, TokenBalance, BalancesApiResponse } from '@/interfaces'
+import { createRequest } from '@/utils/requests.util'
 
 export function useInventories({
     walletAddress,
@@ -14,31 +15,21 @@ export function useInventories({
             return []
         }
 
-        try {
-            const response = await fetch('/api/balances', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    walletAddress,
-                    tokenAddresses,
-                    chainId,
-                    includeNative, // Pass this to the API
-                }),
-            })
+        const result = await createRequest<BalancesApiResponse>('/api/balances', {
+            method: 'POST',
+            body: JSON.stringify({
+                walletAddress,
+                tokenAddresses,
+                chainId,
+                includeNative,
+            }),
+        })
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
-                throw new Error(errorData.error || `Failed to fetch balances: ${response.status}`)
-            }
-
-            const data: BalancesApiResponse = await response.json()
-            return data.balances
-        } catch (error) {
-            console.error('Failed to fetch balances:', error)
-            throw error
+        if (!result.success) {
+            throw new Error(result.error || 'Failed to fetch balances')
         }
+
+        return result.data?.balances || []
     }
 
     return useQuery({
