@@ -81,7 +81,7 @@ export default function HeaderMobile() {
                                 ))}
                                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias p-2.5">
                                     <p className="text-base">Docs (Run locally)</p>
-                                    <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                                    <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                                 </LinkWrapper>
                             </nav>
                         </Suspense>

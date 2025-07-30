@@ -131,7 +131,7 @@ export default function InstanceKPIs({ instance }: { instance: EnrichedInstance 
                                 {instance.baseSymbol}/{instance.quoteSymbol}
                             </p>
                         </div>
-                        {instance.baseSymbol && instance.quoteSymbol && <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />}
+                        {instance.baseSymbol && instance.quoteSymbol && <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />}
                     </LinkWrapper>
                 }
             />
@@ -229,7 +229,7 @@ export default function InstanceKPIs({ instance }: { instance: EnrichedInstance 
                     config?.broadcast_url === 'buildernet' ? (
                         <LinkWrapper href={AppUrls.BUILDERNET} target="_blank" className="flex items-center w-full gap-2 hover:underline">
                             <p className="truncate capitalize">{config?.broadcast_url || 'Unknown'}</p>
-                            <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                            <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                         </LinkWrapper>
                     ) : (
                         <p className="truncate capitalize">{config?.broadcast_url || 'Unknown'}</p>

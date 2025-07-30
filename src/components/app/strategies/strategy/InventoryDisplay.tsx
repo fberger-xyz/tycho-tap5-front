@@ -1,6 +1,5 @@
 'use client'
 
-import { Strategy } from '@/types'
 import { cn, shortenValue } from '@/utils'
 import { SymbolImage } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
@@ -10,7 +9,7 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import StyledTooltip from '@/components/common/StyledTooltip'
 import { RoundedAmount } from '@/components/common/RoundedAmount'
 import numeral from 'numeral'
-import { ErrorTemplate, LoadingTemplate, NotFoundTemplate } from '@/components/app/shared/PlaceholderTemplates'
+import { ErrorPlaceholder, LoadingPlaceholder, NotFoundPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 
 export function InventoryEntryTemplate(props: {
     asset: React.ReactNode
@@ -50,7 +49,8 @@ export function InventoryDisplay({
 }: {
     baseTokenAddress: string
     quoteTokenAddress: string
-    chain: Strategy['chains'][number]
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    chain: any
     walletAddress: string
     gasTokenSymbol?: string
 }) {
@@ -67,9 +67,9 @@ export function InventoryDisplay({
         includeNative: true,
     })
 
-    if (isLoading) return <LoadingTemplate entryName="inventory" />
-    if (error || !balances) return <ErrorTemplate entryName="inventory" />
-    if (!walletAddress) return <NotFoundTemplate entryName="wallet" />
+    if (isLoading) return <LoadingPlaceholder entryName="inventory" />
+    if (error || !balances) return <ErrorPlaceholder entryName="inventory" errorMessage="Error fetching inventory" />
+    if (!walletAddress) return <NotFoundPlaceholder entryName="wallet" />
 
     return (
         <div className="flex flex-col gap-2 pl-2 pr-4">

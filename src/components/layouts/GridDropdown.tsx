@@ -34,7 +34,7 @@ export default function GridDropdown({ isOpen, onClose, className }: GridDropdow
                 className="hover:bg-milk-100 p-2.5 w-full rounded-xl flex justify-between items-center group"
             >
                 <p className="text-sm text-milk text-left">Orderbook</p>
-                <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 hidden group-hover:flex text-milk" />
+                <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 hidden group-hover:flex text-milk" />
             </LinkWrapper>
             <div onClick={onClose} className="bg-milk-100 p-2.5 w-full rounded-xl">
                 <p className="text-sm text-milk text-left">{SITE_NAME}</p>

@@ -39,45 +39,52 @@ export default function Footer(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <p className="text-wrap lg:text-right">
-                Made by
-                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
+            <div className="flex flex-wrap lg:justify-end gap-x-1">
+                <p className="text-wrap lg:text-right">
+                    Made by
+                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
+                        <LinkWrapper
+                            href={AppUrls.PROPELLERHEADS_WEBSITE}
+                            target="_blank"
+                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pl-1"
+                        >
+                            PropellerHeads,
+                        </LinkWrapper>
+                    </StyledTooltip>
+                </p>
+                <p className="text-wrap lg:text-right">
                     <LinkWrapper
-                        href={AppUrls.PROPELLERHEADS_WEBSITE}
+                        href={AppUrls.QUANT_TELEGRAM}
                         target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
+                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
                     >
-                        PropellerHeads,
+                        @hugoschrng,
                     </LinkWrapper>
-                </StyledTooltip>
-                <LinkWrapper
-                    href={AppUrls.QUANT_TELEGRAM}
-                    target="_blank"
-                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
-                >
-                    @hugoschrng
-                </LinkWrapper>
-                ,
-                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.MERSO_WEBSITE} />}>
-                    <LinkWrapper
-                        href={AppUrls.FBERGER_WEBSITE}
-                        target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
-                    >
-                        xMerso
-                    </LinkWrapper>
-                </StyledTooltip>
-                and
-                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
-                    <LinkWrapper
-                        href={AppUrls.FBERGER_WEBSITE}
-                        target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine px-1"
-                    >
-                        fberger_xyz
-                    </LinkWrapper>
-                </StyledTooltip>
-            </p>
+                </p>
+                <p className="text-wrap lg:text-right">
+                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.MERSO_WEBSITE} />}>
+                        <LinkWrapper
+                            href={AppUrls.FBERGER_WEBSITE}
+                            target="_blank"
+                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
+                        >
+                            xMerso
+                        </LinkWrapper>
+                    </StyledTooltip>
+                    and
+                </p>
+                <p className="text-wrap lg:text-right">
+                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
+                        <LinkWrapper
+                            href={AppUrls.FBERGER_WEBSITE}
+                            target="_blank"
+                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                        >
+                            fberger_xyz
+                        </LinkWrapper>
+                    </StyledTooltip>
+                </p>
+            </div>
         </footer>
     )
 }

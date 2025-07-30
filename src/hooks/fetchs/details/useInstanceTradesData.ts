@@ -2,47 +2,48 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { ReactQueryKeys } from '@/enums'
-import { transformTrade } from '@/utils'
-import { ApiTrade, TradeData } from '@/interfaces'
+// import { transformTrade } from '@/utils'
+// import { ApiTrade, TradeData } from '@/interfaces'
 
-interface ApiResponse {
-    trades: ApiTrade[]
-}
+// interface ApiResponse {
+//     trades: ApiTrade[]
+// }
 
-async function fetchInstanceTrades(instanceId: string): Promise<TradeData[]> {
-    try {
-        const response = await fetch(`/api/trades?instanceId=${encodeURIComponent(instanceId)}&limit=100`)
+// async function fetchInstanceTrades(instanceId: string): Promise<TradeData[]> {
+//     try {
+//         const response = await fetch(`/api/trades?instanceId=${encodeURIComponent(instanceId)}&limit=100`)
 
-        // Handle non-OK responses
-        if (!response.ok) {
-            const errorText = await response.text().catch(() => 'Network error')
-            console.error(`API Error (${response.status}):`, errorText)
-            throw new Error(`Failed to fetch instance trades: ${response.status} ${response.statusText}`)
-        }
+//         // Handle non-OK responses
+//         if (!response.ok) {
+//             const errorText = await response.text().catch(() => 'Network error')
+//             console.error(`API Error (${response.status}):`, errorText)
+//             throw new Error(`Failed to fetch instance trades: ${response.status} ${response.statusText}`)
+//         }
 
-        // Parse response safely
-        const data: ApiResponse = await response.json()
+//         // Parse response safely
+//         const data: ApiResponse = await response.json()
 
-        // Validate response structure
-        if (!data.trades || !Array.isArray(data.trades)) {
-            console.error('Invalid API response:', data)
-            throw new Error('Invalid response format from API')
-        }
+//         // Validate response structure
+//         if (!data.trades || !Array.isArray(data.trades)) {
+//             console.error('Invalid API response:', data)
+//             throw new Error('Invalid response format from API')
+//         }
 
-        return data.trades.map(transformTrade)
-    } catch (error) {
-        // Re-throw with more context
-        if (error instanceof Error) {
-            throw error
-        }
-        throw new Error('An unexpected error occurred while fetching instance trades')
-    }
-}
+//         return data.trades.map(transformTrade)
+//     } catch (error) {
+//         // Re-throw with more context
+//         if (error instanceof Error) {
+//             throw error
+//         }
+//         throw new Error('An unexpected error occurred while fetching instance trades')
+//     }
+// }
 
 export function useInstanceTradesData(instanceId?: string, refreshInterval = 5000) {
     const queryResult = useQuery({
         queryKey: [ReactQueryKeys.TRADES, instanceId],
-        queryFn: () => fetchInstanceTrades(instanceId!),
+        // queryFn: () => fetchInstanceTrades(instanceId!),
+        queryFn: () => [],
         enabled: !!instanceId,
         // Retry configuration
         retry: (failureCount, error) => {

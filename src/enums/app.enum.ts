@@ -6,6 +6,7 @@ export enum AppUrls {
     // api
     API_CONFIGURATIONS = '/api/configurations',
     API_STRATEGIES = '/api/strategies',
+    API_TRADES = '/api/trades',
 
     // hidden pages
     LOGS = '/logs',
@@ -110,4 +111,9 @@ export enum StrategyTabs {
     TRADES = 'Trades',
     INSTANCES = 'Instances',
     INVENTORY = 'Inventory',
+}
+
+export enum ListToShow {
+    STRATEGIES = 'Strategies',
+    TRADES = 'Trades History',
 }

@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode, SupportedStrategyChainsFilters } from '@/enums'
+import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode, SupportedStrategyChainsFilters, ListToShow } from '@/enums'
 import { env } from '@/env/t3-env'
 
 export const useAppStore = create<{
@@ -23,6 +23,8 @@ export const useAppStore = create<{
     setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
     showMobileMenu: boolean
     setShowMobileMenu: (showMobileMenu: boolean) => void
+
+    // unstable v1
     showActivitySection: boolean
     setShowActivitySection: (showActivitySection: boolean) => void
     showInstancesSection: boolean
@@ -30,11 +32,15 @@ export const useAppStore = create<{
     showStrategiesSection: boolean
     setShowStrategiesSection: (showStrategiesSection: boolean) => void
 
-    // instance
+    // unstable v2
     showCandlesSection: boolean
     setShowCandlesSection: (showCandlesSection: boolean) => void
     showInventorySection: boolean
     setShowInventorySection: (showInventorySection: boolean) => void
+
+    // unstable v3
+    listToShow: ListToShow
+    setListToShow: (listToShow: ListToShow) => void
 
     /**
      * sorting
@@ -72,11 +78,13 @@ export const useAppStore = create<{
              * ui
              */
 
-            // list
+            // ui
             appStoreRefreshedAt: -1,
             setAppStoreRefreshedAt: (appStoreRefreshedAt) => set(() => ({ appStoreRefreshedAt })),
             showMobileMenu: false,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
+
+            // unstable v1
             showActivitySection: true,
             setShowActivitySection: (showActivitySection) => set(() => ({ showActivitySection })),
             showInstancesSection: true,
@@ -84,11 +92,15 @@ export const useAppStore = create<{
             showStrategiesSection: true,
             setShowStrategiesSection: (showStrategiesSection) => set(() => ({ showStrategiesSection })),
 
-            // instance
+            // unstable v2
             showCandlesSection: true,
             setShowCandlesSection: (showCandlesSection) => set(() => ({ showCandlesSection })),
             showInventorySection: true,
             setShowInventorySection: (showInventorySection) => set(() => ({ showInventorySection })),
+
+            // unstable v3
+            listToShow: ListToShow.STRATEGIES,
+            setListToShow: (listToShow) => set(() => ({ listToShow })),
 
             /**
              * sorting

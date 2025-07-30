@@ -28,6 +28,10 @@ export interface ApiTrade {
     }
 }
 
+/**
+ * current
+ */
+
 export interface TradeData {
     id: string
     instanceId: string

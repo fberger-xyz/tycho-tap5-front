@@ -1,15 +1,15 @@
 'use client'
 
 import { useState } from 'react'
-import { Strategy } from '@/types'
 import { cn, listTradesByChain } from '@/utils'
 import { StrategyTabs } from '@/enums'
 import ChartForPairOnChain from '@/components/charts/ChartForPairOnChain'
-import { InstanceEntry, InstanceEntryHeader } from './InstanceEntry'
+import { InstanceEntryHeader } from './InstanceEntry'
 import { TradeEntry, TradeEntryHeader } from './TradeEntry'
 import { InventoryDisplay } from './InventoryDisplay'
 
-export function StrategyChain({ chain }: { chain: Strategy['chains'][number] }) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function StrategyChain({ chain }: { chain: any }) {
     const [activeTab, setActiveTab] = useState<StrategyTabs>(StrategyTabs.TRADES)
 
     if (chain.configurations.length === 0) return null
@@ -61,11 +61,11 @@ export function StrategyChain({ chain }: { chain: Strategy['chains'][number] }) 
                         {activeTab === StrategyTabs.INSTANCES && (
                             <>
                                 <InstanceEntryHeader />
-                                {chain.configurations
+                                {/* {chain.configurations
                                     .flatMap((configuration) => configuration.instances)
                                     .map((instance, index) => (
                                         <InstanceEntry key={instance.value.id} instance={instance.value} index={index} />
-                                    ))}
+                                    ))} */}
                             </>
                         )}
                         {activeTab === StrategyTabs.INVENTORY && parsedConfiguration.base.address && parsedConfiguration.quote.address && (

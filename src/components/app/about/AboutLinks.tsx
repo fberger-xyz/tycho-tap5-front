@@ -14,14 +14,14 @@ const links: LinkItem[] = [
     {
         href: AppUrls.STRATEGIES,
         target: '_self',
-        icon: IconIds.OPEN_LINK_IN_NEW_TAB,
+        icon: IconIds.ARROW_UP_RIGHT,
         text: 'Run your market maker',
         className: 'bg-folly/95 hover:bg-folly/100 cursor-pointer',
     },
     {
         href: AppUrls.DOCUMENTATION,
         target: '_blank',
-        icon: IconIds.OPEN_LINK_IN_NEW_TAB,
+        icon: IconIds.ARROW_UP_RIGHT,
         text: 'Read the docs',
         className: 'bg-[#FFF4E005] hover:bg-milk-100/10 cursor-alias',
     },

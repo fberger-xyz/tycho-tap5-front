@@ -1,29 +1,23 @@
-import { Configuration, Trade } from '@prisma/client'
-import { ChainConfig, ParsedConfigurationValues, TokenConfig } from '@/interfaces'
+import { Trade } from '@prisma/client'
+import { ParsedConfigurationValues, TokenConfig } from '@/interfaces'
 import { InstanceWithCounts } from './instance.type'
+import { AppSupportedChainIds } from '@/enums'
 
 // pair -> chain -> config > instances[]
 export type Strategy = {
+    chainId: AppSupportedChainIds
     base: TokenConfig
     quote: TokenConfig
-    pair: string
     config: ParsedConfigurationValues
 
     // metrics
-    instancesCount: number
+    pnlUsd: number
+    aumUsd: number
+    priceUsd: number
     tradesCount: number
-    pnl: number
-    // todo
 
-    // chains
-    chains: {
-        value: ChainConfig
-        configurations: {
-            value: Configuration
-            parsedConfiguration: ParsedConfigurationValues
-            instances: {
-                value: InstanceWithCounts & { trades: Trade[] }
-            }[]
-        }[]
+    // instances
+    instances: {
+        value: InstanceWithCounts & { trades: Trade[] }
     }[]
 }

@@ -41,7 +41,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                     className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4" // mr-6
                 >
                     <p className="text-milk text-sm truncate">Docs (Run locally)</p>
-                    <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                    <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                 </LinkWrapper>
             </div>
         </header>

@@ -1,17 +1,16 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { ReactQueryKeys } from '@/enums'
-import { transformTrade } from '@/utils'
-import { ApiTrade, TradeData } from '@/interfaces'
+import { AppUrls, ReactQueryKeys } from '@/enums'
+import { TradeWithInstanceAndConfiguration } from '@/types'
 
 /**
  * ------------------------ 3 fetch trades
  */
 
-async function fetchTrades(): Promise<TradeData[]> {
+async function fetchTrades(): Promise<TradeWithInstanceAndConfiguration[]> {
     try {
-        const response = await fetch('/api/trades?limit=100')
+        const response = await fetch(`${AppUrls.API_TRADES}?limit=100`)
 
         // Handle non-OK responses
         if (!response.ok) {
@@ -21,7 +20,7 @@ async function fetchTrades(): Promise<TradeData[]> {
         }
 
         // Parse response safely
-        const data: { trades: ApiTrade[] } = await response.json()
+        const data: { trades: TradeWithInstanceAndConfiguration[] } = await response.json()
 
         // Validate response structure
         if (!data.trades || !Array.isArray(data.trades)) {
@@ -29,7 +28,7 @@ async function fetchTrades(): Promise<TradeData[]> {
             throw new Error('Invalid response format from API')
         }
 
-        return data.trades.map(transformTrade)
+        return data.trades
     } catch (error) {
         // Re-throw with more context
         if (error instanceof Error) {

@@ -1,13 +1,17 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { cn, shortenValue } from '@/utils'
+import { cn, getStrategyPair } from '@/utils'
 import { memo } from 'react'
 import { Strategy } from '@/types'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
-import numeral from 'numeral'
 import { CHAINS_CONFIG } from '@/config/chains.config'
+import { useStrategies } from '@/hooks/fetchs/all/useStrategies'
+import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
+import UsdAmount from '@/components/figma/UsdAmount'
+import MiniLineChart from '@/components/charts/MiniLineChart'
+import { Range, TargetSpread } from '@/components/figma/Tags'
 
 /**
  * ------------------------ 1 template
@@ -21,7 +25,7 @@ export const StrategyHeaderTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex flex-row gap-4 center p-4 bg-milk-50 items-center rounded-t-2xl transition-colors duration-200', props.className)}>
+        <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
             {props.pairImages}
             <div className="flex flex-col gap-2">
                 {/* sub row 1 */}
@@ -37,14 +41,17 @@ export const StrategyHeaderTemplate = (props: {
     )
 }
 
-export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; className?: string }) => {
+export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string }) => {
     return (
         <div className={cn('w-full flex flex-col', props.className)}>
             {/* row 1 */}
-            {props.header}
+            <div className="grid grid-cols-1 md:grid-cols-2 w-full p-4 bg-milk-50 rounded-t-2xl group-hover:bg-milk-100 transition-colors duration-200">
+                {props.header}
+                {props.chart}
+            </div>
 
             {/* row 2 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-100 group-hover:bg-milk-200 p-5 rounded-b-2xl transition-colors duration-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-100 group-hover:bg-milk-200 p-5 rounded-b-2xl transition-colors duration-200">
                 {props.kpis}
             </div>
         </div>
@@ -58,7 +65,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
 // none
 
 /**
- * ------------------------ 3 loading row
+ * ------------------------ 3 loading
  */
 
 export function LoadingStrategyHeader() {
@@ -75,7 +82,7 @@ export function LoadingStrategyHeader() {
     )
 }
 
-export function LoadingStrategyRows() {
+export function LoadingStrategiesList() {
     const loadingClass = 'w-3/4 skeleton-loading h-6 rounded-lg'
     return (
         <>
@@ -101,7 +108,7 @@ export function LoadingStrategyRows() {
 }
 
 /**
- * ------------------------ 4 content row
+ * ------------------------ 4 content
  */
 
 export const StrategyId = ({ strategy, className }: { strategy: Strategy; className?: string }) => {
@@ -125,18 +132,9 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
                 </p>
             }
             spread={
-                <div className="flex gap-1">
-                    <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
-                        <p className="truncate">target spread: {numeral(data.config.execution.targetSpreadBps).format('0.[0000]')} bps</p>
-                    </div>
-                    <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
-                        <p className="truncate">
-                            max. slippage: {numeral(data.config.execution.maxSlippagePct).multiply(10000).format('0.[0000]')} bps
-                        </p>
-                    </div>
-                    <div className="flex gap-1 items-center bg-milk-100 rounded px-1.5 py-1 text-xs">
-                        <p className="truncate">min. exec spread: {numeral(data.config.execution.minExecSpreadBps).format('0.[0000]')} bps</p>
-                    </div>
+                <div className="flex gap-0.5">
+                    <TargetSpread bpsAmount={data.config.execution.targetSpreadBps} />
+                    <Range inRange={true} />
                 </div>
             }
             chains={
@@ -151,27 +149,35 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
 }
 
 export const StrategyRow = memo(function StrategyRow({ data, index }: { data: Strategy; index: number }) {
+    // Generate sample data for the chart (replace with real data when available)
+    const mockChartData = [20, 35, 30, 45, 40, 55, 50, 65, 60, 70, 68, 75]
+
     return (
-        <LinkWrapper key={`${data.pair}-${index}`} href={`/strategies/${data.pair.toLowerCase()}`} className="group">
+        <LinkWrapper key={`${data.chainId}-${index}`} href={`/strategies/${getStrategyPair(data)}`} className="group">
             <StrategyRowTemplate
-                header={<StrategyHeader data={data} className="group-hover:bg-milk-100" />}
+                header={<StrategyHeader data={data} />}
+                chart={
+                    <div className="w-full md:w-44 h-14 md:ml-auto">
+                        <MiniLineChart data={mockChartData} className="size-full" />
+                    </div>
+                }
                 kpis={
                     <>
                         <div className="flex flex-col gap-1 items-start">
-                            <p className="truncate text-milk-400 text-sm">Instances</p>
-                            <p className="truncate">{data.instancesCount}</p>
+                            <p className="truncate text-milk-400 text-sm">PnL</p>
+                            <UsdAmount amountUsd={8234.56} variationPercentage={0.0702} />
+                        </div>
+                        <div className="flex flex-col gap-1 items-start">
+                            <p className="truncate text-milk-400 text-sm">AUM</p>
+                            <UsdAmount amountUsd={95807.48} />
+                        </div>
+                        <div className="flex flex-col gap-1 items-start">
+                            <p className="truncate text-milk-400 text-sm">Price</p>
+                            <UsdAmount amountUsd={data.priceUsd} />
                         </div>
                         <div className="flex flex-col gap-1 items-start">
                             <p className="truncate text-milk-400 text-sm">Trades</p>
                             <p className="truncate">{data.tradesCount}</p>
-                        </div>
-                        <div className="flex flex-col gap-1 items-start">
-                            <p className="truncate text-milk-400 text-sm">P&L</p>
-                            <p className="truncate">${numeral(data.pnl).format('0.[00]')}</p>
-                        </div>
-                        <div className="flex flex-col gap-1 items-start">
-                            <p className="truncate text-milk-400 text-sm">Inventory</p>
-                            <p className="truncate">{shortenValue(data.config.inventory.walletPublicKey)}</p>
                         </div>
                     </>
                 }
@@ -179,3 +185,46 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
         </LinkWrapper>
     )
 })
+
+/**
+ * ------------------------ 5 list
+ */
+
+export default function StrategiesList() {
+    const { isLoading, error, refetch, hasError, isRefetching, strategies } = useStrategies()
+
+    // error
+    if (hasError && error) {
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load strategies'
+        return (
+            <div className="flex flex-col gap-5 mx-auto w-full mt-10">
+                <ErrorPlaceholder entryName="strategies" errorMessage={errorMessage} />
+                <button
+                    onClick={() => refetch()}
+                    disabled={isRefetching}
+                    className="mt-2 px-4 py-2 bg-folly/20 text-folly rounded-lg disabled:cursor-not-allowed text-sm font-medium"
+                >
+                    {isRefetching ? 'Retrying...' : 'Try Again'}
+                </button>
+            </div>
+        )
+    }
+
+    // easy ternary
+    const showLoading = isLoading && strategies?.length === 0
+    const noData = !isLoading && strategies?.length === 0
+
+    return (
+        <div className="flex flex-col gap-5 mx-auto w-full">
+            {showLoading ? (
+                <LoadingStrategiesList />
+            ) : noData ? (
+                <EmptyPlaceholder entryName="strategies" />
+            ) : (
+                strategies.map((strategy, strategyIndex) => (
+                    <StrategyRow key={`${strategy.chainId}-${strategyIndex}`} data={strategy} index={strategyIndex} />
+                ))
+            )}
+        </div>
+    )
+}

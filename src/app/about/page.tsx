@@ -25,7 +25,7 @@ export default function Page() {
                             className="bg-folly px-4 py-2.5 rounded-xl opacity-90 hover:opacity-100 transition-all duration-300 ease-in-out w-fit flex gap-2 items-center"
                         >
                             <p className="text-milk truncate">{CALL_TO_ACTION}</p>
-                            <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                            <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                         </LinkWrapper>
                         <LinkWrapper
                             href={AppUrls.DOCUMENTATION}
@@ -33,7 +33,7 @@ export default function Page() {
                             className="flex items-center gap-2 px-4 py-2.5 cursor-alias w-max bg-milk-100 hover:bg-milk-150 transition-colors duration-300 rounded-xl"
                         >
                             <p className="text-milk text-sm truncate">Docs</p>
-                            <IconWrapper id={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                            <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                         </LinkWrapper>
                     </div>
                 </div>

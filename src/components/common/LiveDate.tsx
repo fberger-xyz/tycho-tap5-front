@@ -2,21 +2,28 @@
 
 import { cn, DAYJS_FORMATS, getDurationBetween } from '@/utils'
 import StyledTooltip from './StyledTooltip'
-// import useTimeAgo from '@/hooks/useTimeAgo'
+import { useState } from 'react'
+import { useEffect } from 'react'
 
 export function LiveDate(props: { date: string | number | Date; className?: string; children?: React.ReactNode }) {
-    // const timeago = useTimeAgo(props.date)
+    const [now, setNow] = useState(new Date())
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setNow(new Date())
+        }, 1000)
+        return () => clearInterval(interval)
+    }, [])
     return (
         <StyledTooltip
             disableAnimation={true}
             content={
                 <div>
-                    <p>{DAYJS_FORMATS.date(props.date)}</p>
+                    <p>{DAYJS_FORMATS.date(props.date)} UTC</p>
                     <p>
                         {
                             getDurationBetween({
                                 startTs: new Date(props.date).getTime(),
-                                endTs: new Date().getTime(),
+                                endTs: now.getTime(),
                                 showYears: false,
                                 showMonths: false,
                                 showWeeks: false,
