@@ -16,6 +16,7 @@ import { TradeValues } from '@/interfaces/database/trade.interface'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
+import { jsonConfigParser } from '@/utils/data/parser'
 
 /**
  * ------------------------ 1 template
@@ -100,10 +101,12 @@ export function LoadingTradeRows() {
 
 export const TradeRow = memo(function TradeRow({ trade, className }: { trade: TradeWithInstanceAndConfiguration; className?: string }) {
     if (!trade.Instance.Configuration) return null
+    const parsedConfig = jsonConfigParser(trade.Instance.Configuration.values)
     const tradeValues = trade.values as unknown as TradeValues
-    const spread = 0 // trade.Instance.Configuration?.execution?.targetSpreadBps || 0
+    const spread = parsedConfig.execution.minSpreadThresholdBps || 0
     const txHash = tradeValues.data?.broadcast?.hash ?? ''
     if (!txHash || !txHash.startsWith('0x')) return null
+    // console.log({ trade, configValues: trade.Instance.Configuration.values, parsedConfig })
     return (
         <TradeRowTemplate
             strategy={

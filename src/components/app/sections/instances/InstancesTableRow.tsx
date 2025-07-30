@@ -11,6 +11,7 @@ import { useAppStore } from '@/stores/app.store'
 import { SupportedFilters, SupportedFilterDirections, IconIds } from '@/enums'
 import IconWrapper from '@/components/icons/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
+import { jsonConfigParser } from '@/utils/data/parser'
 
 /**
  * ------------------------ 1 template
@@ -159,10 +160,11 @@ export function LoadingInstanceRows() {
  */
 
 export const InstanceRow = memo(function InstanceRow({ data, index }: { data: EnrichedInstance; index: number }) {
-    const broadcast = data.config?.values.broadcast_url ? String(data.config?.values.broadcast_url) : 'unknown'
-    const reference = data.config?.values.price_feed_config.source ? String(data.config?.values.price_feed_config.type) : 'unknown'
-    const targetSpread = data.config?.values.target_spread_bps ? `${String(data.config?.values.target_spread_bps)} bps` : 'unknown'
-    const eoa = data.config?.values.wallet_public_key ? String(data.config?.values.wallet_public_key) : ''
+    const parsedConfig = jsonConfigParser(data.config?.values)
+    // const broadcast = parsedConfig.execution.broadcastUrl ? String(parsedConfig.execution.broadcastUrl) : 'unknown' // v1
+    const reference = parsedConfig.execution.priceFeedConfig.source ? String(parsedConfig.execution.priceFeedConfig.type) : 'unknown'
+    const targetSpread = parsedConfig.execution.minSpreadThresholdBps ? `${String(parsedConfig.execution.minSpreadThresholdBps)} bps` : 'unknown'
+    const eoa = parsedConfig.inventory.walletPublicKey ? String(parsedConfig.inventory.walletPublicKey) : ''
     return (
         <LinkWrapper href={`/instances/${data.instance.id}`} className="w-full">
             <InstanceRowTemplate
@@ -193,7 +195,7 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                         </div>
                     </StyledTooltip>
                 }
-                broadcast={<p>{broadcast}</p>}
+                broadcast={null}
                 reference={<p>{reference}</p>}
                 targetSpread={<p>{targetSpread}</p>}
                 startedAt={<LiveDate date={data.instance.startedAt}>{DAYJS_FORMATS.dateShort(data.instance.startedAt)}</LiveDate>}

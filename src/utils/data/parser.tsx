@@ -7,7 +7,7 @@ export const jsonConfigParser = (json: unknown): ParsedConfigurationValues => {
     return {
         // base
         base: {
-            symbol: castedJson.base_token,
+            symbol: castedJson.base_token, // TODO: ask to add '_symbol'
             address: castedJson.base_token_address,
             config: getTokenByAddress(castedJson.chain_id, castedJson.base_token),
         },
@@ -49,14 +49,15 @@ export const jsonConfigParser = (json: unknown): ParsedConfigurationValues => {
         // price / exec
         execution: {
             txGasLimit: castedJson.tx_gas_limit,
-            targetSpreadBps: castedJson.target_spread_bps,
+            // targetSpreadBps: castedJson.target_spread_bps, // v1
+            minSpreadThresholdBps: castedJson.min_spread_threshold_bps,
             maxSlippagePct: castedJson.max_slippage_pct,
             priceFeedConfig: castedJson.price_feed_config,
             minExecSpreadBps: castedJson.min_exec_spread_bps,
-            profitabilityCheck: castedJson.profitability_check,
+            // profitabilityCheck: castedJson.profitability_check, // v1
             pollIntervalMs: castedJson.poll_interval_ms,
             gasTokenSymbol: castedJson.gas_token_symbol,
-            broadcastUrl: castedJson.broadcast_url,
+            // broadcastUrl: castedJson.broadcast_url, // v1
             blockOffset: castedJson.block_offset,
             // quoteDepth: castedJson.quote_depths, // useless
         },

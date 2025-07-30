@@ -2,11 +2,8 @@
 
 import { Instance } from '@prisma/client'
 import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
-import { UnstableInstanceConfigValues } from '@/interfaces'
 import { LiveDate } from '@/components/common/LiveDate'
 import StyledTooltip from '@/components/common/StyledTooltip'
-import { RoundedAmount } from '@/components/common/RoundedAmount'
-import numeral from 'numeral'
 
 export function InstanceEntryTemplate(props: {
     started: React.ReactNode
@@ -44,7 +41,7 @@ export function InstanceEntryHeader() {
 }
 
 export function InstanceEntry({ instance, index }: { instance: Instance & { Configuration?: { chainId: number } }; index: number }) {
-    const castedConfig = instance.config as unknown as UnstableInstanceConfigValues
+    // const castedConfig = instance.config as unknown as UnstableInstanceConfigValues
 
     return (
         <InstanceEntryTemplate
@@ -66,13 +63,14 @@ export function InstanceEntry({ instance, index }: { instance: Instance & { Conf
                 </div>
             }
             targetSpread={
-                castedConfig?.target_spread_bps ? (
-                    <RoundedAmount amount={castedConfig.target_spread_bps}>
-                        <p>{numeral(castedConfig.target_spread_bps).format('0,0')} bps</p>
-                    </RoundedAmount>
-                ) : (
-                    <p>-</p>
-                )
+                null
+                // castedConfig?.target_spread_bps ? (
+                //     <RoundedAmount amount={castedConfig.target_spread_bps}>
+                //         <p>{numeral(castedConfig.target_spread_bps).format('0,0')} bps</p>
+                //     </RoundedAmount>
+                // ) : (
+                //     <p>-</p>
+                // )
             }
             status={
                 instance.endedAt ? (

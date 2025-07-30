@@ -1,48 +1,49 @@
-// import { TradeData } from '@/interfaces'
+// import { TradeValuesV2 } from '@/interfaces'
 // import { TradeStatus } from '@/enums'
 // import { TradeWithInstanceAndConfiguration } from '@/types'
+// import { CHAINS_CONFIG } from '@/config/chains.config'
 
 // /**
 //  * v1
 //  */
 
-// export function transformTrade(trade: TradeWithInstanceAndConfiguration): TradeData {
-//     const instance = trade.Instance
-//     const configuration = instance.Configuration
+// export function transformTrade(trade: TradeWithInstanceAndConfiguration) {
+//     try {
+//         const instance = trade.Instance
+//         const configuration = instance.Configuration
+//         if (!configuration) return null
+//         const tradeValues = trade.values as unknown as TradeValuesV2
+//         const tokenIn = configuration.baseTokenSymbol
+//         const tokenOut = configuration.quoteTokenSymbol
 
-//     const tokenIn = configuration.baseTokenSymbol
-//     const tokenOut = configuration.quoteTokenSymbol
-
-//     return {
-//         id: trade.id,
-//         instanceId: trade.instanceId,
-//         chain: configuration?.chain || 'ethereum',
-//         chainName: configuration?.chain === 'ethereum' ? 'Ethereum' : 'Unichain',
-//         tokenIn: {
-//             symbol: tokenIn,
-//             amount: 0,
-//             valueUsd: 0,
-//         },
-//         tokenOut: {
-//             symbol: tokenOut,
-//             amount: 0,
-//             valueUsd: 0,
-//         },
-//         pool: {
-//             protocol: 'Unknown',
-//             address: '0x0000000000000000000000000000000000000000',
-//             fee: 0,
-//         },
-//         status: TradeStatus.SUCCESS,
-//         gasCost: {
-//             amount: 0,
-//             valueUsd: 0,
-//         },
-//         netProfit: {
-//             amount: 0,
-//             valueUsd: 0,
-//         },
-//         timestamp: trade.createdAt,
-//         txHash: trade.hash,
+//         return {
+//             instanceId: trade.Instance.id,
+//             chain: configuration.chainId.toString(),
+//             chainName: CHAINS_CONFIG[configuration.chainId]?.name || 'Unknown',
+//             tokenIn: {
+//                 symbol: tokenIn,
+//                 amount: tradeValues.data.metadata.amount_in_normalized.toString(),
+//                 valueUsd: tradeValues.data.metadata.amount_in_normalized,
+//             },
+//             tokenOut: {
+//                 symbol: tokenOut,
+//                 amount: tradeValues.data.metadata.amount_out_expected.toString(),
+//                 valueUsd: tradeValues.data.metadata.amount_out_expected,
+//             },
+//             status: TradeStatus.SUCCESS,
+//             gasCost: {
+//                 amount: tradeValues.data.metadata.gas_cost_usd.toString(),
+//                 valueUsd: 0,
+//             },
+//             netProfit: {
+//                 amount: tradeValues.data.metadata.profit_delta_bps.toString(),
+//                 valueUsd: 0,
+//             },
+//             timestamp: trade.createdAt,
+//             txHash: tradeValues.data.broadcast.hash,
+//         }
+//     } catch (error) {
+//         console.error(error)
+//         return null
 //     }
 // }

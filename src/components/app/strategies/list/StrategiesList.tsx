@@ -133,7 +133,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
             }
             spread={
                 <div className="flex gap-0.5">
-                    <TargetSpread bpsAmount={data.config.execution.targetSpreadBps} />
+                    <TargetSpread bpsAmount={0} />
                     <Range inRange={true} />
                 </div>
             }
