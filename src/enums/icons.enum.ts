@@ -45,6 +45,7 @@ export enum IconIds {
     TRANSACTION = 'carbon:text-align-center',
     CONTRACT = 'carbon:cics-program',
     LOADING = 'line-md:loading-twotone-loop',
+    REFRESH = 'ix:reload',
     WALLET = 'ic:baseline-wallet',
     DOLLAR = 'carbon:currency-dollar',
     STOP_TRADING = 'carbon:pause',
