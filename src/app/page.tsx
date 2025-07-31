@@ -12,7 +12,7 @@ import { TradesList } from '@/components/app/trades/TradesList'
 export default function Page() {
     const { listToShow, setListToShow } = useAppStore()
     return (
-        <HydratedPageWrapper className="w-full max-w-[876px]">
+        <HydratedPageWrapper>
             {/* KPIs */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full">
                 <Card>

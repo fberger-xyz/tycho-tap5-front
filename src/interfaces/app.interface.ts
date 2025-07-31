@@ -21,6 +21,7 @@ export interface ChainConfig {
         symbol: string
         decimals: number
     }
+    debankId: string // https://docs.cloud.debank.com/en/readme/api-pro-reference/chain
 }
 
 export interface TokenConfig {

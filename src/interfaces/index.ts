@@ -1,5 +1,6 @@
 export * from './app.interface'
 export * from './database/configuration.interface'
+export * from './database/inventory.interface'
 export * from './database/trade.interface'
 export * from './candles.interface'
-export * from './database/inventory.interface'
+export * from './debank.interface'

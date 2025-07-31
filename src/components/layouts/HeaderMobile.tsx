@@ -23,7 +23,7 @@ export default function HeaderMobile() {
 
     return (
         <div className={cn('flex justify-center z-50 w-full', { 'fixed top-0': showMobileMenu })}>
-            <div className="w-full lg:hidden flex justify-between px-5 py-4 ">
+            <div className="w-full md:hidden flex justify-between px-5 py-4 ">
                 {/* left */}
                 <div className="flex gap-4 items-center z-30">
                     <GridDropdownButton />

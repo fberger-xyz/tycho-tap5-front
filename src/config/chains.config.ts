@@ -12,6 +12,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
             symbol: 'ETH',
             decimals: 18,
         },
+        debankId: 'eth',
     },
     [AppSupportedChainIds.UNICHAIN]: {
         id: AppSupportedChainIds.UNICHAIN,
@@ -23,6 +24,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
             symbol: 'ETH',
             decimals: 18,
         },
+        debankId: 'uni',
     },
     [AppSupportedChainIds.BASE]: {
         id: AppSupportedChainIds.BASE,
@@ -34,5 +36,6 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
             symbol: 'ETH',
             decimals: 18,
         },
+        debankId: 'base',
     },
 }

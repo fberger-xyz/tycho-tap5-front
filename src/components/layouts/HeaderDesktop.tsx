@@ -15,7 +15,7 @@ export default function HeaderDesktop(props: { className?: string }) {
     const isStrategyPage = pathname.includes('/strategies/')
 
     return (
-        <header className={cn('hidden lg:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
+        <header className={cn('hidden md:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
             <div className="flex gap-4 items-center">
                 <GridDropdownButton />
                 <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={152} height={24} />

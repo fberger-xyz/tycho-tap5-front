@@ -41,7 +41,7 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
 }
 
 export function useStrategies() {
-    const queryResult = useQuery({
+    const { data: configurations, isLoading, error, refetch, isRefetching } = useQuery({
         queryKey: [ReactQueryKeys.STRATEGIES],
         queryFn: fetchConfigurationsWithInstances,
         // Retry configuration
@@ -67,16 +67,17 @@ export function useStrategies() {
         gcTime: 5 * 60 * 1000,
     })
 
-    const { data, isLoading, error, refetch, isRefetching } = queryResult
+    // Process strategies without AUM data (AUM is now fetched per strategy)
+    const strategies = configurations ? groupByStrategies(configurations) : []
 
     return {
-        configurations: data || [],
-        strategies: data ? groupByStrategies(data) : [],
+        configurations: configurations || [],
+        strategies,
         isLoading,
         isRefetching,
         error,
         refetch,
         // Helper to check if we're in an error state with no data
-        hasError: !!error && (!data || data.length === 0),
+        hasError: !!error && (!configurations || configurations.length === 0),
     }
 }

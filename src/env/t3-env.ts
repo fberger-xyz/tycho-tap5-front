@@ -17,6 +17,9 @@ export const env = createEnv({
         // rpc
         INFURA_API_KEY: z.string().optional(),
         ALCHEMY_API_KEY: z.string().optional(),
+
+        // debank
+        DEBANK_ACCESS_KEY: z.string().min(1),
     },
 
     /**
@@ -40,6 +43,7 @@ export const env = createEnv({
         ONEINCH_API_KEY: process.env.ONEINCH_API_KEY,
         INFURA_API_KEY: process.env.INFURA_API_KEY,
         ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
+        DEBANK_ACCESS_KEY: process.env.DEBANK_ACCESS_KEY,
 
         // Client
         NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,

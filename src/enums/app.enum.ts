@@ -7,6 +7,8 @@ export enum AppUrls {
     API_CONFIGURATIONS = '/api/configurations',
     API_STRATEGIES = '/api/strategies',
     API_TRADES = '/api/trades',
+    API_PRICES = '/api/prices',
+    API_DEBANK = '/api/debank',
 
     // hidden pages
     LOGS = '/logs',
@@ -90,6 +92,7 @@ export enum ReactQueryKeys {
     TRADES = 'trades',
     CANDLES = 'candles',
     PRICES = 'prices',
+    DEBANK = 'debank',
 }
 
 export enum ChartType {

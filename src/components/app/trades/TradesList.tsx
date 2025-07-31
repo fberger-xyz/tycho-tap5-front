@@ -2,7 +2,7 @@
 
 import { LoadingTradeRows as LoadingRows } from './TradesList'
 import { ReactNode, memo } from 'react'
-import { useTradesData } from '@/hooks/fetchs/all/useTradesData'
+import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
 import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
 import { TradeWithInstanceAndConfiguration } from '@/types'
@@ -17,10 +17,22 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
 import { jsonConfigParser } from '@/utils/data/parser'
+import { LinkToExplorer } from '@/components/common/LinkToExplorer'
 
 /**
  * ------------------------ 1 template
  */
+
+export const CELL_WIDTHS = {
+    strategy: 200,
+    time: 100,
+    side: 60,
+    chain: 120,
+    in: 90,
+    out: 90,
+    price: 90,
+    tx: 60,
+}
 
 export const TradeRowTemplate = (props: {
     strategy: ReactNode
@@ -35,14 +47,14 @@ export const TradeRowTemplate = (props: {
 }) => {
     return (
         <div className={cn('flex items-center text-sm gap-1', props.className)}>
-            <div className="w-[200px]">{props.strategy}</div>
-            <div className="w-[100px]">{props.time}</div>
-            <div className="w-[60px]">{props.side}</div>
-            <div className="w-[120px]">{props.chain}</div>
-            <div className="w-[90px]">{props.in}</div>
-            <div className="w-[90px]">{props.out}</div>
-            <div className="w-[90px]">{props.price}</div>
-            <div className="w-[60px]">{props.tx}</div>
+            <div className={`w-[${CELL_WIDTHS.strategy}px]`}>{props.strategy}</div>
+            <div className={`w-[${CELL_WIDTHS.time}px]`}>{props.time}</div>
+            <div className={`w-[${CELL_WIDTHS.side}px]`}>{props.side}</div>
+            <div className={`w-[${CELL_WIDTHS.chain}px]`}>{props.chain}</div>
+            <div className={`w-[${CELL_WIDTHS.in}px]`}>{props.in}</div>
+            <div className={`w-[${CELL_WIDTHS.out}px]`}>{props.out}</div>
+            <div className={`w-[${CELL_WIDTHS.price}px]`}>{props.price}</div>
+            <div className={`w-[${CELL_WIDTHS.tx}px]`}>{props.tx}</div>
         </div>
     )
 }
@@ -150,13 +162,9 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
             }
             price={<p>{numeral(tradeValues.data.metadata.reference_price).format('0,0.[0]')}</p>}
             tx={
-                <LinkWrapper
-                    href={`${CHAINS_CONFIG[trade.Instance.Configuration?.chainId].explorerRoot}/tx/${txHash}`}
-                    target="_blank"
-                    className="col-span-5 hover:underline"
-                >
+                <LinkToExplorer chainId={trade.Instance.Configuration?.chainId} txHash={txHash} className="col-span-5 hover:underline">
                     <p>{shortenValue(txHash)}</p>
-                </LinkWrapper>
+                </LinkToExplorer>
             }
             className={cn('px-4 py-3 hover:bg-milk-100 transition-colors duration-200', className)}
         />
@@ -177,7 +185,7 @@ export function TradesList() {
     return (
         <div className="rounded-xl w-full">
             <div className="overflow-x-auto w-full">
-                <div className="flex flex-col min-w-[800px] rounded-2xl bg-milk-50 max-h-[50vh] w-full">
+                <div className="flex flex-col min-w-max rounded-2xl bg-milk-50 max-h-[50vh] w-full">
                     <TradesTableHeaders />
                     {showLoading ? (
                         <LoadingRows />

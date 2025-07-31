@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import { ReactQueryKeys } from '@/enums'
+import { AppUrls, ReactQueryKeys } from '@/enums'
 
 interface PriceData {
     id: string
@@ -19,7 +19,7 @@ async function fetchPrices(instanceId?: string): Promise<PriceData[]> {
     if (!instanceId) return []
 
     try {
-        const response = await fetch(`/api/prices?instanceId=${encodeURIComponent(instanceId)}`)
+        const response = await fetch(`${AppUrls.API_PRICES}?instanceId=${encodeURIComponent(instanceId)}`)
 
         // Handle non-OK responses
         if (!response.ok) {
