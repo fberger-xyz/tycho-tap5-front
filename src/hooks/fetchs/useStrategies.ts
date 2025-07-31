@@ -41,7 +41,13 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
 }
 
 export function useStrategies() {
-    const { data: configurations, isLoading, error, refetch, isRefetching } = useQuery({
+    const {
+        data: configurations,
+        isLoading,
+        error,
+        refetch,
+        isRefetching,
+    } = useQuery({
         queryKey: [ReactQueryKeys.STRATEGIES],
         queryFn: fetchConfigurationsWithInstances,
         // Retry configuration

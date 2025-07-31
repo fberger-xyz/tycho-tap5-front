@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { AppUrls, ReactQueryKeys } from '@/enums'
 import type { DebankApiResponse, DebankUserNetWorthUsd, UseDebankDataParams } from '@/interfaces/debank.interface'
+import { DEBANK_QUERY_CONFIG } from '@/config/query.config'
 
 export async function fetchDebankData({ walletAddress, chainId }: UseDebankDataParams): Promise<DebankApiResponse['data']> {
     if (!walletAddress || !chainId) {
@@ -54,27 +55,13 @@ export function useDebankData({ walletAddress, chainId }: UseDebankDataParams, r
         queryKey: [ReactQueryKeys.DEBANK, walletAddress ?? '', chainId ?? ''],
         queryFn: () => fetchDebankData({ walletAddress, chainId }),
         enabled: !!walletAddress && !!chainId,
-        // Retry configuration
-        retry: (failureCount, error) => {
-            // Don't retry on 4xx errors
-            if (error instanceof Error && error.message.includes('4')) {
-                return false
-            }
-            // Retry up to 2 times for other errors (less than prices since this is external API)
-            return failureCount < 2
-        },
-        retryDelay: (attemptIndex) => Math.min(2000 * 2 ** attemptIndex, 30000),
-        // Refetch configuration
+        ...DEBANK_QUERY_CONFIG,
+        // Override refetchInterval if provided
         refetchInterval: (data) => {
             // Only refetch if we have data and refreshInterval is positive
             return data && refreshInterval > 0 ? refreshInterval : false
         },
-        refetchOnWindowFocus: false,
         refetchIntervalInBackground: false,
-        // Stale time - data is fresh for 30 minutes to minimize API calls
-        staleTime: 30 * 60 * 1000,
-        // Cache time - keep data in cache for 24 hours
-        gcTime: 24 * 60 * 60 * 1000,
     })
 
     const { data, isLoading, error, refetch, isRefetching } = queryResult

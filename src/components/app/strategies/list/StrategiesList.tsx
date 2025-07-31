@@ -151,11 +151,11 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
     // Generate sample data for the chart (replace with real data when available)
     const mockChartData = [20, 35, 30, 45, 40, 55, 50, 65, 60, 70, 68, 75]
     const walletAddress = data.config.inventory.walletPublicKey
-    
+
     // Fetch AUM for this specific strategy
-    const { aum } = useStrategyAUM({ 
-        walletAddress, 
-        chainId: data.chainId 
+    const { aum } = useStrategyAUM({
+        walletAddress,
+        chainId: data.chainId,
     })
 
     return (

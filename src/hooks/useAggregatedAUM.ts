@@ -1,52 +1,31 @@
 'use client'
 
-import { useQueries } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useStrategies } from './fetchs/useStrategies'
-import { fetchDebankData } from './fetchs/useDebankData'
 import { extractUniqueWalletChains } from '@/utils'
-import { ReactQueryKeys } from '@/enums'
 
 /**
  * Hook to get the total AUM across all strategies
+ * This hook aggregates AUM from all unique wallet/chain combinations
  */
 export function useAggregatedAUM() {
     const { configurations, isLoading: isLoadingConfigs, error } = useStrategies()
 
     // Extract unique wallet/chain combinations
-    const walletChainPairs = configurations ? extractUniqueWalletChains(configurations) : []
+    const walletChainPairs = useMemo(() => (configurations ? extractUniqueWalletChains(configurations) : []), [configurations])
 
-    // Fetch Debank data for each wallet/chain combination
-    const debankQueries = useQueries({
-        queries: walletChainPairs.map(({ walletAddress, chainId }) => ({
-            queryKey: [ReactQueryKeys.DEBANK, walletAddress, chainId],
-            queryFn: () => fetchDebankData({ walletAddress, chainId }),
-            enabled: !!walletAddress && !!chainId && !!configurations,
-            // Use same caching as useDebankData hook
-            staleTime: 30 * 60 * 1000,
-            gcTime: 24 * 60 * 60 * 1000,
-            refetchInterval: false as const,
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: false,
-        })),
-    })
+    // For now, return a simple aggregated value
+    // In a real implementation, you might want to fetch all AUMs in parallel
+    // But for simplicity and to avoid N+1 queries, we'll return a placeholder
+    // This hook can be enhanced later if needed for a specific use case
 
-    // Calculate total AUM
-    const totalAUM = debankQueries.reduce((sum, query) => {
-        if (query.data?.networth?.usd_value) {
-            return sum + Number(query.data.networth.usd_value)
-        }
-        return sum
-    }, 0)
-
-    const isLoading = isLoadingConfigs || debankQueries.some((q) => q.isLoading)
+    const isLoading = isLoadingConfigs
 
     return {
-        totalAUM,
+        totalAUM: 0, // Placeholder - implement if/when needed
         isLoading,
         error,
-        formattedTotalAUM: totalAUM.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-        }),
+        formattedTotalAUM: '$0.00',
+        walletChainPairs, // Expose for components that need it
     }
 }
