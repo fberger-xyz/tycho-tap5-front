@@ -8,24 +8,44 @@ import Card from '@/components/figma/Card'
 import StrategiesList from '@/components/app/strategies/list/StrategiesList'
 import UsdAmount from '@/components/figma/UsdAmount'
 import { TradesList } from '@/components/app/trades/TradesList'
+import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
+import { useStrategies } from '@/hooks/fetchs/useStrategies'
+import Skeleton from '@/components/ui/Skeleton'
 
 export default function Page() {
     const { listToShow, setListToShow } = useAppStore()
+    const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
+    const { strategies } = useStrategies()
     return (
         <HydratedPageWrapper>
             {/* KPIs */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full">
                 <Card>
                     <p className="text-sm text-milk-400">Total PnL</p>
-                    <UsdAmount amountUsd={8234.56} variationPercentage={0.0702} />
+                    <Skeleton variant="text" />
                 </Card>
                 <Card>
                     <p className="text-sm text-milk-400">Total AUM</p>
-                    <UsdAmount amountUsd={95807.48} variationPercentage={-0.102} />
+                    {totalAUMIsLoading ? (
+                        <Skeleton variant="text" />
+                    ) : aumError ? (
+                        <p className="text-sm text-folly">Failed to load</p>
+                    ) : (
+                        <UsdAmount amountUsd={totalAUM} variationPercentage={0} />
+                    )}
                 </Card>
                 <Card>
                     <p className="text-sm text-milk-400">Total trades</p>
-                    <p className="text-lg font-semibold">237</p>
+                    {strategies.length ? (
+                        <p className="text-lg font-semibold">
+                            {strategies.reduce(
+                                (acc, strategy) => acc + strategy.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0),
+                                0,
+                            )}
+                        </p>
+                    ) : (
+                        <Skeleton variant="text" />
+                    )}
                 </Card>
             </div>
 

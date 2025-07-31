@@ -1,31 +1,50 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useQueries } from '@tanstack/react-query'
 import { useStrategies } from './fetchs/useStrategies'
 import { extractUniqueWalletChains } from '@/utils'
+import { fetchDebankData } from './fetchs/useDebankData'
+import { ReactQueryKeys } from '@/enums'
+import { DEBANK_QUERY_CONFIG } from '@/config/query.config'
 
 /**
  * Hook to get the total AUM across all strategies
  * This hook aggregates AUM from all unique wallet/chain combinations
  */
 export function useAggregatedAUM() {
-    const { configurations, isLoading: isLoadingConfigs, error } = useStrategies()
+    const { configurations, isLoading: isLoadingConfigs, error: configError } = useStrategies()
 
     // Extract unique wallet/chain combinations
     const walletChainPairs = useMemo(() => (configurations ? extractUniqueWalletChains(configurations) : []), [configurations])
 
-    // For now, return a simple aggregated value
-    // In a real implementation, you might want to fetch all AUMs in parallel
-    // But for simplicity and to avoid N+1 queries, we'll return a placeholder
-    // This hook can be enhanced later if needed for a specific use case
+    // Fetch AUM for all wallet/chain pairs in parallel
+    const aumQueries = useQueries({
+        queries: walletChainPairs.map(({ walletAddress, chainId }) => ({
+            queryKey: [ReactQueryKeys.DEBANK, walletAddress, chainId],
+            queryFn: () => fetchDebankData({ walletAddress, chainId }),
+            enabled: !!walletAddress && !!chainId,
+            ...DEBANK_QUERY_CONFIG,
+        })),
+    })
 
-    const isLoading = isLoadingConfigs
+    // Calculate totals and loading state
+    const isLoading = isLoadingConfigs || aumQueries.some((query) => query.isLoading)
+    const hasError = configError || aumQueries.some((query) => query.error)
+
+    // Sum up all AUM values
+    const totalAUM = useMemo(() => {
+        if (isLoading || hasError) return 0
+
+        return aumQueries.reduce((sum, query) => {
+            const usdValue = query.data?.networth?.usd_value || 0
+            return sum + usdValue
+        }, 0)
+    }, [aumQueries, isLoading, hasError])
 
     return {
-        totalAUM: 0, // Placeholder - implement if/when needed
+        totalAUM,
         isLoading,
-        error,
-        formattedTotalAUM: '$0.00',
-        walletChainPairs, // Expose for components that need it
+        error: hasError ? new Error('Failed to fetch AUM data') : undefined,
     }
 }

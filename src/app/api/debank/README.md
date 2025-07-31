@@ -137,4 +137,26 @@ The API returns appropriate error messages for:
 
 ## Caching
 
-This API route uses `cache: 'no-store'` to ensure fresh data on every request. Consider implementing caching at the application level using React Query or similar solutions to minimize API calls to Debank's paid service.
+This API route implements server-side caching to minimize API calls to Debank's paid service:
+
+- **Server-side cache TTL**: 5 minutes (300 seconds)
+- **HTTP Cache headers**: `Cache-Control: public, s-maxage=300, stale-while-revalidate=60`
+- **Cache implementation**: Uses Next.js `unstable_cache` for edge caching
+
+The combination of server-side caching and React Query's client-side caching (30 minutes stale time) ensures efficient data fetching while preventing excessive API calls.
+
+## Rate Limiting Considerations
+
+Debank's Pro API has rate limits that need to be considered when scaling:
+
+- **API Limits**: Debank Pro API has rate limits based on your subscription tier
+- **Mitigation Strategies**:
+    1. **Server-side caching**: 5-minute cache reduces repeated calls for same wallet/chain
+    2. **Client-side caching**: React Query's 30-minute stale time prevents refetching
+    3. **Request deduplication**: Multiple components requesting same data share the cached result
+    4. **Parallel request management**: `useAggregatedAUM` fetches all wallet/chain pairs in parallel, which could hit rate limits with many strategies
+- **Recommendations**:
+    - Monitor API usage in Debank dashboard
+    - Consider implementing request queuing for large deployments
+    - Increase cache TTL if rate limits are frequently hit
+    - Implement exponential backoff for retry logic

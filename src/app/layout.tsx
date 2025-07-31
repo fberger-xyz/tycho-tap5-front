@@ -93,7 +93,13 @@ export const metadata: Metadata = {
 }
 
 const Providers = ({ children }: { children: React.ReactNode }) => (
-    <ThemeProvider attribute="class" defaultTheme={AppThemes.DARK} disableTransitionOnChange themes={Object.values(AppThemes)}>
+    <ThemeProvider
+        attribute="class"
+        defaultTheme={AppThemes.DARK}
+        forcedTheme={AppThemes.DARK}
+        disableTransitionOnChange
+        themes={Object.values(AppThemes)}
+    >
         <ReactQueryProvider>
             <NuqsAdapter>{children}</NuqsAdapter>
         </ReactQueryProvider>

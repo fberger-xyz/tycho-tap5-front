@@ -46,15 +46,15 @@ export const TradeRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex items-center text-sm gap-1', props.className)}>
-            <div className={`w-[${CELL_WIDTHS.strategy}px]`}>{props.strategy}</div>
-            <div className={`w-[${CELL_WIDTHS.time}px]`}>{props.time}</div>
-            <div className={`w-[${CELL_WIDTHS.side}px]`}>{props.side}</div>
-            <div className={`w-[${CELL_WIDTHS.chain}px]`}>{props.chain}</div>
-            <div className={`w-[${CELL_WIDTHS.in}px]`}>{props.in}</div>
-            <div className={`w-[${CELL_WIDTHS.out}px]`}>{props.out}</div>
-            <div className={`w-[${CELL_WIDTHS.price}px]`}>{props.price}</div>
-            <div className={`w-[${CELL_WIDTHS.tx}px]`}>{props.tx}</div>
+        <div className={cn('flex w-full items-center text-sm gap-1', props.className)}>
+            <div className={`w-[200px]`}>{props.strategy}</div>
+            <div className={`w-[100px]`}>{props.time}</div>
+            <div className={`w-[60px]`}>{props.side}</div>
+            <div className={`w-[120px]`}>{props.chain}</div>
+            <div className={`w-[90px]`}>{props.in}</div>
+            <div className={`w-[90px]`}>{props.out}</div>
+            <div className={`w-[90px]`}>{props.price}</div>
+            <div className={`w-[60px]`}>{props.tx}</div>
         </div>
     )
 }

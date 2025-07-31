@@ -56,12 +56,11 @@ export function PercentEvolution({ percentage }: { percentage: number }) {
     const variant = percentage > 0 ? 'success' : percentage < 0 ? 'error' : 'default'
     return (
         <Tag variant={variant} className="rounded-xl px-1 py-0.5 text-xs">
-            {variant !== 'default' && (
-                <IconWrapper
-                    id={percentage > 0 ? IconIds.ARROW_UP_RIGHT : IconIds.ARROW_DOWN_LEFT}
-                    className={cn('size-4', variantStyles[variant].text)}
-                />
-            )}
+            <IconWrapper
+                id={percentage > 0 ? IconIds.ARROW_UP_RIGHT : percentage < 0 ? IconIds.ARROW_DOWN_LEFT : IconIds.ARROW_WAVE_RIGHT_UP}
+                className={cn('size-4', variantStyles[variant].text)}
+            />
+
             <p className={variantStyles[variant].text}>{numeral(percentage).format('0,0.[00]%')}</p>
         </Tag>
     )

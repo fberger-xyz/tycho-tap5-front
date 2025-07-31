@@ -1,18 +1,19 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { cn, getStrategyPair, shortenValue } from '@/utils'
+import { cn, getStrategyPair } from '@/utils'
 import { memo } from 'react'
 import { Strategy } from '@/types'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { useStrategies } from '@/hooks/fetchs/useStrategies'
-import { useStrategyAUM } from '@/hooks/fetchs/useStrategyAUM'
+import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import UsdAmount from '@/components/figma/UsdAmount'
 import MiniLineChart from '@/components/charts/MiniLineChart'
 import { Range, TargetSpread } from '@/components/figma/Tags'
+import Skeleton from '@/components/ui/Skeleton'
 
 /**
  * ------------------------ 1 template
@@ -68,8 +69,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
  */
 
 export function LoadingStrategyHeader() {
-    const loadingClass = 'w-3/4 skeleton-loading h-6 rounded-lg'
-    const loadingParagraph = <p className={loadingClass}>Loading...</p>
+    const loadingParagraph = <Skeleton className="w-3/4" />
     return (
         <StrategyHeaderTemplate
             pairImages={<DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={48} gap={2} className="text-transparent" />}
@@ -82,7 +82,6 @@ export function LoadingStrategyHeader() {
 }
 
 export function LoadingStrategiesList() {
-    const loadingClass = 'w-3/4 skeleton-loading h-6 rounded-lg'
     return (
         <>
             {Array.from({ length: 2 }, (_, i) => (
@@ -93,8 +92,8 @@ export function LoadingStrategiesList() {
                         <>
                             {Array.from({ length: 4 }, (_, i) => (
                                 <div key={i} className="flex flex-col gap-1 items-start">
-                                    <p className={loadingClass}>Metric {i + 1}</p>
-                                    <p className={loadingClass}>Todo</p>
+                                    <Skeleton className="w-3/4 mb-1" />
+                                    <Skeleton className="w-3/4" />
                                 </div>
                             ))}
                         </>
@@ -148,15 +147,17 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
 }
 
 export const StrategyRow = memo(function StrategyRow({ data, index }: { data: Strategy; index: number }) {
-    // Generate sample data for the chart (replace with real data when available)
-    const mockChartData = [20, 35, 30, 45, 40, 55, 50, 65, 60, 70, 68, 75]
     const walletAddress = data.config.inventory.walletPublicKey
 
-    // Fetch AUM for this specific strategy
-    const { aum } = useStrategyAUM({
+    // Fetch AUM and 24h history for this specific strategy
+    const { networth, debankLast24hNetWorth } = useDebankData({
         walletAddress,
         chainId: data.chainId,
     })
+    const aum = networth?.usd_value || 0
+
+    // Extract USD values from the 24h history for the chart
+    const chartData = debankLast24hNetWorth.length > 0 ? debankLast24hNetWorth.map((item) => item.usd_value) : [] // If no history, just show a flat line with current value
 
     return (
         <StrategyRowTemplate
@@ -169,22 +170,22 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             }
             chart={
                 <div className="w-full md:w-44 h-14 md:ml-auto">
-                    <MiniLineChart data={mockChartData} className="size-full" />
+                    {chartData.length > 0 ? <MiniLineChart data={chartData} className="size-full" /> : <Skeleton variant="chart" />}
                 </div>
             }
             kpis={
                 <>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">PnL</p>
-                        <UsdAmount amountUsd={8234.56} variationPercentage={0.0702} />
+                        <Skeleton variant="metric" />
                     </div>
                     <LinkWrapper
                         href={`https://debank.com/profile/${walletAddress}`}
                         target="_blank"
                         className="group flex flex-col gap-1 items-start group cursor-alias"
                     >
-                        <p className="truncate text-milk-400 text-sm">AUM {shortenValue(walletAddress)}</p>
-                        <UsdAmount amountUsd={aum} className="group-hover:underline" />
+                        <p className="truncate text-milk-400 text-sm">AUM</p>
+                        {aum ? <UsdAmount amountUsd={aum} className="group-hover:underline" /> : <Skeleton variant="text" />}
                     </LinkWrapper>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Price</p>
@@ -192,7 +193,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                     </div>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Trades</p>
-                        <p className="truncate">{data.tradesCount}</p>
+                        <p className="truncate">{data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)}</p>
                     </div>
                 </>
             }

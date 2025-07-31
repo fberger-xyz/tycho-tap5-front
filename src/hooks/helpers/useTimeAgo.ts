@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-function useTimeAgo(date: Date | number | string): string {
+export function useTimeAgo(date: Date | number | string): string {
     const [timeAgo, setTimeAgo] = useState<string>('')
 
     useEffect(() => {
@@ -42,5 +42,3 @@ function useTimeAgo(date: Date | number | string): string {
 
     return timeAgo
 }
-
-export default useTimeAgo

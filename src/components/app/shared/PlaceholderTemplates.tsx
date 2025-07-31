@@ -8,7 +8,7 @@ export function LoadingPlaceholder(props: { entryName: string }) {
 
 export function ErrorPlaceholder(props: { entryName: string; errorMessage: string }) {
     return (
-        <div className="w-full border border-red-200 bg-red-50 p-4 rounded-xl">
+        <div className="w-full border border-red-200 p-4 rounded-xl">
             <p className="text-red-600 text-sm font-medium">Failed to load {props.entryName}</p>
             <p className="text-red-500 text-xs">{props.errorMessage}</p>
         </div>

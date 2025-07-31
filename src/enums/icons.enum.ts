@@ -32,6 +32,8 @@ export enum IconIds {
     ARROW_DOWN_RIGHT = 'solar:arrow-right-down-outline',
     ARROW_UP_LEFT = 'solar:arrow-left-up-outline',
     ARROW_DOWN_LEFT = 'solar:arrow-left-down-outline',
+    ARROW_WAVE_RIGHT_UP = 'tabler:arrow-wave-right-up',
+    ARROW_WAVE_LEFT_DOWN = 'tabler:arrow-wave-left-down',
     THEME_LIGHT = 'line-md:sunny-filled-loop',
     THEME_DARK = 'line-md:sunny-filled-loop-to-moon-filled-alt-loop-transition',
     X = 'ri:twitter-x-fill',
