@@ -155,7 +155,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
         walletAddress,
         chainId: data.chainId,
     })
-    const aum = networth?.usd_value || 0
+    const aum = debankLast24hNetWorth.length ? debankLast24hNetWorth[debankLast24hNetWorth.length - 1].usd_value : networth?.usd_value || 0
 
     // Extract USD values from the 24h history for the chart
     const chartData = debankLast24hNetWorth.length > 0 ? debankLast24hNetWorth.map((item) => item.usd_value) : [] // If no history, just show a flat line with current value
