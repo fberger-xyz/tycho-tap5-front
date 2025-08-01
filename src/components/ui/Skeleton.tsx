@@ -7,10 +7,10 @@ interface SkeletonProps {
 
 export default function Skeleton({ className, variant = 'text' }: SkeletonProps) {
     const variantClasses = {
-        text: 'w-1/2 h-6',
-        chart: 'w-full h-14',
-        metric: 'w-20 h-6',
+        text: 'w-1/2 h-6  rounded',
+        chart: 'w-full h-14  rounded-lg',
+        metric: 'w-20 h-6  rounded',
     }
 
-    return <div className={cn('skeleton-loading rounded-lg', variantClasses[variant], className)} />
+    return <div className={cn('skeleton-loading', variantClasses[variant], className)} />
 }

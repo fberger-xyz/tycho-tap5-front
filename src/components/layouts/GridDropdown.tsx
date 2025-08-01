@@ -37,7 +37,7 @@ export default function GridDropdown({ isOpen, onClose, className }: GridDropdow
                 <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 hidden group-hover:flex text-milk" />
             </LinkWrapper>
             <div onClick={onClose} className="bg-milk-100 p-2.5 w-full rounded-xl">
-                <p className="text-sm text-milk text-left">{SITE_NAME}</p>
+                <p className="text-sm text-milk text-left">{SITE_NAME.replace('Tycho ', '')}</p>
             </div>
         </div>
     )

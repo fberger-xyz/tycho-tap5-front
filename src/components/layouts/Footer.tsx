@@ -6,10 +6,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 import { cn } from '@/utils'
 import StyledTooltip from '../common/StyledTooltip'
-import IframeWrapper from '../common/IframeWrapper'
-import { AppUrls } from '@/enums'
-import LinkWrapper from '../common/LinkWrapper'
 import { env } from '@/env/t3-env'
+import Authors from './Authors'
 dayjs.extend(utc)
 dayjs.extend(relativeTime)
 
@@ -39,52 +37,7 @@ export default function Footer(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <div className="flex flex-wrap lg:justify-end gap-x-1">
-                <p className="text-wrap lg:text-right">
-                    Made by
-                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
-                        <LinkWrapper
-                            href={AppUrls.PROPELLERHEADS_WEBSITE}
-                            target="_blank"
-                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pl-1"
-                        >
-                            PropellerHeads,
-                        </LinkWrapper>
-                    </StyledTooltip>
-                </p>
-                <p className="text-wrap lg:text-right">
-                    <LinkWrapper
-                        href={AppUrls.QUANT_TELEGRAM}
-                        target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
-                    >
-                        @hugoschrng,
-                    </LinkWrapper>
-                </p>
-                <p className="text-wrap lg:text-right">
-                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.MERSO_WEBSITE} />}>
-                        <LinkWrapper
-                            href={AppUrls.FBERGER_WEBSITE}
-                            target="_blank"
-                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
-                        >
-                            xMerso
-                        </LinkWrapper>
-                    </StyledTooltip>
-                    and
-                </p>
-                <p className="text-wrap lg:text-right">
-                    <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
-                        <LinkWrapper
-                            href={AppUrls.FBERGER_WEBSITE}
-                            target="_blank"
-                            className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
-                        >
-                            fberger_xyz
-                        </LinkWrapper>
-                    </StyledTooltip>
-                </p>
-            </div>
+            <Authors />
         </footer>
     )
 }

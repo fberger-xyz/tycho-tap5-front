@@ -3,7 +3,7 @@
 import { APP_PAGES } from '@/config/app.config'
 import { useAppStore } from '@/stores/app.store'
 import { cn, isCurrentPath } from '@/utils'
-import { useRef, Suspense, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { useKeyboardShortcut } from '@/hooks/helpers/useKeyboardShortcutArgs'
 import Image from 'next/image'
 import { AppUrls, IconIds, FileIds } from '@/enums'
@@ -12,6 +12,7 @@ import LinkWrapper from '../common/LinkWrapper'
 import { usePathname } from 'next/navigation'
 import GridDropdownButton from './GridDropdownButton'
 import { AnimatePresence, motion } from 'framer-motion'
+import Authors from './Authors'
 
 export default function HeaderMobile() {
     const { showMobileMenu, setShowMobileMenu } = useAppStore()
@@ -59,7 +60,7 @@ export default function HeaderMobile() {
                 </div>
 
                 {/* right */}
-                <div className="flex gap-2 z-30">
+                <div className={cn('flex gap-2', showMobileMenu ? 'z-40' : 'z-30')}>
                     {/* menu */}
                     <button
                         ref={menuDropdown}
@@ -69,87 +70,79 @@ export default function HeaderMobile() {
                         <IconWrapper id={showMobileMenu ? IconIds.CLOSE : IconIds.MENU} className="size-5" />
                     </button>
                 </div>
-
-                <AnimatePresence>
-                    {showMobileMenu && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
-                            className="fixed z-20 inset-0 flex size-full items-center justify-center px-4 backdrop-blur-xl bg-background/40 overflow-hidden"
-                            onClick={(e) => {
-                                // to improve later
-                                if (e.target === e.currentTarget) {
-                                    setShowMobileMenu(false)
-                                }
-                            }}
-                        >
-                            <Suspense
-                                fallback={
-                                    <motion.nav
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.4, ease: 'easeOut' }}
-                                        className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28"
-                                    >
-                                        {[1, 2, 3].map((index) => (
-                                            <div key={index}>
-                                                <p className="text-base p-2.5 skeleton-loading text-transparent">----------------------</p>
-                                            </div>
-                                        ))}
-                                    </motion.nav>
-                                }
-                            >
-                                <motion.nav
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: 20 }}
-                                    transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
-                                    className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-4 pt-28"
-                                >
-                                    {APP_PAGES.map((page, index) => (
-                                        <motion.div
-                                            key={page.path}
-                                            initial={{ opacity: 0, x: -20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            exit={{ opacity: 0, x: -20 }}
-                                            transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 * index }}
-                                        >
-                                            <LinkWrapper
-                                                href={page.path}
-                                                className={cn('rounded-lg', { 'bg-milk-100': isCurrentPath(pathname, page.path) })}
-                                            >
-                                                <p
-                                                    className={cn('text-base text-milk px-2.5 py-2 hover:bg-milk-100/5 rounded-xl cursor-pointer')}
-                                                    onClick={handleLinkClick}
-                                                >
-                                                    {page.name}
-                                                </p>
-                                            </LinkWrapper>
-                                        </motion.div>
-                                    ))}
-                                    <motion.div
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        exit={{ opacity: 0, x: -20 }}
-                                        transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 * APP_PAGES.length }}
-                                    >
-                                        <LinkWrapper
-                                            href={AppUrls.DOCUMENTATION}
-                                            target="_blank"
-                                            className="flex items-center gap-1 cursor-alias p-2.5 group"
-                                        >
-                                            <p className="text-base group-hover:underline">Docs (Run locally)</p>
-                                            <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
-                                        </LinkWrapper>
-                                    </motion.div>
-                                </motion.nav>
-                            </Suspense>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
             </div>
+
+            <AnimatePresence>
+                {showMobileMenu && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="fixed z-20 inset-0 flex w-full items-center justify-center px-4 backdrop-blur-xl bg-background/40 h-[calc(100vh-0px)]"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) {
+                                setShowMobileMenu(false)
+                            }
+                        }}
+                    >
+                        <motion.nav
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
+                            className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-4 pt-28"
+                        >
+                            {APP_PAGES.map((page, index) => (
+                                <motion.div
+                                    key={page.path}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    exit={{ opacity: 0, x: -20 }}
+                                    transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 * index }}
+                                >
+                                    <LinkWrapper href={page.path} className={cn('rounded-lg', { 'bg-milk-100': isCurrentPath(pathname, page.path) })}>
+                                        <p
+                                            className={cn('text-base text-milk px-2.5 py-2 hover:bg-milk-100 rounded-xl cursor-pointer', {
+                                                'bg-milk-100': page.path === pathname,
+                                            })}
+                                            onClick={handleLinkClick}
+                                        >
+                                            {page.name}
+                                        </p>
+                                    </LinkWrapper>
+                                </motion.div>
+                            ))}
+                            <motion.div
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: -20 }}
+                                transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 * APP_PAGES.length }}
+                            >
+                                <LinkWrapper
+                                    href={AppUrls.DOCUMENTATION}
+                                    target="_blank"
+                                    className="flex items-center gap-1 cursor-alias p-2.5 group"
+                                >
+                                    <p className="text-base group-hover:underline">Docs (Run locally)</p>
+                                    <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
+                                </LinkWrapper>
+                            </motion.div>
+                        </motion.nav>
+
+                        {/* Authors - at bottom */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 20 }}
+                            transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 * (APP_PAGES.length + 1) }}
+                            className="absolute bottom-10 text-center"
+                        >
+                            <Authors className="text-xs text-milk-200 mx-auto" />
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }

@@ -2,7 +2,7 @@
 
 import { usePullToRefresh } from '@/hooks/usePullToRefresh'
 import { cn } from '@/utils'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums/icons.enum'
 
@@ -19,6 +19,18 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
         resistance: 2.5,
     })
 
+    const [showSpinner, setShowSpinner] = useState(false)
+
+    useEffect(() => {
+        if (isRefreshing) {
+            setShowSpinner(true)
+            const timer = setTimeout(() => {
+                setShowSpinner(false)
+            }, 1000)
+            return () => clearTimeout(timer)
+        }
+    }, [isRefreshing])
+
     return (
         <>
             {/* Pull indicator - Fixed positioned to avoid clipping */}
@@ -32,27 +44,25 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
                     }}
                 >
                     <div className="mb-3">
-                        {isRefreshing ? (
-                            <div className="size-10 animate-spin rounded-full border-2 border-aquamarine border-t-transparent" />
-                        ) : (
-                            <div
-                                className={cn(
-                                    'size-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center',
-                                    isReady ? 'border-aquamarine bg-aquamarine/20' : 'border-milk-300 bg-milk-100',
-                                )}
+                        <div
+                            className={cn(
+                                'size-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center',
+                                isRefreshing || isReady ? 'border-aquamarine bg-aquamarine/20' : 'border-milk-300 bg-milk-100',
+                            )}
+                            style={{
+                                transform: isRefreshing
+                                    ? 'scale(1)'
+                                    : `rotate(${Math.min(pullDistance * 2, 180)}deg) scale(${Math.min(pullDistance / 60, 1)})`,
+                            }}
+                        >
+                            <IconWrapper
+                                id={IconIds.REFRESH}
+                                className={cn('size-6', showSpinner && 'animate-spin', isRefreshing || isReady ? 'text-aquamarine' : 'text-milk-400')}
                                 style={{
-                                    transform: `rotate(${Math.min(pullDistance * 2, 180)}deg) scale(${Math.min(pullDistance / 60, 1)})`,
+                                    transform: isRefreshing ? undefined : `rotate(${-Math.min(pullDistance * 2, 180)}deg)`,
                                 }}
-                            >
-                                <IconWrapper
-                                    id={IconIds.REFRESH}
-                                    className={cn('size-6', isReady ? 'text-aquamarine' : 'text-milk-400')}
-                                    style={{
-                                        transform: `rotate(${-Math.min(pullDistance * 2, 180)}deg)`,
-                                    }}
-                                />
-                            </div>
-                        )}
+                            />
+                        </div>
                         <p className="text-xs text-aquamarine mt-2">Reload</p>
                     </div>
                 </div>
