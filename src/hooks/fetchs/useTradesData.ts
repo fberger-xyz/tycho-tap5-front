@@ -8,9 +8,14 @@ import { TradeWithInstanceAndConfiguration } from '@/types'
  * ------------------------ 3 fetch trades
  */
 
-async function fetchTrades(): Promise<TradeWithInstanceAndConfiguration[]> {
+async function fetchTrades(configurationId?: string): Promise<TradeWithInstanceAndConfiguration[]> {
     try {
-        const response = await fetch(`${AppUrls.API_TRADES}?limit=100`)
+        const params = new URLSearchParams({ limit: '100' })
+        if (configurationId) {
+            params.append('configurationId', configurationId)
+        }
+
+        const response = await fetch(`${AppUrls.API_TRADES}?${params.toString()}`)
 
         // Handle non-OK responses
         if (!response.ok) {
@@ -38,10 +43,10 @@ async function fetchTrades(): Promise<TradeWithInstanceAndConfiguration[]> {
     }
 }
 
-export function useTradesData(refreshInterval = 5000) {
+export function useTradesData(refreshInterval = 5000, configurationId?: string) {
     const queryResult = useQuery({
-        queryKey: [ReactQueryKeys.TRADES],
-        queryFn: fetchTrades,
+        queryKey: [ReactQueryKeys.TRADES, configurationId],
+        queryFn: () => fetchTrades(configurationId),
         // Retry configuration
         retry: (failureCount, error) => {
             // Don't retry on 4xx errors
