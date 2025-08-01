@@ -133,9 +133,9 @@ export default async function RootLayout({
             </head>
             <body
                 className={cn(
-                    INTER_TIGHT_FONT.className,
-                    INTER_TIGHT_FONT.variable,
+                    INTER_FONT.className,
                     INTER_FONT.variable,
+                    INTER_TIGHT_FONT.variable,
                     'min-h-screen w-full overflow-x-auto overflow-y-auto text-base text-milk',
                 )}
             >

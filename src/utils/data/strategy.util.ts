@@ -15,6 +15,7 @@ const createStrategy = (
     baseToken: TokenConfig,
     quoteToken: TokenConfig,
     configValues: UnstableInstanceConfigValues,
+    configId: string,
 ): Strategy => ({
     chainId,
     base: baseToken,
@@ -24,7 +25,7 @@ const createStrategy = (
     aumUsd: 0,
     priceUsd: 0,
     tradesCount: 0,
-    config: jsonConfigParser(configValues),
+    config: jsonConfigParser(configId, configValues),
 })
 
 const findOrCreateStrategy = (
@@ -33,11 +34,12 @@ const findOrCreateStrategy = (
     baseToken: TokenConfig,
     quoteToken: TokenConfig,
     configValues: UnstableInstanceConfigValues,
+    configId: string,
 ): number => {
     const index = strategies.findIndex((s) => s.chainId === chainId)
     if (index >= 0) return index
 
-    strategies.push(createStrategy(chainId, baseToken, quoteToken, configValues))
+    strategies.push(createStrategy(chainId, baseToken, quoteToken, configValues, configId))
     return strategies.length - 1
 }
 
@@ -67,7 +69,7 @@ export const groupByStrategies = (configurations: ConfigurationWithInstances[]):
             const quoteToken = getTokenByAddress(chain.id, configValues.quote_token_address)
             if (!baseToken || !quoteToken) continue
 
-            const strategyIndex = findOrCreateStrategy(strategies, chain.id, baseToken, quoteToken, configValues)
+            const strategyIndex = findOrCreateStrategy(strategies, chain.id, baseToken, quoteToken, configValues, configuration.id)
             addInstanceToStrategy(strategies[strategyIndex], instance)
         }
     }

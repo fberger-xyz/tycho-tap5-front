@@ -17,6 +17,7 @@ export const toUTC = (date: PossiblyADate, format: string) => {
     }
 }
 export const DAYJS_FORMATS = {
+    dateLong: (date: PossiblyADate) => toUTC(date, 'dddd, MMMM D, YYYY ∙ hh:mm A'),
     date: (date: PossiblyADate) => toUTC(date, 'ddd. MMM. D ∙ hh:mm A'),
     dateShort: (date: PossiblyADate) => toUTC(date, 'MMM. D ∙ hh:mm A'),
     day: (date: PossiblyADate) => toUTC(date, 'MMM D'),

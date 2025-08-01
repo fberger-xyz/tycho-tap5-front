@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode } from 'react'
-import { cn, getStrategyPair } from '@/utils'
+import { cn } from '@/utils'
 import { memo } from 'react'
 import { Strategy } from '@/types'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
@@ -47,7 +47,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
     return (
         <div className={cn('w-full flex flex-col', props.className)}>
             {/* row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl group-hover:bg-milk-200 transition-colors duration-200 cursor-pointer">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer">
                 {props.header}
                 {props.chart}
             </div>
@@ -165,7 +165,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             key={`${data.chainId}-${index}`}
             className="group"
             header={
-                <LinkWrapper href={`/strategies/${getStrategyPair(data)}`}>
+                <LinkWrapper href={`/strategies/${data.config.id}`}>
                     <StrategyHeader data={data} />
                 </LinkWrapper>
             }

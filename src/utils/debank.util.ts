@@ -18,7 +18,7 @@ export function extractUniqueWalletChains(configurations: ConfigurationWithInsta
         config.Instance.forEach(() => {
             // Parse the configuration to get wallet address
             try {
-                const parsedConfig = jsonConfigParser(config.values)
+                const parsedConfig = jsonConfigParser(config.id, config.values)
                 const walletAddress = parsedConfig.inventory.walletPublicKey
 
                 if (walletAddress && chainId) {

@@ -3,7 +3,6 @@
 import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
 import { ListToShow } from '@/enums'
 import { cn } from '@/utils'
-import { useAppStore } from '@/stores/app.store'
 import Card from '@/components/figma/Card'
 import StrategiesList from '@/components/app/strategies/list/StrategiesList'
 import UsdAmount from '@/components/figma/UsdAmount'
@@ -11,9 +10,10 @@ import { TradesList } from '@/components/app/trades/TradesList'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategies } from '@/hooks/fetchs/useStrategies'
 import Skeleton from '@/components/ui/Skeleton'
+import { useTabFromUrl } from '@/hooks/useTabFromUrl'
 
 export default function Page() {
-    const { listToShow, setListToShow } = useAppStore()
+    const { tab, setTab } = useTabFromUrl()
     const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
     const { strategies } = useStrategies()
     return (
@@ -52,14 +52,14 @@ export default function Page() {
             {/* list to show */}
             <div className="flex gap-6 mb-8">
                 {Object.values(ListToShow).map((list) => (
-                    <button key={list} className={cn('cursor-pointer')} onClick={() => setListToShow(list)}>
-                        <p className={cn('text-lg', { 'text-milk': list === listToShow, 'text-milk-400': list !== listToShow })}>{list}</p>
+                    <button key={list} className={cn('cursor-pointer')} onClick={() => setTab(list)}>
+                        <p className={cn('text-lg', { 'text-milk': list === tab, 'text-milk-400': list !== tab })}>{list}</p>
                     </button>
                 ))}
             </div>
 
-            {listToShow === ListToShow.STRATEGIES && <StrategiesList />}
-            {listToShow === ListToShow.TRADES && <TradesList />}
+            {tab === ListToShow.STRATEGIES && <StrategiesList />}
+            {tab === ListToShow.TRADES && <TradesList />}
         </HydratedPageWrapper>
     )
 }

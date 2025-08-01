@@ -112,7 +112,7 @@ export function LoadingTradeRows() {
 
 export const TradeRow = memo(function TradeRow({ trade, className }: { trade: TradeWithInstanceAndConfiguration; className?: string }) {
     if (!trade.Instance.Configuration) return null
-    const parsedConfig = jsonConfigParser(trade.Instance.Configuration.values)
+    const parsedConfig = jsonConfigParser(trade.Instance.Configuration.id, trade.Instance.Configuration.values)
     const tradeValues = trade.values as unknown as TradeValues
     const spread = parsedConfig.execution.minSpreadThresholdBps || 0
     const txHash = tradeValues.data?.broadcast?.hash ?? ''
@@ -122,7 +122,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
         <TradeRowTemplate
             strategy={
                 <LinkWrapper
-                    href={`/strategies/${trade.id}`}
+                    href={`/strategies/${parsedConfig.id}`}
                     target="_blank"
                     className="flex gap-2 items-center hover:bg-milk-100 w-fit px-3 py-2 rounded-lg group cursor-pointer"
                 >
@@ -132,7 +132,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                     <Tag variant="default" className="rounded pl-2 pr-1.5 py-0.5 text-xs">
                         <p className="text-milk-600">{numeral(spread).format('0,0.[0000]')} bps</p>
                     </Tag>
-                    <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 text-transparent group-hover:text-aquamarine" />
+                    <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 text-transparent group-hover:text-milk" />
                 </LinkWrapper>
             }
             time={<LiveDate date={trade.createdAt}>{DAYJS_FORMATS.timeAgo(trade.createdAt)}</LiveDate>}

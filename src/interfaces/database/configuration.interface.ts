@@ -1,6 +1,7 @@
 import { ChainConfig, TokenConfig } from '../app.interface'
 
 export interface UnstableInstanceConfigValues {
+    id: string
     rpc_url: string
     chain_id: number
     pair_tag: string
@@ -36,6 +37,7 @@ export interface UnstableInstanceConfigValues {
 }
 
 export interface ParsedConfigurationValues {
+    id: string
     base: {
         symbol: string
         address: string

@@ -18,7 +18,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
             disableAnimation={true}
             content={
                 <div>
-                    <p>{DAYJS_FORMATS.date(props.date)} UTC</p>
+                    <p>{DAYJS_FORMATS.dateLong(props.date)} UTC</p>
                     <p>
                         {
                             getDurationBetween({
@@ -35,7 +35,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
                 </div>
             }
         >
-            <p className={cn('truncate hover:underline', props.className)}>{props.children}</p>
+            <p className={cn('truncate hover:underline cursor-help', props.className)}>{props.children}</p>
         </StyledTooltip>
     )
 }

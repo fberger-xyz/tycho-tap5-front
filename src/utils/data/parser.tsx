@@ -2,9 +2,11 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import { getTokenByAddress } from '@/config/tokens.config'
 import { ParsedConfigurationValues, UnstableInstanceConfigValues } from '@/interfaces'
 
-export const jsonConfigParser = (json: unknown): ParsedConfigurationValues => {
+export const jsonConfigParser = (configurationId: string, json: unknown): ParsedConfigurationValues => {
     const castedJson = json as UnstableInstanceConfigValues
     return {
+        id: configurationId,
+
         // base
         base: {
             symbol: castedJson.base_token, // TODO: ask to add '_symbol'

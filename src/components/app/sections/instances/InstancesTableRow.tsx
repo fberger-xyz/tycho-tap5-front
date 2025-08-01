@@ -160,7 +160,7 @@ export function LoadingInstanceRows() {
  */
 
 export const InstanceRow = memo(function InstanceRow({ data, index }: { data: EnrichedInstance; index: number }) {
-    const parsedConfig = jsonConfigParser(data.config?.values)
+    const parsedConfig = jsonConfigParser(data.config?.id, data.config?.values)
     // const broadcast = parsedConfig.execution.broadcastUrl ? String(parsedConfig.execution.broadcastUrl) : 'unknown' // v1
     const reference = parsedConfig.execution.priceFeedConfig.source ? String(parsedConfig.execution.priceFeedConfig.type) : 'unknown'
     const targetSpread = parsedConfig.execution.minSpreadThresholdBps ? `${String(parsedConfig.execution.minSpreadThresholdBps)} bps` : 'unknown'
