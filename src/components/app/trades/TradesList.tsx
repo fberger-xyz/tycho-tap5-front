@@ -1,6 +1,5 @@
 'use client'
 
-import { LoadingTradeRows as LoadingRows } from './TradesList'
 import { ReactNode, memo } from 'react'
 import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
@@ -84,7 +83,7 @@ export function TradesTableHeaders() {
  */
 
 export function LoadingTradeRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-full">Loading...</p>
+    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg mr-auto">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">
@@ -99,7 +98,7 @@ export function LoadingTradeRows() {
                         out={loadingParagraph}
                         price={loadingParagraph}
                         tx={loadingParagraph}
-                        className="px-3 py-2 rounded-lg text-transparent border-b border-milk-50"
+                        className="py-2 rounded-lg text-transparent border-b border-milk-50"
                     />
                 ))}
             </div>
@@ -188,7 +187,7 @@ export function TradesList() {
                 <div className="flex flex-col min-w-max rounded-2xl bg-milk-50 max-h-[50vh] w-full">
                     <TradesTableHeaders />
                     {showLoading ? (
-                        <LoadingRows />
+                        <LoadingTradeRows />
                     ) : noData ? (
                         <EmptyPlaceholder entryName="trades" />
                     ) : (

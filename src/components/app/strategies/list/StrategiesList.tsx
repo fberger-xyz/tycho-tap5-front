@@ -11,9 +11,9 @@ import { useStrategies } from '@/hooks/fetchs/useStrategies'
 import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import UsdAmount from '@/components/figma/UsdAmount'
-import MiniLineChart from '@/components/charts/MiniLineChart'
 import { Range, TargetSpread } from '@/components/figma/Tags'
 import Skeleton from '@/components/ui/Skeleton'
+import DebankAumChart from '@/components/charts/DebankAumChart'
 
 /**
  * ------------------------ 1 template
@@ -169,8 +169,8 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                 </LinkWrapper>
             }
             chart={
-                <div className="w-full md:w-44 h-14 md:ml-auto">
-                    {chartData.length > 0 ? <MiniLineChart data={chartData} className="size-full" /> : <Skeleton variant="chart" />}
+                <div className="w-full md:w-48 h-14 md:ml-auto">
+                    {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="chart" />}
                 </div>
             }
             kpis={
