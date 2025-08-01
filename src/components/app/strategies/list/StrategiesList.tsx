@@ -47,7 +47,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
     return (
         <div className={cn('w-full flex flex-col', props.className)}>
             {/* row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 w-full p-4 bg-milk-50 rounded-t-2xl group-hover:bg-milk-200 transition-colors duration-200 cursor-pointer">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl group-hover:bg-milk-200 transition-colors duration-200 cursor-pointer">
                 {props.header}
                 {props.chart}
             </div>
@@ -185,7 +185,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                         className="group flex flex-col gap-1 items-start group cursor-alias"
                     >
                         <p className="truncate text-milk-400 text-sm">AUM</p>
-                        {aum ? <UsdAmount amountUsd={aum} className="group-hover:underline" /> : <Skeleton variant="text" />}
+                        {aum ? <UsdAmount amountUsd={aum} className="hover:underline" /> : <Skeleton variant="text" />}
                     </LinkWrapper>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Price</p>

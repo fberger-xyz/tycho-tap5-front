@@ -53,13 +53,14 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
                                 />
                             </div>
                         )}
+                        <p className="text-xs text-aquamarine mt-2">Reload</p>
                     </div>
                 </div>
             )}
 
             {/* Content wrapper */}
             <div
-                className={cn('relative min-h-screen', className)}
+                className={cn('relative flex flex-col min-h-screen', className)}
                 style={{
                     transform: isPulling || isRefreshing ? `translateY(${pullDistance}px)` : 'translateY(0)',
                     transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

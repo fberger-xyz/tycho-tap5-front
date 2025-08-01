@@ -11,7 +11,7 @@ import Footer from '@/components/layouts/Footer'
 import HeaderDesktop from '@/components/layouts/HeaderDesktop'
 import HeaderMobile from '@/components/layouts/HeaderMobile'
 import { ThemeProvider } from 'next-themes'
-import { AppThemes } from '@/enums'
+import { AppThemes, Authors } from '@/enums'
 import { ReactQueryProvider } from '@/providers/react-query.providers'
 import PWAProvider from '@/providers/pwa.provider'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme.config'
@@ -119,20 +119,10 @@ export default async function RootLayout({
         url: APP_METADATA.SITE_URL,
         applicationCategory: APP_METADATA.STRUCTURED_DATA.applicationCategory,
         operatingSystem: APP_METADATA.STRUCTURED_DATA.operatingSystem,
-        offers: {
-            '@type': 'Offer',
-            price: APP_METADATA.STRUCTURED_DATA.price,
-            priceCurrency: APP_METADATA.STRUCTURED_DATA.priceCurrency,
-        },
         author: {
-            '@type': 'Person',
+            '@type': Authors.PROPELLER_HEADS,
             name: APP_METADATA.AUTHOR.name,
-            url: AppUrls.FBERGER_WEBSITE,
-        },
-        about: {
-            '@type': 'Thing',
-            name: APP_METADATA.STRUCTURED_DATA.about.name,
-            description: APP_METADATA.STRUCTURED_DATA.about.description,
+            url: AppUrls.PROPELLERHEADS_WEBSITE,
         },
     }
 
@@ -151,7 +141,7 @@ export default async function RootLayout({
             >
                 <PWAProvider>
                     <Providers>
-                        <main>
+                        <main className="flex flex-col min-h-screen">
                             <Suspense fallback={null}>
                                 <HeaderDesktop />
                                 <HeaderMobile />

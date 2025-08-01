@@ -120,3 +120,10 @@ export enum ListToShow {
     STRATEGIES = 'Strategies',
     TRADES = 'Trades History',
 }
+
+export enum Authors {
+    PROPELLER_HEADS = 'PropellerHeads',
+    FBERGER = 'fberger.xyz',
+    MERSO = 'merso.xyz',
+    HUGOSCHRNG = 'hugoschrng',
+}
