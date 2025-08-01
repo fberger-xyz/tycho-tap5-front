@@ -29,7 +29,7 @@ export const StrategyHeaderTemplate = (props: {
     return (
         <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
             {props.pairImages}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-full">
                 {/* sub row 1 */}
                 <div className="flex gap-2 items-center">
                     {props.pairSymbols}
@@ -76,7 +76,7 @@ export function LoadingStrategyHeader() {
             pairSymbols={loadingParagraph}
             spread={loadingParagraph}
             chains={loadingParagraph}
-            className="text-transparent"
+            className="cursor-wait"
         />
     )
 }
@@ -98,6 +98,7 @@ export function LoadingStrategiesList() {
                             ))}
                         </>
                     }
+                    chart={<div className="w-full md:w-48 h-14 md:ml-auto skeleton-loading rounded-lg" />}
                     className="text-transparent cursor-wait"
                 />
             ))}
