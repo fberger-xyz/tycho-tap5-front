@@ -9,7 +9,7 @@ import UsdAmount from '@/components/figma/UsdAmount'
 import { TradesList } from '@/components/app/trades/TradesList'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategies } from '@/hooks/fetchs/useStrategies'
-import Skeleton from '@/components/ui/Skeleton'
+import Skeleton from '@/components/common/Skeleton'
 import { useTabFromUrl } from '@/hooks/useTabFromUrl'
 
 export default function Page() {

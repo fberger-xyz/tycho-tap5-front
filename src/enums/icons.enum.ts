@@ -50,7 +50,7 @@ export enum IconIds {
     REFRESH = 'ix:reload',
     WALLET = 'ic:baseline-wallet',
     DOLLAR = 'carbon:currency-dollar',
-    STOP_TRADING = 'carbon:pause',
+    STOP_TRADING = 'material-symbols:stop-circle-rounded',
     TERMS = 'material-symbols:contract-edit-outline',
     FAQ = 'carbon:help',
     THUNDER = 'ant-design:thunderbolt-twotone',
@@ -72,4 +72,5 @@ export enum IconIds {
     TRIANGLE_UP = 'ic:round-arrow-drop-up',
     INFORMATION = 'iconamoon:information-circle',
     SETTINGS = 'ic:baseline-settings',
+    DOTS_HORIZONTAL = 'mdi:dots-horizontal',
 }

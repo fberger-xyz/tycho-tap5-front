@@ -12,8 +12,8 @@ import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import UsdAmount from '@/components/figma/UsdAmount'
 import { Range, TargetSpread } from '@/components/figma/Tags'
-import Skeleton from '@/components/ui/Skeleton'
 import DebankAumChart from '@/components/charts/DebankAumChart'
+import Skeleton from '@/components/common/Skeleton'
 
 /**
  * ------------------------ 1 template
@@ -29,7 +29,7 @@ export const StrategyHeaderTemplate = (props: {
     return (
         <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
             {props.pairImages}
-            <div className="flex flex-col gap-2 w-full">
+            <div className="flex flex-col gap-2 grow">
                 {/* sub row 1 */}
                 <div className="flex gap-2 items-center">
                     {props.pairSymbols}

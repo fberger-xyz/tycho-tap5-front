@@ -79,7 +79,7 @@ export default function HeaderMobile() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="fixed z-20 inset-0 flex w-full items-center justify-center px-4 backdrop-blur-xl bg-background/40 h-[calc(100vh-0px)]"
+                        className="fixed md:hidden z-20 inset-0 flex w-full items-center justify-center px-4 backdrop-blur-xl bg-background/40 h-[calc(100vh-0px)]"
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
                                 setShowMobileMenu(false)
