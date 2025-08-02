@@ -24,7 +24,7 @@ export function Tag({ variant, children, className }: { variant: TagVariant; chi
 export function TargetSpread({ bpsAmount }: { bpsAmount: number }) {
     const variant = 'default'
     return (
-        <Tag variant={variant} className="rounded-l pl-2 pr-1.5 py-0.5 text-xs">
+        <Tag variant={variant} className="rounded-l pl-2 pr-1.5 py-0.5 text-xs h-fit">
             <p className={variantStyles[variant].text}>{numeral(bpsAmount).format('0,0.[0000]')} bps</p>
         </Tag>
     )
@@ -33,7 +33,7 @@ export function TargetSpread({ bpsAmount }: { bpsAmount: number }) {
 export function Range({ inRange }: { inRange: boolean }) {
     const variant = inRange ? 'success' : 'error'
     return (
-        <Tag variant={variant} className="rounded-r pl-1.5 pr-2 py-0.5 text-xs">
+        <Tag variant={variant} className="rounded-r pl-1.5 pr-2 py-0.5 text-xs h-fit">
             <p className={variantStyles[variant].text}>{inRange ? 'In range' : 'Out of range'}</p>
         </Tag>
     )
@@ -46,7 +46,7 @@ export function Range({ inRange }: { inRange: boolean }) {
 export function TradeSide({ side }: { side: 'buy' | 'sell' }) {
     const variant = side === 'buy' ? 'success' : 'error'
     return (
-        <Tag variant={variant} className="rounded-xl px-2 py-0.5 text-xs">
+        <Tag variant={variant} className="rounded-xl px-2 py-0.5 text-xs h-fit">
             <p className={variantStyles[variant].text}>{side === 'buy' ? 'Buy' : 'Sell'}</p>
         </Tag>
     )
@@ -55,7 +55,7 @@ export function TradeSide({ side }: { side: 'buy' | 'sell' }) {
 export function PercentEvolution({ percentage }: { percentage: number }) {
     const variant = percentage > 0 ? 'success' : percentage < 0 ? 'error' : 'default'
     return (
-        <Tag variant={variant} className="rounded-xl px-1 py-0.5 text-xs">
+        <Tag variant={variant} className="rounded-xl px-1 py-0.5 text-xs h-fit">
             <IconWrapper
                 id={percentage > 0 ? IconIds.ARROW_UP_RIGHT : percentage < 0 ? IconIds.ARROW_DOWN_LEFT : IconIds.ARROW_WAVE_RIGHT_UP}
                 className={cn('size-4', variantStyles[variant].text)}

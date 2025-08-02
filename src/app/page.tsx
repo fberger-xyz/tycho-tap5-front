@@ -11,15 +11,16 @@ import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategies } from '@/hooks/fetchs/useStrategies'
 import Skeleton from '@/components/common/Skeleton'
 import { useTabFromUrl } from '@/hooks/useTabFromUrl'
+import { DEFAULT_PADDING_X } from '@/config'
 
 export default function Page() {
     const { tab, setTab } = useTabFromUrl()
     const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
     const { strategies } = useStrategies()
     return (
-        <HydratedPageWrapper>
+        <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full">
+            <div className={cn('grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full', DEFAULT_PADDING_X)}>
                 <Card>
                     <p className="text-sm text-milk-400">Total PnL</p>
                     <Skeleton variant="text" />
@@ -50,7 +51,7 @@ export default function Page() {
             </div>
 
             {/* list to show */}
-            <div className="flex gap-6 mb-8">
+            <div className={cn('flex gap-6 mb-8', DEFAULT_PADDING_X)}>
                 {Object.values(ListToShow).map((list) => (
                     <button key={list} className={cn('cursor-pointer')} onClick={() => setTab(list)}>
                         <p className={cn('text-lg', { 'text-milk': list === tab, 'text-milk-400': list !== tab })}>{list}</p>

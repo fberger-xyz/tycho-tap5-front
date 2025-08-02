@@ -17,6 +17,7 @@ import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
 import { jsonConfigParser } from '@/utils/data/parser'
 import { LinkToExplorer } from '@/components/common/LinkToExplorer'
+import { DEFAULT_PADDING_X } from '@/config'
 
 /**
  * ------------------------ 1 template
@@ -83,7 +84,7 @@ export function TradesTableHeaders() {
  */
 
 export function LoadingTradeRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg mr-auto">Loading...</p>
+    const loadingParagraph = <p className="w-3/4 skeleton-loading h-8 rounded-lg mr-auto">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">
@@ -183,8 +184,8 @@ export function TradesList() {
     // render table
     return (
         <div className="rounded-xl w-full">
-            <div className="overflow-x-auto w-full">
-                <div className="flex flex-col min-w-max rounded-2xl bg-milk-50 max-h-[50vh] w-full">
+            <div className={cn('overflow-x-auto w-full', DEFAULT_PADDING_X)}>
+                <div className={cn('flex flex-col min-w-max rounded-2xl bg-milk-50 max-h-[50vh] w-full')}>
                     <TradesTableHeaders />
                     {showLoading ? (
                         <LoadingTradeRows />

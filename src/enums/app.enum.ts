@@ -99,6 +99,7 @@ export enum ChartType {
     CANDLES = 'Candles',
     PNL = 'P&L',
     SPREAD = 'Spread',
+    AUM = 'AUM',
     // INVENTORY = 'Inventory',
 }
 

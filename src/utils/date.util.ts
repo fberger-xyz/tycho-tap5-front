@@ -11,24 +11,21 @@ dayjs.extend(relativeTime)
 type PossiblyADate = Date | string | number
 export const toUTC = (date: PossiblyADate, format: string) => {
     try {
+        // return `${dayjs(date).utc().format(format)} UTC`
         return dayjs(date).utc().format(format)
     } catch {
         return 'Not a date'
     }
 }
+
 export const DAYJS_FORMATS = {
-    dateLong: (date: PossiblyADate) => toUTC(date, 'dddd, MMMM D, YYYY ∙ hh:mm A'),
+    dateLong: (date: PossiblyADate) => `${toUTC(date, 'dddd, MMMM D, YYYY ∙ hh:mm A')} UTC`,
     date: (date: PossiblyADate) => toUTC(date, 'ddd. MMM. D ∙ hh:mm A'),
     dateShort: (date: PossiblyADate) => toUTC(date, 'MMM. D ∙ hh:mm A'),
+    dateChart: (date: PossiblyADate) => toUTC(date, 'MMM. D'),
     day: (date: PossiblyADate) => toUTC(date, 'MMM D'),
     timeAgo: (date: PossiblyADate) => dayjs(date).utc().fromNow(),
 }
-
-export const dateHelper = (dayjsInstance: dayjs.Dayjs) => ({
-    dayjs: dayjsInstance,
-    date: dayjsInstance.toDate(),
-    ts: dayjsInstance.toDate().getTime(),
-})
 
 export const getDurationBetween = ({
     startTs,

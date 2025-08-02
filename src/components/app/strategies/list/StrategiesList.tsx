@@ -14,6 +14,7 @@ import UsdAmount from '@/components/figma/UsdAmount'
 import { Range, TargetSpread } from '@/components/figma/Tags'
 import DebankAumChart from '@/components/charts/DebankAumChart'
 import Skeleton from '@/components/common/Skeleton'
+import { DEFAULT_PADDING_X } from '@/config'
 
 /**
  * ------------------------ 1 template
@@ -171,7 +172,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             }
             chart={
                 <div className="w-full md:w-48 h-14 md:ml-auto">
-                    {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="chart" />}
+                    {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="debanAumChart" />}
                 </div>
             }
             kpis={
@@ -213,7 +214,7 @@ export default function StrategiesList() {
     if (hasError && error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load strategies'
         return (
-            <div className="flex flex-col gap-5 mx-auto w-full mt-10">
+            <div className={cn('flex flex-col gap-5 mx-auto w-full mt-10', DEFAULT_PADDING_X)}>
                 <ErrorPlaceholder entryName="strategies" errorMessage={errorMessage} />
                 <button
                     onClick={() => refetch()}
@@ -231,7 +232,7 @@ export default function StrategiesList() {
     const noData = !isLoading && strategies?.length === 0
 
     return (
-        <div className="flex flex-col gap-5 mx-auto w-full">
+        <div className={cn('flex flex-col gap-5 mx-auto w-full', DEFAULT_PADDING_X)}>
             {showLoading ? (
                 <LoadingStrategiesList />
             ) : noData ? (

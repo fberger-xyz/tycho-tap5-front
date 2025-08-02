@@ -49,7 +49,7 @@ export function ImageWithText(props: { symbol?: string; chainId?: number; classN
     if (props.symbol) {
         return (
             <StyledTooltip disableAnimation={true} content={props.symbol}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-fit">
                     <SymbolImage symbol={props.symbol} size={props.size} className={cn('rounded-full', props.className)} />
                     <p>{props.symbol}</p>
                 </div>
@@ -58,7 +58,7 @@ export function ImageWithText(props: { symbol?: string; chainId?: number; classN
     } else if (props.chainId) {
         return (
             <StyledTooltip disableAnimation={true} content={CHAINS_CONFIG[Number(props.chainId)].name}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-fit">
                     <ChainImage id={props.chainId} size={props.size ?? 20} className={cn('rounded-lg', props.className)} />
                     <p>{CHAINS_CONFIG[Number(props.chainId)].name}</p>
                 </div>
@@ -66,7 +66,7 @@ export function ImageWithText(props: { symbol?: string; chainId?: number; classN
         )
     }
     return (
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-fit">
             <ChainImage id={props.chainId} size={props.size ?? 20} className={props.className} />
             <p>Unknown</p>
         </div>
@@ -91,7 +91,7 @@ export function DoubleSymbol({
     marginRight?: number
 }) {
     return (
-        <div className="relative flex items-center" style={{ width: size + gap, height: size }}>
+        <div className="relative flex items-center" style={{ width: size + gap, height: size, minWidth: size + gap }}>
             {/* Left half */}
             <div
                 className={cn('absolute overflow-hidden', className)}

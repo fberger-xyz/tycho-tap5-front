@@ -12,7 +12,7 @@ export default function StrategyTemplate(props: {
 }) {
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center w-full gap-4">{props.header}</div>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">{props.header}</div>
             <div className="grid grid-cols-12 gap-6">
                 {/* left */}
                 <div className="md:col-span-8 col-span-12 flex flex-col gap-4">

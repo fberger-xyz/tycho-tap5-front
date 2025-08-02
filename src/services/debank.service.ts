@@ -1,7 +1,7 @@
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { env } from '@/env/t3-env'
 import { fetchWithTimeout } from '@/utils/requests.util'
-import { DebankUserNetWorthUsd, DebankUserNetWorthUsdSnapshot } from '@/interfaces/debank.interface'
+import { DebankUserNetWorthUsd, DebankUserNetWorthUsdSnapshot, DebankToken } from '@/interfaces/debank.interface'
 
 const DEBANK_API_BASE = 'https://pro-openapi.debank.com/v1'
 const DEFAULT_TIMEOUT = 60000
@@ -79,5 +79,19 @@ export class DebankService {
         }
 
         return result
+    }
+
+    /**
+     * Fetch user's token list on a specific chain
+     */
+    static async fetchTokenList(walletAddress: string, debankChainId: string, isAll: boolean = true): Promise<DebankToken[]> {
+        const url = `${DEBANK_API_BASE}/user/token_list?id=${walletAddress}&chain_id=${debankChainId}&is_all=${isAll}`
+        const response = await fetchWithTimeout(url, {
+            method: 'GET',
+            headers: this.getHeaders(),
+            timeout: DEFAULT_TIMEOUT,
+            retries: DEFAULT_RETRIES,
+        })
+        return (await response.json()) as DebankToken[]
     }
 }

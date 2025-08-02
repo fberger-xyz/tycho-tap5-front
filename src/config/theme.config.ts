@@ -75,3 +75,5 @@ export const toastStyle = {
     textOverflow: 'ellipsis',
     maxWidth: '800px',
 } as const
+
+export const DEFAULT_PADDING_X = 'px-6 md:px-8 lg:px-10'
