@@ -8,7 +8,7 @@ import { cn } from '@/utils'
 
 export default function Authors(props: { className?: string }) {
     return (
-        <div className={cn('flex flex-wrap justify-center lg:justify-end gap-x-1', props.className)}>
+        <div className={cn('flex flex-wrap gap-x-1', props.className)}>
             <p className="text-wrap lg:text-right">
                 Made by
                 <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
@@ -22,18 +22,9 @@ export default function Authors(props: { className?: string }) {
                 </StyledTooltip>
             </p>
             <p className="text-wrap lg:text-right">
-                <LinkWrapper
-                    href={AppUrls.QUANT_TELEGRAM}
-                    target="_blank"
-                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
-                >
-                    @hugoschrng,
-                </LinkWrapper>
-            </p>
-            <p className="text-wrap lg:text-right">
                 <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.MERSO_WEBSITE} />}>
                     <LinkWrapper
-                        href={AppUrls.FBERGER_WEBSITE}
+                        href={AppUrls.MERSO_WEBSITE}
                         target="_blank"
                         className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
                     >
@@ -43,13 +34,22 @@ export default function Authors(props: { className?: string }) {
                 and
             </p>
             <p className="text-wrap lg:text-right">
+                <LinkWrapper
+                    href={AppUrls.QUANT_TELEGRAM}
+                    target="_blank"
+                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                >
+                    @hugoschrng,
+                </LinkWrapper>
+            </p>
+            <p className="text-wrap lg:text-right">
                 <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
                     <LinkWrapper
                         href={AppUrls.FBERGER_WEBSITE}
                         target="_blank"
                         className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
                     >
-                        fberger_xyz
+                        fberger
                     </LinkWrapper>
                 </StyledTooltip>
             </p>

@@ -37,7 +37,7 @@ export default function Footer(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <Authors />
+            <Authors className="md:justify-start lg:justify-end" />
         </footer>
     )
 }
