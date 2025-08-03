@@ -13,6 +13,7 @@ export const SITE_DOMAIN = env.NEXT_PUBLIC_APP_URL
 export const SITE_URL = SITE_DOMAIN.replace('www.', '')
 export const APP_METADATA = {
     SITE_NAME,
+    SHORT_NAME: 'Tycho MM',
     SITE_DOMAIN,
     SITE_DESCRIPTION: 'A market maker that anyone can easily run, well documented',
     SITE_URL: SITE_URL,

@@ -44,7 +44,7 @@ export const metadata: Metadata = {
 
     // PWA & Mobile
     appleWebApp: {
-        title: APP_METADATA.SITE_NAME,
+        title: APP_METADATA.SHORT_NAME,
         capable: true,
         statusBarStyle: 'black-translucent',
         startupImage: '/figma/logo/tap-5-logo.svg',
