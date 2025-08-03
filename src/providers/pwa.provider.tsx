@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import PullToRefresh from '@/components/common/PullToRefresh'
 import { useRouter } from 'next/navigation'
+import IconWrapper from '@/components/icons/IconWrapper'
+import { IconIds } from '@/enums'
 
 export default function PWAProvider({ children }: { children: React.ReactNode }) {
     const [isIOS, setIsIOS] = useState(false)
@@ -38,9 +40,16 @@ export default function PWAProvider({ children }: { children: React.ReactNode })
 
     const CONTENT = (
         <div className="fixed bottom-0 left-0 right-0 p-4 text-center">
-            <p className="text-xs max-w-[300px] mx-auto text-aquamarine">
-                📲 Get the full app experience: tap <span className="font-semibold">Share</span> and choose{' '}
-                <span className="font-semibold">&quot;Add to Home Screen&quot;</span> 📲
+            <p className="text-xs max-w-[300px] mx-auto text-aquamarine flex items-center justify-center gap-1 flex-wrap">
+                Get the full app experience: tap
+                <span className="font-semibold flex items-center gap-1">
+                    Share
+                    <span className="inline-flex align-middle">
+                        <IconWrapper id={IconIds.SHARE} className="w-4 h-4" />
+                    </span>
+                </span>
+                and choose <span className="font-semibold">&quot;Add to Home Screen&quot;</span>
+                <span className="text-base">📲</span>
             </p>
         </div>
     )

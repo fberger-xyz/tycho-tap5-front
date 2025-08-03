@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     icons: {
         icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico' }],
         shortcut: '/favicon.ico',
-        apple: '/figma/logo/tap-5-logo.svg',
+        apple: '/apple-touch-icon.png',
     },
 
     // PWA & Mobile

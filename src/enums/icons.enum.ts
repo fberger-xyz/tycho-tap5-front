@@ -73,4 +73,5 @@ export enum IconIds {
     INFORMATION = 'iconamoon:information-circle',
     SETTINGS = 'ic:baseline-settings',
     DOTS_HORIZONTAL = 'mdi:dots-horizontal',
+    SHARE = 'ic:round-ios-share',
 }
