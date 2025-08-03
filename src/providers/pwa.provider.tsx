@@ -38,7 +38,10 @@ export default function PWAProvider({ children }: { children: React.ReactNode })
 
     const CONTENT = (
         <div className="fixed bottom-0 left-0 right-0 p-4 text-center">
-            <p className="text-xs">Install this app: tap the share button and then &quot;Add to Home Screen&quot;</p>
+            <p className="text-xs max-w-[300px] mx-auto text-aquamarine">
+                📲 Get the full app experience: tap <span className="font-semibold">Share</span> and choose{' '}
+                <span className="font-semibold">&quot;Add to Home Screen&quot;</span> 📲
+            </p>
         </div>
     )
 

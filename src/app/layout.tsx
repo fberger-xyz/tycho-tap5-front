@@ -37,10 +37,7 @@ export const metadata: Metadata = {
 
     // Icons
     icons: {
-        icon: [
-            { url: '/favicon.svg', type: 'image/svg+xml' },
-            { url: '/favicon.ico' },
-        ],
+        icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }, { url: '/favicon.ico' }],
         shortcut: '/favicon.ico',
         apple: '/figma/logo/tap-5-logo.svg',
     },
