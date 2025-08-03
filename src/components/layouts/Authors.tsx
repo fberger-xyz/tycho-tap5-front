@@ -26,21 +26,21 @@ export default function Authors(props: { className?: string }) {
                     <LinkWrapper
                         href={AppUrls.MERSO_WEBSITE}
                         target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
+                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
                     >
-                        xMerso
+                        xMerso,
                     </LinkWrapper>
                 </StyledTooltip>
-                and
             </p>
             <p className="text-wrap lg:text-right">
                 <LinkWrapper
                     href={AppUrls.QUANT_TELEGRAM}
                     target="_blank"
-                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
                 >
-                    @hugoschrng,
+                    @hugoschrng
                 </LinkWrapper>
+                and
             </p>
             <p className="text-wrap lg:text-right">
                 <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
