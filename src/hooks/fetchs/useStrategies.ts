@@ -1,9 +1,12 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-import type { ConfigurationWithInstances } from '@/types'
+import type { ConfigurationWithInstances, Strategy } from '@/types'
 import { AppUrls, ReactQueryKeys } from '@/enums'
 import { groupByStrategies } from '@/utils'
+import { fetchStrategyPrices } from '@/services/price/price-fetcher.service'
+import { useEffect, useState } from 'react'
+import { showErrorToast, TOAST_MESSAGES } from '@/utils/toast.util'
 
 interface ApiResponse {
     configurations?: ConfigurationWithInstances[]
@@ -41,6 +44,9 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
 }
 
 export function useStrategies() {
+    const [strategiesWithPrices, setStrategiesWithPrices] = useState<Strategy[]>([])
+    const [pricesLoading, setPricesLoading] = useState(false)
+
     const {
         data: configurations,
         isLoading,
@@ -73,13 +79,68 @@ export function useStrategies() {
         gcTime: 5 * 60 * 1000,
     })
 
-    // Process strategies without AUM data (AUM is now fetched per strategy)
-    const strategies = configurations ? groupByStrategies(configurations) : []
+    // Show error toast for configuration fetch errors
+    useEffect(() => {
+        if (error && !isRefetching) {
+            showErrorToast(TOAST_MESSAGES.STRATEGY_LOAD_ERROR)
+        }
+    }, [error, isRefetching])
+
+    // Fetch prices for all strategies
+    useEffect(() => {
+        if (!configurations || configurations.length === 0) {
+            setStrategiesWithPrices([])
+            return
+        }
+
+        // Process strategies inside useEffect to avoid dependency issues
+        const strategies = groupByStrategies(configurations)
+
+        const fetchPrices = async () => {
+            setPricesLoading(true)
+            try {
+                // Prepare strategy data for price fetching
+                const strategyPriceInputs = strategies.map((strategy) => ({
+                    baseSymbol: strategy.base.symbol,
+                    quoteSymbol: strategy.quote.symbol,
+                    priceFeedConfig: strategy.config.execution.priceFeedConfig,
+                    chainId: strategy.chainId,
+                }))
+
+                // Fetch prices in batches
+                const priceMap = await fetchStrategyPrices(strategyPriceInputs)
+
+                // Update strategies with fetched prices
+                const updatedStrategies = strategies.map((strategy) => {
+                    const priceKey = `${strategy.base.symbol}/${strategy.quote.symbol}`
+                    const price = priceMap.get(priceKey) || 0
+                    return {
+                        ...strategy,
+                        priceUsd: price,
+                    }
+                })
+
+                setStrategiesWithPrices(updatedStrategies)
+            } catch (error) {
+                console.error('Failed to fetch strategy prices:', error)
+
+                // Show a generic error toast
+                showErrorToast(TOAST_MESSAGES.PRICE_FETCH_ERROR)
+
+                // Use strategies without prices as fallback
+                setStrategiesWithPrices(strategies)
+            } finally {
+                setPricesLoading(false)
+            }
+        }
+
+        fetchPrices()
+    }, [configurations]) // Re-fetch when configurations change
 
     return {
         configurations: configurations || [],
-        strategies,
-        isLoading,
+        strategies: strategiesWithPrices,
+        isLoading: isLoading || pricesLoading,
         isRefetching,
         error,
         refetch,

@@ -12,7 +12,6 @@ import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { INTER_FONT } from '@/config'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
-import { Trade } from '@prisma/client'
 import numeral from 'numeral'
 
 dayjs.extend(timezone)
@@ -35,7 +34,6 @@ interface CandlestickChartProps {
     quoteSymbol?: string
     upColor?: string
     downColor?: string
-    trades?: Trade[]
     className?: string
 }
 
@@ -50,7 +48,6 @@ export default function CandlestickChart({
     upColor,
     downColor,
     className,
-    trades,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
     const { resolvedTheme } = useTheme()
@@ -71,6 +68,11 @@ export default function CandlestickChart({
         }
 
         const ohlc = data.map((item) => [item.time, item.open, item.close, item.low, item.high])
+
+        // Calculate the time range to determine appropriate label formatting
+        const timeRange = data.length > 1 ? data[data.length - 1].time - data[0].time : 0
+        const hourRange = timeRange / (1000 * 60 * 60) // Convert to hours
+        const dayRange = hourRange / 24
 
         const chartOptions: echarts.EChartsOption = {
             animation: true,
@@ -99,15 +101,46 @@ export default function CandlestickChart({
                         show: false,
                     },
                     axisLabel: {
-                        formatter: (value) => {
-                            return dayjs(value).format('MMM D')
+                        formatter: (value: string | number) => {
+                            const date = dayjs(value)
+
+                            // For intraday data (less than 2 days), show date + time
+                            if (dayRange < 2) {
+                                // For very short timeframes (less than 6 hours), only show time
+                                if (hourRange < 6) {
+                                    return date.format('HH:mm')
+                                }
+                                // For single day, show time with date only on first label
+                                return date.format('HH:mm')
+                            }
+
+                            // For multi-day data (2-7 days), show day and date
+                            if (dayRange < 7) {
+                                return date.format('MMM D')
+                            }
+
+                            // For weekly to monthly data
+                            if (dayRange < 30) {
+                                return date.format('MMM D')
+                            }
+
+                            // For longer timeframes, include year if needed
+                            return date.format('MMM D')
                         },
                         color: colors.milkOpacity[200],
                         fontSize: 10,
                         margin: 15,
-                        showMinLabel: false,
+                        showMinLabel: false, // Hide min label to prevent cropping
                         showMaxLabel: true,
+                        rotate: 0, // Keep labels horizontal
                     },
+                    // Control label interval separately
+                    minInterval:
+                        dayRange < 1
+                            ? 3600 * 1000 * 2 // 2 hours for intraday
+                            : dayRange < 7
+                              ? 3600 * 1000 * 24 // 1 day for weekly
+                              : 3600 * 1000 * 24 * 7, // 1 week for monthly
                     axisPointer: {
                         show: true,
                         label: {
@@ -165,48 +198,6 @@ export default function CandlestickChart({
                     },
                 ],
             },
-            // dataZoom: [
-            //     {
-            //         xAxisIndex: 0,
-            //         show: true,
-            //         type: 'slider',
-            //         height: 20,
-            //         bottom: 30,
-            //         backgroundColor: colors.milkOpacity[100],
-            //         fillerColor: 'transparent',
-            //         borderColor: colors.milkOpacity[200],
-            //         labelFormatter: (valueIndex) => dayjs(timestamps[valueIndex]).format('MMM D, HH:mm UTC'),
-            //         textStyle: { color: colors.milkOpacity[200], fontSize: 10 },
-            //         handleLabel: { show: true },
-            //         dataBackground: {
-            //             lineStyle: { color: colors.milkOpacity[200], opacity: 0.3 },
-            //             areaStyle: { color: colors.milkOpacity[50], opacity: 0.3 },
-            //         },
-            //         selectedDataBackground: {
-            //             lineStyle: { color: colors.aquamarine, opacity: 0.5 },
-            //             areaStyle: { color: colors.aquamarine, opacity: 0.2 },
-            //         },
-            //         brushStyle: { color: 'transparent' },
-            //         handleStyle: { color: colors.milkOpacity[400], borderColor: colors.milkOpacity[200] },
-            //         moveHandleStyle: { color: colors.milkOpacity[400] },
-            //         emphasis: {
-            //             handleLabel: { show: true },
-            //             moveHandleStyle: { color: colors.milkOpacity[400] },
-            //         },
-            //         rangeMode: ['value', 'value'],
-            //         left: 110,
-            //         right: 110,
-            //         brushSelect: false,
-            //     },
-            //     {
-            //         xAxisIndex: 0,
-            //         type: 'inside',
-            //         zoomOnMouseWheel: 'ctrl',
-            //         moveOnMouseMove: 'ctrl',
-            //         moveOnMouseWheel: false,
-            //         preventDefaultMouseMove: false,
-            //     },
-            // ],
             textStyle: {
                 color: colors.milkOpacity[600],
                 fontFamily: INTER_FONT.style.fontFamily,
@@ -228,88 +219,12 @@ export default function CandlestickChart({
                             borderWidth: 2,
                         },
                     },
-                    // markLine:
-                    //     trades && trades.length > 0
-                    //         ? {
-                    //               animation: false,
-                    //               symbol: ['none', 'none'],
-                    //               lineStyle: {
-                    //                   color: colors.aquamarine,
-                    //                   type: 'solid',
-                    //                   width: 2,
-                    //                   opacity: 0.8,
-                    //               },
-                    //               data: (() => {
-                    //                   // First pass: calculate all positions
-                    //                   const tradeData = trades.map((trade, tradeIndex) => {
-                    //                       const tradeTimestamp = new Date(trade.createdAt).getTime()
-                    //                       let closestIndex = 0
-                    //                       let minDiff = Math.abs(timestamps[0] - tradeTimestamp)
-
-                    //                       timestamps.forEach((ts, idx) => {
-                    //                           const diff = Math.abs(ts - tradeTimestamp)
-                    //                           if (diff < minDiff) {
-                    //                               minDiff = diff
-                    //                               closestIndex = idx
-                    //                           }
-                    //                       })
-
-                    //                       return { trade, tradeIndex, closestIndex }
-                    //                   })
-
-                    //                   // Group by position to detect overlaps
-                    //                   const positionGroups = tradeData.reduce(
-                    //                       (groups, data) => {
-                    //                           if (!groups[data.closestIndex]) {
-                    //                               groups[data.closestIndex] = []
-                    //                           }
-                    //                           groups[data.closestIndex].push(data)
-                    //                           return groups
-                    //                       },
-                    //                       {} as Record<number, typeof tradeData>,
-                    //                   )
-
-                    //                   // Create mark line data with smart label positioning
-                    //                   return tradeData.map(({ trade, tradeIndex, closestIndex }) => {
-                    //                       const group = positionGroups[closestIndex]
-                    //                       const positionInGroup = group.findIndex((d) => d.tradeIndex === tradeIndex)
-
-                    //                       // Calculate vertical offset based on position in group
-                    //                       const baseOffset = -10
-                    //                       const spacing = 20
-                    //                       const yOffset = baseOffset - positionInGroup * spacing
-
-                    //                       return {
-                    //                           xAxis: closestIndex,
-                    //                           label: {
-                    //                               show: true,
-                    //                               formatter: `${tradeIndex + 1}`,
-                    //                               position: 'start',
-                    //                               distance: 5,
-                    //                               offset: [0, yOffset],
-                    //                               color: colors.milk,
-                    //                               backgroundColor: colors.aquamarine,
-                    //                               padding: [2, 4],
-                    //                               borderRadius: 10,
-                    //                               fontSize: 10,
-                    //                               fontWeight: 'bold',
-                    //                           },
-                    //                           tooltip: {
-                    //                               formatter: () => {
-                    //                                   return `Trade #${tradeIndex + 1}: ${dayjs(trade.createdAt).format('MMM D, HH:mm:ss UTC')}`
-                    //                               },
-                    //                           },
-                    //                       }
-                    //                   })
-                    //               })(),
-                    //           }
-                    //         : undefined,
                 },
             ],
         }
 
         setOptions(chartOptions)
-    }, [data, isLoading, error, symbol, baseSymbol, quoteSymbol, colors, isMobile, upColor, downColor, trades])
+    }, [data, isLoading, error, symbol, baseSymbol, quoteSymbol, colors, isMobile, upColor, downColor])
 
     // Loading and no data state options
     const emptyStateOptions = useMemo((): echarts.EChartsOption => {

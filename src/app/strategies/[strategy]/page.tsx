@@ -28,6 +28,8 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import numeral from 'numeral'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import { ReactNode } from 'react'
+import { getPriceSourceUrl } from '@/utils/price-source.util'
+import { cleanOutput } from '@/utils/format.util'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -79,15 +81,25 @@ const STRATEGY_LABELS = {
         MAX_SLIPPAGE: 'Max Slippage',
         DAILY_GAS_BUDGET: 'Daily Gas Budget',
         PRICE_UPDATES: 'Price Updates',
-        PRICE_FEED: 'Price Feed',
+        PRICE_FEED: 'Reference Price',
         EOA: 'EOA',
+        BASE_TOKEN: 'Base Token',
+        QUOTE_TOKEN: 'Quote Token',
+        TX_GAS_LIMIT: 'Tx Gas Limit',
+        POLL_INTERVAL: 'Poll Interval',
+        BLOCK_OFFSET: 'Block Offset',
+        PERMIT2: 'Permit2 Address',
+        MIN_WATCH_SPREAD: 'Min Watch Spread',
+        MIN_EXEC_SPREAD: 'Min Exec Spread',
+        INCLUSION_BLOCK_DELAY: 'Inclusion Block Delay',
+        MIN_PUBLISH_TIMEFRAME: 'Min Publish Timeframe',
+        PUBLISH_EVENTS: 'Publish Events',
     },
     PLACEHOLDERS: {
         NO_TOKENS: 'No tokens found',
         NO_DEPOSITS: 'No deposits or withdrawals',
         NOT_SET: 'Not set',
         UNKNOWN: 'Unknown',
-        TO_BE_IMPLEMENTED: 'to be implemented',
     },
 } as const
 
@@ -101,21 +113,23 @@ function StatRow({ label, value }: { label: string; value: ReactNode }) {
 }
 
 const LoadingPage = ({ router }: { router: AppRouterInstance }) => {
-    const { SKELETON_HEIGHTS, ICON_SIZES } = STRATEGY_UI_CONSTANTS
+    const { SKELETON_HEIGHTS } = STRATEGY_UI_CONSTANTS
 
     return (
         <PageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
             <StrategyTemplate
                 header={
                     <>
-                        <div className="flex items-center gap-4 w-full md:grow">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:grow">
                             <Button onClick={() => router.back()}>
                                 <IconWrapper id={IconIds.ARROW_LEFT} />
                             </Button>
-                            <DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={ICON_SIZES.DOUBLE_SYMBOL} gap={2} />
-                            <div className="flex flex-col gap-2 grow md:w-1/3">
-                                <Skeleton variant="text" className="w-1/2" />
-                                <Skeleton variant="text" className="w-1/2" />
+                            <div className="flex gap-4 items-center w-80">
+                                <DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={STRATEGY_UI_CONSTANTS.ICON_SIZES.DOUBLE_SYMBOL} gap={2} />
+                                <div className="flex flex-col gap-1 grow items-start md:w-1/3">
+                                    <Skeleton variant="text" className="w-3/4" />
+                                    <Skeleton variant="text" className="w-2/3" />
+                                </div>
                             </div>
                         </div>
                         <div className="flex gap-2">
@@ -149,8 +163,8 @@ export default function StrategyPage() {
     // trades view tab state with URL sync
     const [tradesTab, setTradesTab] = useQueryState('view', parseAsString.withDefault(TradesView.RECENT_TRADES))
 
-    // Get configuration
-    const { configuration, isLoading: configLoading, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
+    // Get configuration and strategy with price
+    const { configuration, strategy, isLoading: configLoading, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
 
     // Get trades data
     const strategyIdStr = Array.isArray(strategyId) ? strategyId[0] : strategyId
@@ -178,11 +192,17 @@ export default function StrategyPage() {
         isAll: false,
     })
 
+    // Get price from strategy data (already fetched by useStrategies hook)
+    const priceUsd = strategy?.priceUsd || 0
+
     // Early returns for invalid state
     if (!strategyId || !configuration || !parsedConfig) return <LoadingPage router={router} />
 
     // derived values
     const aum = debankLast24hNetWorth.length ? debankLast24hNetWorth[debankLast24hNetWorth.length - 1].usd_value : networth?.usd_value || 0
+
+    // Get price source URL - use strategy if available for consistency
+    const priceSourceUrl = strategy ? getPriceSourceUrl(strategy) : null
 
     // loading
     const isLoading = configLoading || tradesLoading || tokensLoading
@@ -223,7 +243,7 @@ export default function StrategyPage() {
                                             {parsedConfig.base.symbol} / {parsedConfig.quote.symbol}
                                         </p>
                                         <div className="flex gap-0.5">
-                                            <TargetSpread bpsAmount={parsedConfig.execution.minSpreadThresholdBps} />
+                                            <TargetSpread bpsAmount={parsedConfig.execution.minWatchSpreadBps ?? 0} />
                                             <Range inRange={true} />
                                         </div>
                                     </div>
@@ -250,7 +270,8 @@ export default function StrategyPage() {
                     <div className="grid grid-cols-3 gap-4">
                         <Card>
                             <p className="text-sm text-milk-400">PnL</p>
-                            <Skeleton variant="text" />
+                            {/* <Skeleton variant="text" /> */}
+                            <p className="text-milk-200">To be computed</p>
                         </Card>
                         <Card>
                             <p className="text-sm text-milk-400">AUM</p>
@@ -258,7 +279,13 @@ export default function StrategyPage() {
                         </Card>
                         <Card>
                             <p className="text-sm text-milk-400">Price</p>
-                            <Skeleton variant="text" />
+                            {priceSourceUrl ? (
+                                <LinkWrapper href={priceSourceUrl} target="_blank">
+                                    <UsdAmount amountUsd={priceUsd} className="hover:underline cursor-alias" />
+                                </LinkWrapper>
+                            ) : (
+                                <UsdAmount amountUsd={priceUsd} />
+                            )}
                         </Card>
                     </div>
                 }
@@ -267,7 +294,6 @@ export default function StrategyPage() {
                         baseTokenAddress={parsedConfig.base.address}
                         quoteTokenAddress={parsedConfig.quote.address}
                         chainId={parsedConfig.chain.id}
-                        trades={trades || []}
                         className="h-[420px] w-full rounded-lg bg-milk-50"
                     />
                 }
@@ -306,27 +332,32 @@ export default function StrategyPage() {
                             {tokens.length === 0 ? (
                                 <p className="text-milk-400 text-center py-4">{STRATEGY_LABELS.PLACEHOLDERS.NO_TOKENS}</p>
                             ) : (
-                                tokens.map((token) => (
-                                    <div key={token.id} className="grid grid-cols-2 items-center border-t border-milk-100 py-3 px-5">
-                                        <div className="flex items-center gap-2">
-                                            <SymbolImage
-                                                symbol={token.optimized_symbol || token.symbol || '?'}
-                                                size={STRATEGY_UI_CONSTANTS.ICON_SIZES.TOKEN}
-                                            />
+                                tokens
+                                    .filter((token) => token.price > 0.01)
+                                    .sort((a, b) => b.amount - a.amount)
+                                    .map((token) => (
+                                        <div key={token.id} className="grid grid-cols-2 items-center border-t border-milk-100 py-3 px-5">
+                                            <div className="flex items-center gap-2">
+                                                <SymbolImage
+                                                    symbol={token.optimized_symbol || token.symbol || '?'}
+                                                    size={STRATEGY_UI_CONSTANTS.ICON_SIZES.TOKEN}
+                                                />
+                                                <p className="truncate">
+                                                    {token.optimized_symbol || token.symbol || STRATEGY_LABELS.PLACEHOLDERS.UNKNOWN}
+                                                </p>
+                                            </div>
                                             <p className="truncate">
-                                                {token.optimized_symbol || token.symbol || STRATEGY_LABELS.PLACEHOLDERS.UNKNOWN}
+                                                {token.amount.toFixed(STRATEGY_UI_CONSTANTS.DEFAULTS.TOKEN_DECIMALS)}{' '}
+                                                {token.price > 0 && (
+                                                    <span className="text-xs text-milk-400 ml-2">
+                                                        {cleanOutput(
+                                                            `($${numeral(token.amount * token.price).format(STRATEGY_UI_CONSTANTS.DEFAULTS.PRICE_FORMAT)})`,
+                                                        )}
+                                                    </span>
+                                                )}
                                             </p>
                                         </div>
-                                        <p className="truncate">
-                                            {token.amount.toFixed(STRATEGY_UI_CONSTANTS.DEFAULTS.TOKEN_DECIMALS)}{' '}
-                                            {token.price > 0 && (
-                                                <span className="text-xs text-milk-400 ml-2">
-                                                    (${numeral(token.amount * token.price).format(STRATEGY_UI_CONSTANTS.DEFAULTS.PRICE_FORMAT)})
-                                                </span>
-                                            )}
-                                        </p>
-                                    </div>
-                                ))
+                                    ))
                             )}
                         </div>
                     </Card>
@@ -342,6 +373,32 @@ export default function StrategyPage() {
                                         <ChainImage id={parsedConfig.chain.id} size={STRATEGY_UI_CONSTANTS.ICON_SIZES.CHAIN_SMALL} />
                                         <p className="truncate capitalize">{CHAINS_CONFIG[parsedConfig.chain.id].name}</p>
                                     </div>
+                                }
+                            />
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.BASE_TOKEN}
+                                value={
+                                    <LinkWrapper
+                                        href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/token/${parsedConfig.base.address}`}
+                                        className="truncate hover:underline cursor-alias"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {parsedConfig.base.symbol} ({shortenValue(parsedConfig.base.address)})
+                                    </LinkWrapper>
+                                }
+                            />
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.QUOTE_TOKEN}
+                                value={
+                                    <LinkWrapper
+                                        href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/token/${parsedConfig.quote.address}`}
+                                        className="truncate hover:underline cursor-alias"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {parsedConfig.quote.symbol} ({shortenValue(parsedConfig.quote.address)})
+                                    </LinkWrapper>
                                 }
                             />
                             <StatRow
@@ -362,7 +419,7 @@ export default function StrategyPage() {
                                 label={STRATEGY_LABELS.STATS.PRICE_FEED}
                                 value={
                                     <LinkWrapper
-                                        href={parsedConfig.execution.priceFeedConfig.source}
+                                        href={strategy ? getPriceSourceUrl(strategy) || '' : ''}
                                         className="truncate capitalize hover:underline cursor-alias"
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -384,6 +441,56 @@ export default function StrategyPage() {
                                     </LinkWrapper>
                                 }
                             />
+
+                            {parsedConfig.execution.minWatchSpreadBps !== undefined && (
+                                <StatRow label={STRATEGY_LABELS.STATS.MIN_WATCH_SPREAD} value={`${parsedConfig.execution.minWatchSpreadBps} bps`} />
+                            )}
+
+                            {parsedConfig.execution.minExecSpreadBps !== undefined && (
+                                <StatRow label={STRATEGY_LABELS.STATS.MIN_EXEC_SPREAD} value={`${parsedConfig.execution.minExecSpreadBps} bps`} />
+                            )}
+
+                            <StatRow label={STRATEGY_LABELS.STATS.TX_GAS_LIMIT} value={numeral(parsedConfig.execution.txGasLimit).format('0,0')} />
+
+                            <StatRow label={STRATEGY_LABELS.STATS.POLL_INTERVAL} value={`${parsedConfig.execution.pollIntervalMs} ms`} />
+
+                            <StatRow label={STRATEGY_LABELS.STATS.BLOCK_OFFSET} value={parsedConfig.execution.blockOffset.toString()} />
+
+                            {parsedConfig.execution.inclusionBlockDelay !== undefined && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.INCLUSION_BLOCK_DELAY}
+                                    value={parsedConfig.execution.inclusionBlockDelay.toString()}
+                                />
+                            )}
+
+                            {parsedConfig.execution.minPublishTimeframeMs !== undefined && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.MIN_PUBLISH_TIMEFRAME}
+                                    value={`${parsedConfig.execution.minPublishTimeframeMs} ms`}
+                                />
+                            )}
+
+                            {parsedConfig.execution.publishEvents !== undefined && (
+                                <StatRow label={STRATEGY_LABELS.STATS.PUBLISH_EVENTS} value={parsedConfig.execution.publishEvents ? 'Yes' : 'No'} />
+                            )}
+
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.PERMIT2}
+                                value={
+                                    <LinkWrapper
+                                        href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/address/${parsedConfig.tycho.permit2Address}`}
+                                        className="truncate hover:underline cursor-alias"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {shortenValue(parsedConfig.tycho.permit2Address)}
+                                    </LinkWrapper>
+                                }
+                            />
+                            {/* <StatRow
+                                label={STRATEGY_LABELS.STATS.TYCHO_API}
+                                value={<span className="text-xs font-mono">{parsedConfig.tycho.tychoApi}</span>}
+                            /> */}
                         </div>
                     </Card>
                 }

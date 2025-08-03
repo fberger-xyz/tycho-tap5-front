@@ -28,6 +28,7 @@ export const jsonConfigParser = (configurationId: string, json: unknown): Parsed
             chainId: castedJson.chain_id,
             networkName: castedJson.network_name,
             config: CHAINS_CONFIG[castedJson.chain_id] ?? null,
+            pairTag: castedJson.pair_tag,
 
             // example: 3500$ for ETH
             gas: {
@@ -44,7 +45,7 @@ export const jsonConfigParser = (configurationId: string, json: unknown): Parsed
         tycho: {
             tychoRouterAddress: castedJson.tycho_router_address,
             tychoApi: castedJson.tycho_api,
-            // infiniteApproval: castedJson.infinite_approval, // TODO: add this
+            infiniteApproval: castedJson.infinite_approval,
             permit2Address: castedJson.permit2_address,
         },
 
@@ -52,16 +53,21 @@ export const jsonConfigParser = (configurationId: string, json: unknown): Parsed
         execution: {
             txGasLimit: castedJson.tx_gas_limit,
             // targetSpreadBps: castedJson.target_spread_bps, // v1
-            minSpreadThresholdBps: castedJson.min_spread_threshold_bps,
+            minSpreadThresholdBps: castedJson.min_spread_threshold_bps ?? castedJson.min_executable_spread_bps ?? 0,
             maxSlippagePct: castedJson.max_slippage_pct,
             priceFeedConfig: castedJson.price_feed_config,
-            minExecSpreadBps: castedJson.min_exec_spread_bps,
+            minExecSpreadBps: castedJson.min_exec_spread_bps ?? castedJson.min_executable_spread_bps ?? 0,
             // profitabilityCheck: castedJson.profitability_check, // v1
             pollIntervalMs: castedJson.poll_interval_ms,
             gasTokenSymbol: castedJson.gas_token_symbol,
             // broadcastUrl: castedJson.broadcast_url, // v1
             blockOffset: castedJson.block_offset,
             // quoteDepth: castedJson.quote_depths, // useless
+            minWatchSpreadBps: castedJson.min_watch_spread_bps,
+            inclusionBlockDelay: castedJson.inclusion_block_delay,
+            minPublishTimeframeMs: castedJson.min_publish_timeframe_ms,
+            skipSimulation: castedJson.skip_simulation,
+            publishEvents: castedJson.publish_events,
         },
 
         // inventory

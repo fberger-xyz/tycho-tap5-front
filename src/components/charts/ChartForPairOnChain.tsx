@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { ChartColors } from '@/config/chart-colors.config'
-import { Trade } from '@prisma/client'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
@@ -15,16 +14,14 @@ export default function ChartForPairOnChain({
     baseTokenAddress,
     quoteTokenAddress,
     chainId,
-    trades,
     className,
 }: {
     baseTokenAddress: string
     quoteTokenAddress: string
     chainId: number
-    trades: Trade[]
     className?: string
 }) {
-    const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(ChartType.CANDLES))
+    const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(CHART_CONFIG[ChartType.CANDLES].name))
     const [selectedInterval, selectInterval] = useQueryState('interval', parseAsInteger.withDefault(CHART_CONFIG[ChartType.CANDLES].defaultInterval))
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
@@ -104,7 +101,6 @@ export default function ChartForPairOnChain({
                     quoteSymbol={quoteTokenAddress}
                     upColor={colors.aquamarine}
                     downColor={colors.folly}
-                    trades={trades}
                 />
             </div>
         </div>

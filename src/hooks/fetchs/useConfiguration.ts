@@ -4,7 +4,7 @@ import { useMemo } from 'react'
 import { useStrategies } from './useStrategies'
 
 export function useConfiguration(configurationId: string | string[]) {
-    const { configurations, isLoading, error, refetch } = useStrategies()
+    const { configurations, strategies, isLoading, error, refetch } = useStrategies()
 
     // Handle array from useParams
     const id = Array.isArray(configurationId) ? configurationId[0] : configurationId
@@ -13,6 +13,12 @@ export function useConfiguration(configurationId: string | string[]) {
         if (!configurations || !id) return null
         return configurations.find((config) => config.id === id) || null
     }, [configurations, id])
+
+    // Get the strategy with price info
+    const strategy = useMemo(() => {
+        if (!strategies || !id) return null
+        return strategies.find((s) => s.config.id === id) || null
+    }, [strategies, id])
 
     // Get all instances across all configurations for this strategy
     const instances = useMemo(() => {
@@ -27,6 +33,7 @@ export function useConfiguration(configurationId: string | string[]) {
 
     return {
         configuration,
+        strategy,
         instances,
         totalTradesCount,
         isLoading,

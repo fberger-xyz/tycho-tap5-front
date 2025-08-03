@@ -19,6 +19,8 @@ import { jsonConfigParser } from '@/utils/data/parser'
 import { LinkToExplorer } from '@/components/common/LinkToExplorer'
 import { DEFAULT_PADDING_X } from '@/config'
 
+// todo simulation failed pas de broadcast data
+
 /**
  * ------------------------ 1 template
  */

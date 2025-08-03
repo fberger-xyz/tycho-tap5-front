@@ -34,6 +34,8 @@ export interface UnstableInstanceConfigValues {
     min_publish_timeframe_ms: number
     min_spread_threshold_bps: number
     gas_token_chainlink_price_feed: string
+    min_watch_spread_bps: number
+    min_executable_spread_bps: number
 }
 
 export interface ParsedConfigurationValues {
@@ -54,6 +56,7 @@ export interface ParsedConfigurationValues {
         chainId: number
         networkName: string
         config: ChainConfig
+        pairTag?: string
         gas: {
             symbol: string
             chainlinkPriceFeed: string
@@ -65,6 +68,7 @@ export interface ParsedConfigurationValues {
         tychoRouterAddress: string
         tychoApi: string
         permit2Address: string
+        infiniteApproval?: boolean
     }
     execution: {
         txGasLimit: number
@@ -82,6 +86,11 @@ export interface ParsedConfigurationValues {
         gasTokenSymbol: string
         // broadcastUrl: string // v1
         blockOffset: number
+        minWatchSpreadBps?: number
+        inclusionBlockDelay?: number
+        minPublishTimeframeMs?: number
+        skipSimulation?: boolean
+        publishEvents?: boolean
     }
     inventory: {
         walletPublicKey: string

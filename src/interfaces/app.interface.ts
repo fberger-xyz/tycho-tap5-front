@@ -22,6 +22,7 @@ export interface ChainConfig {
         decimals: number
     }
     debankId: string // https://docs.cloud.debank.com/en/readme/api-pro-reference/chain
+    chainlinkFeeds?: Record<string, string> // Price feed addresses for this chain
 }
 
 export interface TokenConfig {

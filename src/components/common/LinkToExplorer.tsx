@@ -13,7 +13,7 @@ export function LinkToExplorer(props: { chainId: number; txHash: string; classNa
             disableAnimation={true}
             content={
                 <LinkWrapper
-                    href={`${CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${shortenValue(props.txHash)}` : ''}`}
+                    href={`${CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${props.txHash}` : ''}`}
                     target="_blank"
                     className="cursor-alias flex items-center gap-2 hover:underline"
                 >
@@ -23,7 +23,7 @@ export function LinkToExplorer(props: { chainId: number; txHash: string; classNa
             }
         >
             <LinkWrapper
-                href={`${CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${shortenValue(props.txHash)}` : ''}`}
+                href={`${CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${props.txHash}` : ''}`}
                 target="_blank"
                 className="cursor-alias hover:underline"
             >

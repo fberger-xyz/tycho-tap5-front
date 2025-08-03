@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import { cn } from '@/utils'
 import { memo } from 'react'
 import { Strategy } from '@/types'
+import { getPriceSourceUrl } from '@/utils/price-source.util'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { CHAINS_CONFIG } from '@/config/chains.config'
@@ -28,7 +29,7 @@ export const StrategyHeaderTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex flex-row gap-4 center items-center cursor-pointer', props.className)}>
+        <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
             {props.pairImages}
             <div className="flex flex-col gap-2 grow">
                 {/* sub row 1 */}
@@ -44,14 +45,28 @@ export const StrategyHeaderTemplate = (props: {
     )
 }
 
-export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string }) => {
+export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string; headerLink?: string }) => {
+    const headerContent = (
+        <>
+            {props.header}
+            {props.chart}
+        </>
+    )
+
     return (
         <div className={cn('w-full flex flex-col', props.className)}>
             {/* row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
-                {props.header}
-                {props.chart}
-            </div>
+            {props.headerLink ? (
+                <LinkWrapper href={props.headerLink} className="block">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
+                        {headerContent}
+                    </div>
+                </LinkWrapper>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
+                    {headerContent}
+                </div>
+            )}
 
             {/* row 2 */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-100 p-5 rounded-b-2xl">{props.kpis}</div>
@@ -133,7 +148,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
             }
             spread={
                 <div className="flex gap-0.5">
-                    <TargetSpread bpsAmount={0} />
+                    <TargetSpread bpsAmount={data.config.execution.minWatchSpreadBps ?? 0} />
                     <Range inRange={true} />
                 </div>
             }
@@ -161,15 +176,15 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
     // Extract USD values from the 24h history for the chart
     const chartData = debankLast24hNetWorth.length > 0 ? debankLast24hNetWorth.map((item) => item.usd_value) : [] // If no history, just show a flat line with current value
 
+    // Get price source URL
+    const priceSourceUrl = getPriceSourceUrl(data)
+
     return (
         <StrategyRowTemplate
             key={`${data.chainId}-${index}`}
             className="group"
-            header={
-                <LinkWrapper href={`/strategies/${data.config.id}`} className="cursor-pointer">
-                    <StrategyHeader data={data} className="cursor-pointer" />
-                </LinkWrapper>
-            }
+            headerLink={`/strategies/${data.config.id}`}
+            header={<StrategyHeader data={data} />}
             chart={
                 <div className="md:w-48 h-14 md:ml-auto">
                     {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="debanAumChart" />}
@@ -179,7 +194,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                 <>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">PnL</p>
-                        <Skeleton variant="metric" />
+                        <p className="text-milk-200">To be computed</p>
                     </div>
                     <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">AUM</p>
@@ -187,8 +202,15 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                     </LinkWrapper>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Price</p>
-                        <UsdAmount amountUsd={data.priceUsd} />
+                        {priceSourceUrl ? (
+                            <LinkWrapper href={priceSourceUrl} target="_blank">
+                                <UsdAmount amountUsd={data.priceUsd} className="hover:underline cursor-alias" />
+                            </LinkWrapper>
+                        ) : (
+                            <UsdAmount amountUsd={data.priceUsd} />
+                        )}
                     </div>
+
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Trades</p>
                         <p className="truncate">{data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)}</p>

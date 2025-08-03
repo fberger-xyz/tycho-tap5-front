@@ -9,16 +9,19 @@ import Image from 'next/image'
 import { AppUrls, FileIds, IconIds } from '@/enums'
 import IconWrapper from '../icons/IconWrapper'
 import GridDropdownButton from './GridDropdownButton'
+import { ButtonDark } from '../figma/Button'
 
 export default function HeaderDesktop(props: { className?: string }) {
     const pathname = usePathname()
     const isStrategyPage = pathname.includes('/strategies/')
 
     return (
-        <header className={cn('hidden md:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
+        <header className={cn('hidden lg:grid grid-cols-3 items-center w-full px-6 py-6', props.className)}>
             <div className="flex gap-4 items-center">
                 <GridDropdownButton />
-                <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={152} height={24} />
+                <LinkWrapper href={AppUrls.STRATEGIES} className="cursor-pointer">
+                    <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={152} height={24} />
+                </LinkWrapper>
             </div>
             <div className="flex gap-2 items-center mx-auto">
                 {APP_PAGES.map((page) => (
@@ -34,7 +37,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                     </LinkWrapper>
                 ))}
             </div>
-            <div className="flex z-20 items-center justify-end">
+            <div className="flex z-20 items-center justify-end gap-6">
                 <LinkWrapper
                     href={AppUrls.DOCUMENTATION}
                     target="_blank"
@@ -43,6 +46,9 @@ export default function HeaderDesktop(props: { className?: string }) {
                     <p className="text-milk text-sm truncate">Docs (Run locally)</p>
                     <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                 </LinkWrapper>
+                <ButtonDark>
+                    <p className="truncate text-sm">New strategy</p>
+                </ButtonDark>
             </div>
         </header>
     )

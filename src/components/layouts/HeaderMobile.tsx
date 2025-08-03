@@ -48,7 +48,7 @@ export default function HeaderMobile() {
 
     return (
         <div className="flex justify-center z-50 w-full">
-            <div className="w-full md:hidden flex justify-between px-5 py-4 ">
+            <div className="w-full lg:hidden flex justify-between px-5 py-4 ">
                 {/* left */}
                 <div className="flex gap-4 items-center z-30">
                     <GridDropdownButton />
@@ -56,7 +56,9 @@ export default function HeaderMobile() {
                     {/* logo */}
                     {/* <Image src={FileIds.APP_LOGO_MOBILE_WINTERCUTE} alt={FileIds.APP_LOGO_MOBILE_WINTERCUTE} width={160} height={24} /> */}
                     {/* <Image src={FileIds.APP_LOGO_MOBILE_TYCHO} alt={FileIds.APP_LOGO_MOBILE_TYCHO} width={160} height={24} /> */}
-                    <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={151} height={24} />
+                    <LinkWrapper href={AppUrls.STRATEGIES} className="cursor-pointer">
+                        <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={151} height={24} />
+                    </LinkWrapper>
                 </div>
 
                 {/* right */}

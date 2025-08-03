@@ -84,3 +84,25 @@ export function ButtonDanger({ children, className, style, ...props }: React.But
         </button>
     )
 }
+
+export function ButtonDark({ children, className, style, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+    return (
+        <button
+            className={cn(
+                'flex items-center justify-center hover:bg-milk-50 bg-[#2C2C2C] transition-all duration-200 ease-in-out',
+                'border-[3px] border-black rounded-xl',
+                'text-milk font-medium text-sm leading-5',
+                'hover:shadow-lg active:scale-95',
+                'shadow-[0px_5px_14px_0px_rgba(0,0,0,0.25),0px_5px_7px_0px_rgba(0,0,0,0.24),0px_-1px_1px_0px_rgba(255,255,255,0.14),inset_0px_1px_1px_1px_rgba(255,255,255,0.2)]',
+                className,
+            )}
+            style={{
+                padding: '7px 14px',
+                ...(style || {}),
+            }}
+            {...props}
+        >
+            {children}
+        </button>
+    )
+}

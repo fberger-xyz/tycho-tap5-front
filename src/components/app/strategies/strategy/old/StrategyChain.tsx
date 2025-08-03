@@ -23,7 +23,6 @@ export function StrategyChain({ chain }: { chain: any }) {
                         baseTokenAddress={parsedConfiguration.base.address}
                         quoteTokenAddress={parsedConfiguration.quote.address}
                         chainId={chain.value.id}
-                        trades={listTradesByChain(chain)}
                         className="h-[360px] col-span-7 p-3"
                     />
                 )}
