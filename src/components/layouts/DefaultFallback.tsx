@@ -1,14 +1,50 @@
 import PageWrapper from '../common/PageWrapper'
-import { InstancesTableHeaders as TableHeaders, LoadingInstanceRows as LoadingRows } from '../app/sections/instances/InstancesTableRow'
+import { LoadingStrategiesList } from '../app/strategies/list/StrategiesList'
+import { DEFAULT_PADDING_X } from '@/config/theme.config'
+import { cn } from '@/utils'
+import Card from '../figma/Card'
+import Skeleton from '../common/Skeleton'
+import { ListToShow } from '@/enums'
 
 export function DefaultFallbackContent() {
     return (
-        <div className="w-full overflow-x-scroll px-4">
-            <div className="flex min-w-[1200px] w-full flex-col overflow-hidden rounded-xl border border-milk-200 text-xs">
-                <TableHeaders />
-                <LoadingRows />
+        <>
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10">
+                <Card>
+                    <p className="text-sm text-milk-400">Total PnL</p>
+                    <Skeleton variant="text" />
+                </Card>
+                <Card>
+                    <p className="text-sm text-milk-400">Total AUM</p>
+
+                    <Skeleton variant="text" />
+                </Card>
+                <Card>
+                    <p className="text-sm text-milk-400">Total trades</p>
+
+                    <Skeleton variant="text" />
+                </Card>
             </div>
-        </div>
+
+            {/* list to show */}
+            <div className={cn('flex gap-6 mb-8', DEFAULT_PADDING_X)}>
+                {Object.values(ListToShow).map((list) => (
+                    <button key={list}>
+                        <p
+                            className={cn('text-lg', {
+                                'text-milk': list === ListToShow.STRATEGIES,
+                                'text-milk-400': list !== ListToShow.STRATEGIES,
+                            })}
+                        >
+                            {list}
+                        </p>
+                    </button>
+                ))}
+            </div>
+            <div className={cn('flex flex-col gap-5 mx-auto w-full', DEFAULT_PADDING_X)}>
+                <LoadingStrategiesList />
+            </div>
+        </>
     )
 }
 

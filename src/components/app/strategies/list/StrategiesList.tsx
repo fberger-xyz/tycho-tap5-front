@@ -28,7 +28,7 @@ export const StrategyHeaderTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
+        <div className={cn('flex flex-row gap-4 center items-center cursor-pointer', props.className)}>
             {props.pairImages}
             <div className="flex flex-col gap-2 grow">
                 {/* sub row 1 */}
@@ -48,7 +48,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
     return (
         <div className={cn('w-full flex flex-col', props.className)}>
             {/* row 1 */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
                 {props.header}
                 {props.chart}
             </div>
@@ -166,12 +166,12 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             key={`${data.chainId}-${index}`}
             className="group"
             header={
-                <LinkWrapper href={`/strategies/${data.config.id}`}>
-                    <StrategyHeader data={data} />
+                <LinkWrapper href={`/strategies/${data.config.id}`} className="cursor-pointer">
+                    <StrategyHeader data={data} className="cursor-pointer" />
                 </LinkWrapper>
             }
             chart={
-                <div className="w-full md:w-48 h-14 md:ml-auto">
+                <div className="md:w-48 h-14 md:ml-auto">
                     {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="debanAumChart" />}
                 </div>
             }
