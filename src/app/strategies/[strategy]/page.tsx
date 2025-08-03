@@ -271,7 +271,7 @@ export default function StrategyPage() {
                         <Card>
                             <p className="text-sm text-milk-400">PnL</p>
                             {/* <Skeleton variant="text" /> */}
-                            <p className="text-milk-200">To be computed</p>
+                            <p className="text-milk-200 truncate">To be computed</p>
                         </Card>
                         <Card>
                             <p className="text-sm text-milk-400">AUM</p>

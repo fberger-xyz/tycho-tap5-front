@@ -24,7 +24,7 @@ export default function Page() {
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10">
                 <Card>
                     <p className="text-sm text-milk-400">Total PnL</p>
-                    <p className="text-milk-200">To be computed</p>
+                    <p className="text-milk-200 truncate">To be computed</p>
                 </Card>
                 <Card>
                     <p className="text-sm text-milk-400">Total AUM</p>

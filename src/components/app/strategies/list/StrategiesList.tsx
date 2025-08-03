@@ -194,7 +194,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                 <>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">PnL</p>
-                        <p className="text-milk-200">To be computed</p>
+                        <p className="text-milk-200 truncate">To be computed</p>
                     </div>
                     <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">AUM</p>

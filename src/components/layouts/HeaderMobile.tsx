@@ -18,6 +18,7 @@ export default function HeaderMobile() {
     const { showMobileMenu, setShowMobileMenu } = useAppStore()
 
     const pathname = usePathname()
+    const isStrategyPage = pathname.includes('/strategies/')
 
     // menu
     const menuDropdown = useRef<HTMLButtonElement>(null)
@@ -106,7 +107,8 @@ export default function HeaderMobile() {
                                     <LinkWrapper href={page.path} className={cn('rounded-lg', { 'bg-milk-100': isCurrentPath(pathname, page.path) })}>
                                         <p
                                             className={cn('text-base text-milk px-2.5 py-2 hover:bg-milk-100 rounded-xl cursor-pointer', {
-                                                'bg-milk-100': page.path === pathname,
+                                                'bg-milk-100':
+                                                    isCurrentPath(pathname, page.path) || (isStrategyPage && page.path === AppUrls.STRATEGIES),
                                             })}
                                             onClick={handleLinkClick}
                                         >
