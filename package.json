@@ -79,6 +79,7 @@
         "prettier": "^3.6.2",
         "prettier-eslint": "^16.4.2",
         "prisma": "^6.12.0",
+        "sharp": "^0.34.3",
         "tailwindcss": "^3.4.17",
         "ts-prune": "^0.10.3",
         "tsx": "^4.20.3",

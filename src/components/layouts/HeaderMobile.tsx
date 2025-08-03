@@ -136,7 +136,7 @@ export default function HeaderMobile() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
                             transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 * (APP_PAGES.length + 1) }}
-                            className="absolute bottom-20 text-center max-w-[300px]"
+                            className="absolute bottom-40 text-center max-w-[300px]"
                         >
                             <Authors className="text-xs text-milk-200 mx-auto" />
                         </motion.div>
