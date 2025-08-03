@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base styles for html */
+/* Light mode background = same as dark mode background for now */
 html {
     background-image: url('/figma/background/light.svg');
     background-size: cover;
@@ -11,7 +11,7 @@ html {
     background-attachment: fixed;
 }
 
-/* Dark mode background override */
+/* Dark mode background */
 html.dark {
     background-image: url('/figma/background/dark.svg');
     background-size: cover;
@@ -20,39 +20,12 @@ html.dark {
     background-attachment: fixed;
 }
 
-/* Default colors (light theme) */
+/* Default colors = light theme = same as dark theme for now */
 :root {
     /* Background */
-    --color-background: 262 63% 13%; /* #190A35 */
-
-    /* Jagger colors */
-    --color-jagger: 285 80% 19%; /* #380a53 */
-    --color-jagger-800: 285 80% 19%; /* #380a53 with 80% opacity */
-    --color-jagger-500: 285 80% 19%; /* #380a53 with 56% opacity */
-    --color-jagger-400: 285 80% 19%; /* #380a53 with 40% opacity */
-    --color-jagger-300: 285 80% 19%; /* #380a53 with 27% opacity */
-    --color-jagger-200: 285 80% 19%; /* #380a53 with 10% opacity */
-
-    /* Other colors */
-    --color-folly: 345 100% 60%; /* #ff3366 */
-    --color-aquamarine: 165 100% 50%; /* #00ffbb */
-
-    /* Milk colors */
-    --color-milk: 39 100% 94%; /* #fff4e0ff */
-    --color-milk-600: 39 100% 94% / 0.64; /* #fff4e0a3 - 64% opacity */
-    --color-milk-400: 39 100% 94% / 0.4; /* #fff4e066 - 40% opacity */
-    --color-milk-200: 39 100% 94% / 0.2; /* #fff4e033 - 20% opacity */
-    --color-milk-150: 39 100% 94% / 0.1; /* #fff4e01a - 10% opacity */
-    --color-milk-100: 39 100% 94% / 0.07; /* #fff4e012 - 7% opacity */
-    --color-milk-50: 39 100% 94% / 0.02; /* #fff4e005 - 2% opacity */
-}
-
-/* Dark theme */
-.dark {
-    /* Background - deeper purple/black */
     --color-background: 0 0% 7%; /* #121212 */
 
-    /* Jagger colors - lighter/more vibrant purples */
+    /* Jagger colors */
     --color-jagger: 285 68% 33%; /* #6b1a8c */
     --color-jagger-800: 285 68% 33%; /* #6b1a8c with 80% opacity */
     --color-jagger-500: 285 68% 33%; /* #6b1a8c with 56% opacity */
@@ -60,11 +33,38 @@ html.dark {
     --color-jagger-300: 285 68% 33%; /* #6b1a8c with 27% opacity */
     --color-jagger-200: 285 68% 33%; /* #6b1a8c with 10% opacity */
 
-    /* Other colors - slightly adjusted for dark mode */
+    /* Other colors */
     --color-folly: 345 100% 65%; /* #ff4d7a */
     --color-aquamarine: 165 100% 55%; /* #00ffc4 */
 
-    /* Milk colors - adjusted for dark theme */
+    /* Milk colors */
+    --color-milk: 39 100% 97%; /* #fff9f0ff */
+    --color-milk-600: 39 100% 97% / 0.64; /* 64% opacity */
+    --color-milk-400: 39 100% 97% / 0.4; /* 40% opacity */
+    --color-milk-200: 39 100% 97% / 0.2; /* 20% opacity */
+    --color-milk-150: 39 100% 97% / 0.1; /* 10% opacity */
+    --color-milk-100: 39 100% 97% / 0.07; /* 7% opacity */
+    --color-milk-50: 39 100% 97% / 0.02; /* 2% opacity */
+}
+
+/* Dark theme */
+.dark {
+    /* Background */
+    --color-background: 0 0% 7%; /* #121212 */
+
+    /* Jagger colors */
+    --color-jagger: 285 68% 33%; /* #6b1a8c */
+    --color-jagger-800: 285 68% 33%; /* #6b1a8c with 80% opacity */
+    --color-jagger-500: 285 68% 33%; /* #6b1a8c with 56% opacity */
+    --color-jagger-400: 285 68% 33%; /* #6b1a8c with 40% opacity */
+    --color-jagger-300: 285 68% 33%; /* #6b1a8c with 27% opacity */
+    --color-jagger-200: 285 68% 33%; /* #6b1a8c with 10% opacity */
+
+    /* Other colors */
+    --color-folly: 345 100% 65%; /* #ff4d7a */
+    --color-aquamarine: 165 100% 55%; /* #00ffc4 */
+
+    /* Milk colors */
     --color-milk: 39 100% 97%; /* #fff9f0ff */
     --color-milk-600: 39 100% 97% / 0.64; /* 64% opacity */
     --color-milk-400: 39 100% 97% / 0.4; /* 40% opacity */

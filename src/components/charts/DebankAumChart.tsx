@@ -119,6 +119,7 @@ export default function DebankAumChart({ data, className }: { data: number[] | A
         ],
         tooltip: {
             show: true,
+            appendToBody: true,
             trigger: 'axis',
             axisPointer: {
                 type: 'line',
@@ -150,7 +151,7 @@ export default function DebankAumChart({ data, className }: { data: number[] | A
                 return `
                     <div style="line-height: 1.5;">
                         <div style="font-size: 10px; opacity: 0.7;">${DAYJS_FORMATS.dateShort(timestamp)} UTC</div>
-                        <div style="font-weight: 500;">$${numeral(value).format('0,0.[00]')} AUM</div>
+                        <div style="font-weight: 500;">AUM = $${numeral(value).format('0,0.[00]')}</div>
                     </div>
                 `
             },

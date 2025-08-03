@@ -181,13 +181,9 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                         <p className="truncate text-milk-400 text-sm">PnL</p>
                         <Skeleton variant="metric" />
                     </div>
-                    <LinkWrapper
-                        href={`https://debank.com/profile/${walletAddress}`}
-                        target="_blank"
-                        className="group flex flex-col gap-1 items-start group cursor-alias"
-                    >
+                    <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">AUM</p>
-                        {aum ? <UsdAmount amountUsd={aum} className="hover:underline" /> : <Skeleton variant="text" />}
+                        {aum ? <UsdAmount amountUsd={aum} className="hover:underline cursor-alias" /> : <Skeleton variant="text" />}
                     </LinkWrapper>
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-400 text-sm">Price</p>
