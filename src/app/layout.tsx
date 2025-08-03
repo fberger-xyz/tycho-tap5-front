@@ -37,8 +37,12 @@ export const metadata: Metadata = {
 
     // Icons
     icons: {
-        icon: '/favicon.ico',
+        icon: [
+            { url: '/favicon.svg', type: 'image/svg+xml' },
+            { url: '/favicon.ico' },
+        ],
         shortcut: '/favicon.ico',
+        apple: '/figma/logo/tap-5-logo.svg',
     },
 
     // PWA & Mobile
@@ -46,7 +50,7 @@ export const metadata: Metadata = {
         title: APP_METADATA.SITE_NAME,
         capable: true,
         statusBarStyle: 'black-translucent',
-        startupImage: '/favicon.ico',
+        startupImage: '/figma/logo/tap-5-logo.svg',
     },
 
     // OpenGraph

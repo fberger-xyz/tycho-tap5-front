@@ -9,9 +9,23 @@ export default function manifest(): MetadataRoute.Manifest {
         description: APP_METADATA.SITE_DESCRIPTION,
         start_url: AppUrls.STRATEGIES,
         display: 'standalone',
-        background_color: '#ffffff',
-        theme_color: '#000000',
+        background_color: '#111111',
+        theme_color: '#111111',
         lang: 'en',
         categories: ['tycho', 'market maker', 'defi', 'orderbook'],
+        icons: [
+            {
+                src: '/figma/logo/tap-5-logo.svg',
+                sizes: 'any',
+                type: 'image/svg+xml',
+                purpose: 'any',
+            },
+            {
+                src: '/figma/logo/tap-5-logo.svg',
+                sizes: 'any',
+                type: 'image/svg+xml',
+                purpose: 'maskable',
+            },
+        ],
     }
 }
