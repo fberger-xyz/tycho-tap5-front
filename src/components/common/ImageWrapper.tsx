@@ -4,7 +4,6 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import { cn } from '@/utils'
 import Image from 'next/image'
 import { useState } from 'react'
-import StyledTooltip from './StyledTooltip'
 
 export function ImageWrapper({
     src,
@@ -42,34 +41,6 @@ export function SymbolImage(props: { symbol?: string; className?: string; size?:
             alt={`Logo of ${props.symbol?.toLowerCase() ?? 'unknown'}`}
             className={props.className}
         />
-    )
-}
-
-export function ImageWithText(props: { symbol?: string; chainId?: number; className?: string; size?: number }) {
-    if (props.symbol) {
-        return (
-            <StyledTooltip disableAnimation={true} content={props.symbol}>
-                <div className="flex items-center gap-2 w-fit">
-                    <SymbolImage symbol={props.symbol} size={props.size} className={cn('rounded-full', props.className)} />
-                    <p>{props.symbol}</p>
-                </div>
-            </StyledTooltip>
-        )
-    } else if (props.chainId) {
-        return (
-            <StyledTooltip disableAnimation={true} content={CHAINS_CONFIG[Number(props.chainId)].name}>
-                <div className="flex items-center gap-2 w-fit">
-                    <ChainImage id={props.chainId} size={props.size ?? 20} className={cn('rounded-lg', props.className)} />
-                    <p>{CHAINS_CONFIG[Number(props.chainId)].name}</p>
-                </div>
-            </StyledTooltip>
-        )
-    }
-    return (
-        <div className="flex items-center gap-2 w-fit">
-            <ChainImage id={props.chainId} size={props.size ?? 20} className={props.className} />
-            <p>Unknown</p>
-        </div>
     )
 }
 

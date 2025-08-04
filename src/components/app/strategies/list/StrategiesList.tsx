@@ -21,7 +21,7 @@ import { DEFAULT_PADDING_X } from '@/config'
  * ------------------------ 1 template
  */
 
-export const StrategyHeaderTemplate = (props: {
+const StrategyHeaderTemplate = (props: {
     pairImages: ReactNode
     pairSymbols: ReactNode
     spread: ReactNode
@@ -45,7 +45,7 @@ export const StrategyHeaderTemplate = (props: {
     )
 }
 
-export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string; headerLink?: string }) => {
+const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string; headerLink?: string }) => {
     const headerContent = (
         <>
             {props.header}
@@ -84,7 +84,7 @@ export const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode;
  * ------------------------ 3 loading
  */
 
-export function LoadingStrategyHeader() {
+function LoadingStrategyHeader() {
     const loadingParagraph = <Skeleton className="w-3/4" />
     return (
         <StrategyHeaderTemplate
