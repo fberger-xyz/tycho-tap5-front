@@ -32,6 +32,11 @@ export enum AppUrls {
     MERSO_TELEGRAM = 'https://t.me/xMerso',
     MERSO_WEBSITE = 'https://www.merso.xyz/',
     QUANT_TELEGRAM = 'https://t.me/hugoschrng',
+
+    // binance api https://developers.binance.com/docs/binance-spot-api-docs/rest-api/general-api-information
+    BINANCE_API_DEV = 'https://api.binance.com',
+    BINANCE_API_PROD = 'https://data-api.binance.vision',
+    BINANCE_API_STATUS = 'https://www.binance.us/status',
 }
 
 export enum AppThemes {

@@ -2,9 +2,11 @@ import { NextRequest } from 'next/server'
 import { fetchWithTimeout } from '@/utils/requests.util'
 import { createApiSuccess, createApiError, handleApiError } from '@/utils/api/response.util'
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
+import { AppUrls } from '@/enums'
+import { IS_DEV } from '@/config/app.config'
 
 // Binance API endpoint
-const BINANCE_API_URL = 'https://api.binance.com/api/v3/ticker/price'
+const BINANCE_API_URL = IS_DEV ? AppUrls.BINANCE_API_DEV : AppUrls.BINANCE_API_PROD
 
 interface BinancePriceResponse {
     symbol: string
@@ -14,7 +16,8 @@ interface BinancePriceResponse {
 // Base fetch function
 async function fetchBinancePrice(symbol: string): Promise<number> {
     try {
-        const response = await fetchWithTimeout(`${BINANCE_API_URL}?symbol=${symbol}`, {
+        const binanceEndpoint = `${BINANCE_API_URL}/api/v3/ticker/price?symbol=${symbol}`
+        const response = await fetchWithTimeout(binanceEndpoint, {
             headers: {
                 accept: 'application/json',
                 'content-type': 'application/json',
