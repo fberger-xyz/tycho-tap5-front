@@ -129,7 +129,7 @@ export const PoolRow = memo(function PoolRow({
                     <p className="truncate">{getProtocolConfig(pool.protocol_system).name}</p>
                 </div>
             }
-            status={<Range inRange={!isOutOfRange} className="text-xs" />}
+            status={<Range inRange={!isOutOfRange} className="text-xs rounded" />}
             spotPrice={spotPrice > 0 ? <p className="truncate">${numeral(spotPrice).format('0,0.00')}</p> : <p className="truncate">-</p>}
             delta={
                 <StyledTooltip

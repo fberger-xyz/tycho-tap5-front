@@ -141,7 +141,7 @@ const LoadingPage = ({ router }: { router: AppRouterInstance }) => {
                     <>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:grow">
                             <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
-                                <IconWrapper id={IconIds.ARROW_LEFT} />
+                                <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                             </ButtonDark>
                             <div className="flex gap-4 items-center w-80">
                                 <DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={STRATEGY_UI_CONSTANTS.ICON_SIZES.DOUBLE_SYMBOL} gap={2} />
@@ -254,7 +254,7 @@ export default function StrategyPage() {
                         {/* left */}
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-fit">
                             <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
-                                <IconWrapper id={IconIds.ARROW_LEFT} />
+                                <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                             </ButtonDark>
                             <div className="flex gap-4 items-center">
                                 <DoubleSymbol
@@ -269,8 +269,8 @@ export default function StrategyPage() {
                                             {parsedConfig.base.symbol} / {parsedConfig.quote.symbol}
                                         </p>
                                         <div className="flex gap-0.5">
-                                            <TargetSpread bpsAmount={parsedConfig.execution.minWatchSpreadBps ?? 0} />
-                                            <Range inRange={true} />
+                                            <TargetSpread bpsAmount={parsedConfig.execution.minWatchSpreadBps ?? 0} rounded="rounded-l" />
+                                            <Range inRange={true} className="rounded-r" />
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
@@ -380,13 +380,16 @@ export default function StrategyPage() {
                     <Card className="gap-5 px-0 pb-0">
                         <div className="flex justify-between px-5 items-center">
                             <h1 className="text-lg font-semibold">Your positions</h1>
-                            <ButtonDark
-                                onClick={() => {
-                                    alert('Manage positions')
-                                }}
-                            >
-                                <p className="truncate text-sm">Manage</p>
-                            </ButtonDark>
+                            <StyledTooltip content="Coming soon: Manage your positions">
+                                <ButtonDark
+                                    onClick={() => {
+                                        alert('Manage positions')
+                                    }}
+                                    className="px-[10px] py-[7px] rounded-xl"
+                                >
+                                    <p className="truncate text-sm">Manage</p>
+                                </ButtonDark>
+                            </StyledTooltip>
                         </div>
                         <div className="flex flex-col text-xs">
                             <div className="grid grid-cols-2 px-5 mb-3">
@@ -603,7 +606,7 @@ export default function StrategyPage() {
                                 <StatRow
                                     label={STRATEGY_LABELS.STATS.GAS_TOKEN}
                                     explanation="Native token for transaction fees"
-                                    value={parsedConfig.execution.gasTokenSymbol}
+                                    value={shortenValue(parsedConfig.execution.gasTokenSymbol)}
                                 />
                             )}
 

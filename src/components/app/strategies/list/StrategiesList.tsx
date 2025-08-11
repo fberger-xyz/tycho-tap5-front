@@ -126,7 +126,7 @@ export function LoadingStrategiesList() {
                         <>
                             {Array.from({ length: 4 }, (_, i) => (
                                 <div key={i} className="flex flex-col gap-1 items-start">
-                                    <Skeleton className="w-3/4 mb-1" />
+                                    <Skeleton className="w-1/2 mb-1" />
                                     <Skeleton className="w-3/4" />
                                 </div>
                             ))}

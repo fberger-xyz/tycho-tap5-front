@@ -30,7 +30,7 @@ export const PROTOCOLS_CONFIG: Record<AppSupportedProtocols, ProtocolConfig> = {
 }
 
 export const getProtocolConfig = (protocol: string) => {
-    const protocolName = protocol.split('_')[0].toLowerCase().trim()
+    const protocolName = String(protocol).split('_')[0].toLowerCase().trim()
     if (PROTOCOLS_CONFIG[protocolName as AppSupportedProtocols]) {
         return PROTOCOLS_CONFIG[protocolName as AppSupportedProtocols]
     }

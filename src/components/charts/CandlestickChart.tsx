@@ -13,6 +13,7 @@ import { INTER_FONT } from '@/config'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
 import numeral from 'numeral'
+import { CHAINS_CONFIG } from '@/config/chains.config'
 
 dayjs.extend(timezone)
 
@@ -32,10 +33,12 @@ interface CandlestickChartProps {
     symbol?: string
     baseSymbol?: string
     quoteSymbol?: string
+    chainId: number
     upColor?: string
     downColor?: string
     targetSpreadBps?: number
     referencePrice?: number
+    referencePrices?: Array<{ time: number; price: number }>
     className?: string
 }
 
@@ -47,10 +50,12 @@ export default function CandlestickChart({
     symbol = 'Chart',
     baseSymbol = '',
     quoteSymbol = '',
+    chainId,
     upColor,
     downColor,
     targetSpreadBps = 5,
     referencePrice,
+    referencePrices,
     className,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
@@ -96,26 +101,48 @@ export default function CandlestickChart({
             return [item.time, item.high * (1 + effectiveSpreadBps / 10000)]
         })
 
-        // Create reference price line data if provided
-        console.log('CandlestickChart - referencePrice:', referencePrice)
-        const referencePriceLine = referencePrice
-            ? data.map((item) => {
-                  return [item.time, referencePrice]
-              })
-            : null
-        console.log('CandlestickChart - referencePriceLine:', referencePriceLine?.slice(0, 3))
+        // Create reference price line data
+        let referencePriceLine = null
+
+        if (referencePrices && referencePrices.length > 0) {
+            // Use historical prices if available
+            // Map Binance prices to chart data timestamps
+            referencePriceLine = data.map((item) => {
+                // Find the closest Binance price for this timestamp
+                const closestPrice = referencePrices.reduce((prev, curr) => {
+                    return Math.abs(curr.time - item.time) < Math.abs(prev.time - item.time) ? curr : prev
+                })
+                return [item.time, closestPrice.price]
+            })
+        } else if (referencePrice) {
+            // Fallback to static price line
+            referencePriceLine = data.map((item) => {
+                return [item.time, referencePrice]
+            })
+        }
 
         // Calculate the time range to determine appropriate label formatting
         const timeRange = data.length > 1 ? data[data.length - 1].time - data[0].time : 0
         const hourRange = timeRange / (1000 * 60 * 60) // Convert to hours
         const dayRange = hourRange / 24
 
+        // series names
+        const chartSeriesNames = {
+            lowerBound: 'Lower Bound',
+            spreadBand: `${targetSpreadBps} bps spread band`,
+            upperBound: 'Upper Bound',
+            ohlc: `${CHAINS_CONFIG[chainId].name} Price `,
+            ohlcUp: `${baseSymbol} / ${quoteSymbol} Up`,
+            ohlcDown: `${baseSymbol} / ${quoteSymbol} Down`,
+            referencePrice: 'Market Price (Binance)',
+        }
+
         const chartOptions: echarts.EChartsOption = {
             animation: true,
-            grid: { top: 5, left: 0, right: 55, bottom: 60 },
+            grid: { top: 5, left: 0, right: 55, bottom: 70 },
             legend: {
                 show: true,
-                bottom: 5,
+                bottom: 15,
                 left: 10,
                 orient: 'horizontal',
                 itemGap: 15,
@@ -126,33 +153,37 @@ export default function CandlestickChart({
                     color: colors.milkOpacity[600],
                     fontFamily: INTER_FONT.style.fontFamily,
                 },
-                selectedMode: false,
+                selectedMode: 'multiple',
                 data: [
-                    {
-                        name: '1inch OHLCV',
-                        icon: 'rect',
-                        itemStyle: {
-                            color: colors.milkOpacity[400],
-                        },
-                    },
-                    {
-                        name: 'Target Spread Band',
-                        icon: 'rect',
-                        itemStyle: {
-                            color: 'rgba(0, 255, 180, 0.5)',
-                        },
-                    },
                     ...(referencePrice
                         ? [
                               {
-                                  name: 'Binance Reference Price',
-                                  icon: 'rect',
+                                  name: chartSeriesNames.referencePrice,
+                                  icon: 'roundRect',
                                   itemStyle: {
-                                      color: '#FF6B6B',
+                                      color: '#F3BA2F',
                                   },
                               },
                           ]
                         : []),
+                    {
+                        name: chartSeriesNames.ohlc,
+                        icon:
+                            'image://data:image/svg+xml;base64,' +
+                            btoa(`
+                            <svg width="14" height="10" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="0" y="0" width="7" height="10" rx="2" ry="2" fill="${upColor || colors.aquamarine}" />
+                                <rect x="7" y="0" width="7" height="10" rx="2" ry="2" fill="${downColor || colors.folly}" />
+                            </svg>
+                        `),
+                    },
+                    {
+                        name: chartSeriesNames.spreadBand,
+                        icon: 'roundRect',
+                        itemStyle: {
+                            color: 'rgba(0, 255, 180, 0.5)',
+                        },
+                    },
                 ],
             },
             dataZoom: [
@@ -178,6 +209,77 @@ export default function CandlestickChart({
                 padding: [6, 10],
                 trigger: 'axis',
                 appendToBody: true,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter: function (params: any) {
+                    if (!params || params.length === 0) return ''
+
+                    const date = dayjs(params[0].axisValue).tz('America/New_York')
+                    const formatString = hourRange <= 1 ? 'HH:mm' : dayRange <= 2 ? 'ddd, MMM D, HH:mm' : 'ddd, MMM D, YYYY'
+                    const formattedDate = date.format(formatString)
+
+                    let tooltipContent = `<div style="font-size: 11px; color: ${colors.milkOpacity[600]}; margin-bottom: 8px;">${formattedDate}</div>`
+
+                    // Process params in reverse order to show legend items first
+                    const items = [...params].reverse()
+
+                    items.forEach((item) => {
+                        const seriesName = item.seriesName
+
+                        // Skip Lower Bound and Upper Bound display
+                        if (seriesName === chartSeriesNames.lowerBound || seriesName === chartSeriesNames.upperBound) {
+                            return
+                        }
+
+                        if (seriesName === chartSeriesNames.ohlc && item.data) {
+                            // Candlestick data
+                            const [, open, close, low, high] = item.data
+                            tooltipContent += `
+                                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                                    <span style="display: inline-block; width: 10px; height: 10px; background: ${item.color}; border-radius: 2px; margin-right: 8px;"></span>
+                                    <span style="color: ${colors.milkOpacity[600]};">${item.seriesName}</span>
+                                </div>
+                                <div style="padding-left: 18px; margin-bottom: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">open</span>
+                                        <span style="color: ${colors.milk};">${(Math.round(open * 100) / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">close</span>
+                                        <span style="color: ${colors.milk};">${(Math.round(close * 100) / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">lowest</span>
+                                        <span style="color: ${colors.milk};">${(Math.round(low * 100) / 100).toFixed(2)}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">highest</span>
+                                        <span style="color: ${colors.milk};">${(Math.round(high * 100) / 100).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            `
+                        } else if (item.seriesName && item.value !== undefined) {
+                            // Line data (Target Spread Band, Binance Reference Price)
+                            const value = Array.isArray(item.value) ? item.value[1] : item.value
+
+                            // Only show color for reference price
+                            const showColor = seriesName === chartSeriesNames.referencePrice
+                            // Always use yellow for reference price
+                            const displayColor = showColor ? '#F3BA2F' : item.color
+
+                            tooltipContent += `
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <div style="display: flex; align-items: center;">
+                                        ${showColor ? `<span style="display: inline-block; width: 10px; height: 10px; background: ${displayColor}; border-radius: 2px; margin-right: 8px;"></span>` : ''}
+                                        <span style="color: ${colors.milkOpacity[600]};">${item.seriesName}</span>
+                                    </div>
+                                    <span style="color: ${colors.milk}; margin-left: 24px;">${(Math.round(value * 100) / 100).toFixed(2)}</span>
+                                </div>
+                            `
+                        }
+                    })
+
+                    return tooltipContent
+                },
             },
             xAxis: [
                 {
@@ -296,7 +398,7 @@ export default function CandlestickChart({
             series: [
                 // Lower bound - base of the stack (hidden from legend)
                 {
-                    name: 'Lower Bound',
+                    name: chartSeriesNames.lowerBound,
                     type: 'line',
                     data: lowerBound,
                     symbol: 'none',
@@ -317,7 +419,7 @@ export default function CandlestickChart({
                 },
                 // Spread band - stacked on top of lower bound (shown in legend as Target Spread Band)
                 {
-                    name: 'Target Spread Band',
+                    name: chartSeriesNames.spreadBand,
                     type: 'line',
                     data: spreadBand,
                     symbol: 'none',
@@ -335,7 +437,7 @@ export default function CandlestickChart({
                 },
                 // Upper bound line (hidden from legend)
                 {
-                    name: 'Upper Bound',
+                    name: chartSeriesNames.upperBound,
                     type: 'line',
                     data: upperBound,
                     symbol: 'none',
@@ -352,7 +454,7 @@ export default function CandlestickChart({
                 },
                 // Candlestick series (shown in legend as 1inch OHLCV)
                 {
-                    name: '1inch OHLCV',
+                    name: chartSeriesNames.ohlc,
                     type: 'candlestick',
                     data: ohlc,
                     itemStyle: {
@@ -373,7 +475,7 @@ export default function CandlestickChart({
                 ...(referencePriceLine
                     ? [
                           {
-                              name: 'Binance Reference Price',
+                              name: chartSeriesNames.referencePrice,
                               type: 'line' as const,
                               data: referencePriceLine,
                               symbol: 'circle',
@@ -381,9 +483,9 @@ export default function CandlestickChart({
                               legendHoverLink: false,
                               showSymbol: false,
                               lineStyle: {
-                                  color: '#FF6B6B',
-                                  width: 2.5,
-                                  type: 'dashed' as const,
+                                  color: '#F3BA2F',
+                                  width: 3,
+                                  //   type: 'dashed' as const,
                                   dashOffset: 5,
                                   cap: 'round' as const,
                                   join: 'round' as const,
@@ -409,7 +511,9 @@ export default function CandlestickChart({
         downColor,
         targetSpreadBps,
         referencePrice,
+        referencePrices,
         resolvedTheme,
+        chainId,
     ])
 
     // Loading and no data state options

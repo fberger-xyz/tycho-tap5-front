@@ -49,6 +49,7 @@ export function ButtonDanger({ children, className, style, ...props }: React.But
                 'rounded-[12px]',
                 'border-[3px] border-black',
                 'flex-none',
+                'transition-all duration-200 ease-in-out',
                 className,
             )}
             style={{
@@ -68,7 +69,7 @@ export function ButtonDanger({ children, className, style, ...props }: React.But
                     '0px -1px 1px rgba(255, 255, 255, 0.14)',
                     '0px 5px 7px rgba(0, 0, 0, 0.24)',
                     '0px 5px 14px rgba(0, 0, 0, 0.25)',
-                    'inset 0px 1px 1px 3px rgba(255, 255, 255, 0.2)',
+                    'inset 0px 1px 1px 0.25px rgba(255, 255, 255, 0.2)',
                 ].join(', '),
                 flex: 'none',
                 order: 0,
@@ -82,22 +83,73 @@ export function ButtonDanger({ children, className, style, ...props }: React.But
     )
 }
 
-export const ButtonDark = forwardRef<HTMLButtonElement, React.ButtonHTMLAttributes<HTMLButtonElement>>(
-    ({ children, className = 'px-[14px] py-[7px] rounded-xl', ...props }, ref) => (
+interface ButtonDarkProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+    selected?: boolean
+}
+
+export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ children, className, style, selected = false, ...props }, ref) => {
+    const getBackgroundGradient = () => {
+        if (selected) {
+            return 'linear-gradient(180deg, #1B1919 0%, #222222 100%)'
+        }
+        return 'linear-gradient(180deg, #1B1919 0%, #2C2C2C 100%)'
+    }
+
+    const getHoverBackgroundGradient = () => {
+        if (selected) {
+            return 'linear-gradient(180deg, #070505 0%, #181818 100%)'
+        }
+        return 'linear-gradient(180deg, #110F0F 0%, #2C2C2C 100%)'
+    }
+
+    const getBoxShadow = () => {
+        if (selected) {
+            return '0px -1px 1px rgba(255, 255, 255, 0.14)'
+        }
+        return [
+            '0px -1px 1px rgba(255, 255, 255, 0.14)',
+            '0px 5px 7px rgba(0, 0, 0, 0.24)',
+            '0px 5px 14px rgba(0, 0, 0, 0.25)',
+            'inset 0px 1px 1px 0.25px rgba(255, 255, 255, 0.2)',
+        ].join(', ')
+    }
+
+    return (
         <button
             ref={ref}
             className={cn(
-                'w-max flex items-center justify-center hover:bg-milk-50 bg-[#2C2C2C] transition-all duration-200 ease-in-out',
+                'w-fit flex flex-row items-center justify-center',
                 'border-[3px] border-black',
                 'text-milk font-medium text-sm leading-5',
-                'hover:shadow-lg active:scale-95',
-                'shadow-[0px_5px_14px_0px_rgba(0,0,0,0.25),0px_5px_7px_0px_rgba(0,0,0,0.24),0px_-1px_1px_0px_rgba(255,255,255,0.14),inset_0px_1px_1px_1px_rgba(255,255,255,0.2)]',
+                'rounded-[12px]',
+                'transition-all duration-200 ease-in-out',
                 className,
             )}
+            style={{
+                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: selected ? '8px' : '4px',
+                background: getBackgroundGradient(),
+                border: '3px solid #000000',
+                borderRadius: '12px',
+                boxShadow: getBoxShadow(),
+                ...(style || {}),
+            }}
+            onMouseEnter={(e) => {
+                e.currentTarget.style.background = getHoverBackgroundGradient()
+                props.onMouseEnter?.(e)
+            }}
+            onMouseLeave={(e) => {
+                e.currentTarget.style.background = getBackgroundGradient()
+                props.onMouseLeave?.(e)
+            }}
             {...props}
         >
             {children}
         </button>
-    ),
-)
+    )
+})
 ButtonDark.displayName = 'ButtonDark'

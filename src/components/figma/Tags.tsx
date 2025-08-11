@@ -21,19 +21,19 @@ export function Tag({ variant, children, className }: { variant: TagVariant; chi
  * strategy card
  */
 
-export function TargetSpread({ bpsAmount }: { bpsAmount: number }) {
+export function TargetSpread({ bpsAmount, rounded = 'rounded' }: { bpsAmount: number; rounded?: string }) {
     const variant = 'default'
     return (
-        <Tag variant={variant} className="rounded-l pl-2 pr-1.5 py-0.5 text-xs h-fit">
+        <Tag variant={variant} className={cn('pl-2 pr-1.5 py-0.5 text-xs h-fit', rounded)}>
             <p className={variantStyles[variant].text}>{numeral(bpsAmount).format('0,0.[0000]')} bps</p>
         </Tag>
     )
 }
 
-export function Range({ inRange, className }: { inRange: boolean; className?: string }) {
+export function Range({ inRange, className = 'rounded' }: { inRange: boolean; className?: string }) {
     const variant = inRange ? 'success' : 'error'
     return (
-        <Tag variant={variant} className={cn('rounded-r pl-1.5 pr-2 py-0.5 text-xs h-fit rounded-md', className)}>
+        <Tag variant={variant} className={cn('pl-1.5 pr-2 py-0.5 text-xs h-fit', className)}>
             <p className={variantStyles[variant].text}>{inRange ? 'In range' : 'Out of range'}</p>
         </Tag>
     )

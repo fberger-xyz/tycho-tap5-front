@@ -20,7 +20,6 @@ export default function Page() {
     return (
         <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}
-            {/* <div className={cn('grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full', DEFAULT_PADDING_X)}> */}
             <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10">
                 <Card>
                     <p className="text-sm text-milk-400">Total PnL</p>

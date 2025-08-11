@@ -3,7 +3,7 @@
 import { cn } from '@/utils'
 import { EmptyPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import { TradeWithInstanceAndConfiguration } from '@/types'
-import { LoadingTradeRows, TradeRow, TradesTableHeaders } from '../TradesList'
+import { LoadingRecentTradeRows, RecentTradeRow, RecentTradesTableHeaders } from '../RecentTradesList'
 
 /**
  * ------------------------ 5 list
@@ -21,15 +21,15 @@ export function StrategyTradesList(props: { trades: TradeWithInstanceAndConfigur
         <div className="rounded-xl w-full">
             <div className="overflow-x-auto w-full">
                 <div className={cn('flex flex-col min-w-max max-h-[50vh] w-full')}>
-                    <TradesTableHeaders />
+                    <RecentTradesTableHeaders />
                     {showLoading ? (
-                        <LoadingTradeRows />
+                        <LoadingRecentTradeRows />
                     ) : noData ? (
                         <EmptyPlaceholder entryName="trades" />
                     ) : (
                         <div className="flex flex-col overflow-y-auto">
                             {trades.map((trade, tradeIndex) => (
-                                <TradeRow key={`${trade.id}-${tradeIndex}`} trade={trade} className="border-t border-milk-100" />
+                                <RecentTradeRow key={`${trade.id}-${tradeIndex}`} trade={trade} className="border-t border-milk-100" />
                             ))}
                         </div>
                     )}

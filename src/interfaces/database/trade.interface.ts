@@ -81,6 +81,7 @@ export interface TradeValuesV2 {
             max_priority_fee_per_gas: number
         }
         metadata: {
+            pool: string
             base_token: string
             spot_price: number
             quote_token: string

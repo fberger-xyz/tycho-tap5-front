@@ -7,10 +7,11 @@ import { AppUrls, FileIds, IconIds } from '@/enums'
 import IconWrapper from '../icons/IconWrapper'
 import GridDropdownButton from './GridDropdownButton'
 import { ButtonDark } from '../figma/Button'
+import StyledTooltip from '../common/StyledTooltip'
 
 export default function HeaderDesktop(props: { className?: string }) {
     return (
-        <header className={cn('hidden lg:grid grid-cols-2 items-center w-full px-8 py-6', props.className)}>
+        <header className={cn('hidden md:grid grid-cols-2 items-center w-full px-4 py-4', props.className)}>
             <div className="flex gap-4 items-center">
                 <GridDropdownButton />
                 <LinkWrapper href={AppUrls.STRATEGIES} className="cursor-pointer">
@@ -26,13 +27,16 @@ export default function HeaderDesktop(props: { className?: string }) {
                     <p className="text-milk text-sm truncate">Docs (Run locally)</p>
                     <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                 </LinkWrapper>
-                <ButtonDark
-                    onClick={() => {
-                        alert('new strategy')
-                    }}
-                >
-                    <p className="truncate text-sm">New strategy</p>
-                </ButtonDark>
+                <StyledTooltip content="Coming soon: Create a new strategy">
+                    <ButtonDark
+                        onClick={() => {
+                            alert('new strategy')
+                        }}
+                        className="px-4 py-[7px] rounded-2xl"
+                    >
+                        <p className="truncate text-sm">New strategy</p>
+                    </ButtonDark>
+                </StyledTooltip>
             </div>
         </header>
     )
