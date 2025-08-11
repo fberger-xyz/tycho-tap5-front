@@ -57,6 +57,14 @@ export enum AppInstanceStatus {
     ERROR = 'error',
 }
 
+export enum AppSupportedProtocols {
+    BALANCER = 'balancer',
+    CURVE = 'curve',
+    PANCAKESWAP = 'pancakeswap',
+    SUSHISWAP = 'sushiswap',
+    UNISWAP = 'uniswap',
+}
+
 export enum SupportedFilters {
     CONFIGURATION_CREATED = 'Config Created',
     // INSTANCE_CREATED = 'Instance Created',

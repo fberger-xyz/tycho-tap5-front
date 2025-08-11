@@ -5,6 +5,7 @@ import { useClickOutside } from '@/hooks/helpers/useClickOutside'
 import Image from 'next/image'
 import { FileIds } from '@/enums'
 import GridDropdown from './GridDropdown'
+import { ButtonDark } from '../figma/Button'
 
 export default function GridDropdownButton() {
     const [openGridDropdown, setOpenGridDropdown] = useState(false)
@@ -12,11 +13,9 @@ export default function GridDropdownButton() {
     useClickOutside(gridDropdown, () => setOpenGridDropdown(false))
 
     return (
-        <button ref={gridDropdown} onClick={() => setOpenGridDropdown(!openGridDropdown)} className="relative">
-            <div className="bg-milk-100 p-2.5 rounded-xl">
-                <Image src={FileIds.GRID_DROPDOWN} alt={FileIds.GRID_DROPDOWN} width={16} height={16} className="min-w-4" />
-            </div>
+        <ButtonDark ref={gridDropdown} onClick={() => setOpenGridDropdown(!openGridDropdown)} className="px-[9px] py-[9px] rounded-xl relative">
+            <Image src={FileIds.GRID_DROPDOWN} alt={FileIds.GRID_DROPDOWN} width={16} height={16} className="min-w-4" />
             <GridDropdown isOpen={openGridDropdown} onClose={() => setOpenGridDropdown(false)} />
-        </button>
+        </ButtonDark>
     )
 }

@@ -87,6 +87,12 @@ function toBinanceSymbol(baseSymbol: string, quoteSymbol: string): string {
         DAI: 'DAI',
         USDC: 'USDC',
         USDT: 'USDT',
+        WMATIC: 'MATIC',
+        WBNB: 'BNB',
+        WAVAX: 'AVAX',
+        USDD: 'USDD',
+        TUSD: 'TUSD',
+        BUSD: 'BUSD',
     }
 
     const base = symbolMap[baseSymbol.toUpperCase()] || baseSymbol.toUpperCase()
@@ -104,6 +110,32 @@ function toBinanceSymbol(baseSymbol: string, quoteSymbol: string): string {
     }
 }
 
+// Try to get price through USDT pairs if direct pair doesn't exist
+async function getPriceThroughUSDT(baseSymbol: string, quoteSymbol: string): Promise<number> {
+    const symbolMap: Record<string, string> = {
+        WETH: 'ETH',
+        WBTC: 'BTC',
+        DAI: 'DAI',
+        USDC: 'USDC',
+        USDT: 'USDT',
+    }
+
+    const base = symbolMap[baseSymbol.toUpperCase()] || baseSymbol.toUpperCase()
+    const quote = symbolMap[quoteSymbol.toUpperCase()] || quoteSymbol.toUpperCase()
+
+    // If one of them is already USDT, we can't use this method
+    if (base === 'USDT' || quote === 'USDT') {
+        throw new Error('Cannot use USDT bridge for USDT pairs')
+    }
+
+    // Get both prices in USDT
+    const baseInUSDT = await cachedFetchBinancePrice(base + 'USDT')
+    const quoteInUSDT = await cachedFetchBinancePrice(quote + 'USDT')
+
+    // Calculate the cross rate
+    return baseInUSDT / quoteInUSDT
+}
+
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url)
@@ -115,24 +147,43 @@ export async function GET(request: NextRequest) {
         }
 
         const binanceSymbol = toBinanceSymbol(baseSymbol, quoteSymbol)
+        console.log(`Attempting to fetch Binance price for ${binanceSymbol} (${baseSymbol}/${quoteSymbol})`)
 
         try {
+            // First try direct pair
             const price = await cachedFetchBinancePrice(binanceSymbol)
 
             return createApiSuccess({
                 price,
                 symbol: `${baseSymbol}/${quoteSymbol}`,
                 source: 'binance',
+                method: 'direct',
                 timestamp: new Date().toISOString(),
             })
         } catch (fetchError) {
-            if (fetchError instanceof Error) {
-                if (fetchError.message.includes('400')) {
-                    return createApiError(`Invalid symbol pair: ${baseSymbol}/${quoteSymbol}`, { status: 400 })
+            // If direct pair fails, try through USDT
+            console.log(`Direct pair ${binanceSymbol} failed, trying through USDT`)
+            try {
+                const price = await getPriceThroughUSDT(baseSymbol, quoteSymbol)
+
+                return createApiSuccess({
+                    price,
+                    symbol: `${baseSymbol}/${quoteSymbol}`,
+                    source: 'binance',
+                    method: 'usdt-bridge',
+                    timestamp: new Date().toISOString(),
+                })
+            } catch (bridgeError) {
+                console.error(`Failed to get price through USDT bridge:`, bridgeError)
+
+                if (fetchError instanceof Error) {
+                    if (fetchError.message.includes('400')) {
+                        return createApiError(`Symbol pair not available on Binance: ${baseSymbol}/${quoteSymbol}`, { status: 400 })
+                    }
+                    return createApiError(`Failed to fetch price: ${fetchError.message}`, { status: 500 })
                 }
-                return createApiError(`Failed to fetch price: ${fetchError.message}`, { status: 500 })
+                throw fetchError
             }
-            throw fetchError
         }
     } catch (error) {
         return handleApiError(error, 'fetch Binance price')

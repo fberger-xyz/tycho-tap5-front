@@ -12,10 +12,11 @@ import { useStrategies } from '@/hooks/fetchs/useStrategies'
 import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import UsdAmount from '@/components/figma/UsdAmount'
-import { Range, TargetSpread } from '@/components/figma/Tags'
+import { TargetSpread } from '@/components/figma/Tags'
 import DebankAumChart from '@/components/charts/DebankAumChart'
 import Skeleton from '@/components/common/Skeleton'
 import { DEFAULT_PADDING_X } from '@/config'
+import { useEthBalance } from '@/hooks/useEthBalance'
 
 /**
  * ------------------------ 1 template
@@ -45,7 +46,14 @@ const StrategyHeaderTemplate = (props: {
     )
 }
 
-const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?: ReactNode; className?: string; headerLink?: string }) => {
+const StrategyRowTemplate = (props: {
+    header: ReactNode
+    kpis: ReactNode
+    chart?: ReactNode
+    banner?: ReactNode
+    className?: string
+    headerLink?: string
+}) => {
     const headerContent = (
         <>
             {props.header}
@@ -58,18 +66,28 @@ const StrategyRowTemplate = (props: { header: ReactNode; kpis: ReactNode; chart?
             {/* row 1 */}
             {props.headerLink ? (
                 <LinkWrapper href={props.headerLink} className="block">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full px-4 py-5 bg-milk-50 rounded-t-2xl hover:bg-milk-100 transition-colors duration-200 cursor-pointer overflow-hidden">
                         {headerContent}
                     </div>
                 </LinkWrapper>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-200 transition-colors duration-200 cursor-pointer overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-100 transition-colors duration-200 cursor-pointer overflow-hidden">
                     {headerContent}
                 </div>
             )}
 
+            {/* separator */}
+            <div className="w-full border-b border-milk-100" />
+
             {/* row 2 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-100 p-5 rounded-b-2xl">{props.kpis}</div>
+            <div
+                className={cn('grid grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-50 p-5', !props.banner && 'rounded-b-2xl')}
+            >
+                {props.kpis}
+            </div>
+
+            {/* row 3 : banner */}
+            {props.banner && <div className="w-full rounded-b-2xl overflow-hidden text-xs">{props.banner}</div>}
         </div>
     )
 }
@@ -149,7 +167,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
             spread={
                 <div className="flex gap-0.5">
                     <TargetSpread bpsAmount={data.config.execution.minWatchSpreadBps ?? 0} />
-                    <Range inRange={true} />
+                    {/* <Range inRange={true} /> */}
                 </div>
             }
             chains={
@@ -172,6 +190,12 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
         chainId: data.chainId,
     })
     const aum = debankLast24hNetWorth.length ? debankLast24hNetWorth[debankLast24hNetWorth.length - 1].usd_value : networth?.usd_value || 0
+
+    // Check ETH balance threshold
+    const { isBelowThreshold: isEthBelowThreshold } = useEthBalance({
+        walletAddress,
+        chainId: data.chainId,
+    })
 
     // Extract USD values from the 24h history for the chart
     const chartData = debankLast24hNetWorth.length > 0 ? debankLast24hNetWorth.map((item) => item.usd_value) : [] // If no history, just show a flat line with current value
@@ -216,6 +240,13 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                         <p className="truncate">{data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)}</p>
                     </div>
                 </>
+            }
+            banner={
+                isEthBelowThreshold && (
+                    <div className="w-full p-5 bg-folly/20">
+                        <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
+                    </div>
+                )
             }
         />
     )

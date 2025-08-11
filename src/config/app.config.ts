@@ -33,16 +33,13 @@ export const APP_METADATA = {
         },
     },
 }
+export const ORDERBOOK_API_URL = 'https://www.orderbook.wtf/api'
 
 /**
  * pages
  */
 
 export const APP_PAGES: InterfaceAppLink[] = [
-    {
-        name: 'About',
-        path: AppUrls.ABOUT,
-    },
     {
         name: 'Strategies',
         path: AppUrls.STRATEGIES,

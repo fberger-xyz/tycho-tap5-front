@@ -34,6 +34,8 @@ interface CandlestickChartProps {
     quoteSymbol?: string
     upColor?: string
     downColor?: string
+    targetSpreadBps?: number
+    referencePrice?: number
     className?: string
 }
 
@@ -47,6 +49,8 @@ export default function CandlestickChart({
     quoteSymbol = '',
     upColor,
     downColor,
+    targetSpreadBps = 5,
+    referencePrice,
     className,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
@@ -69,6 +73,38 @@ export default function CandlestickChart({
 
         const ohlc = data.map((item) => [item.time, item.open, item.close, item.low, item.high])
 
+        // Compute spread band - using each candle's high and low
+        // Make sure spread is visible by using a minimum of 50 bps for visualization
+        // const effectiveSpreadBps = Math.max(targetSpreadBps, 50)
+        const effectiveSpreadBps = targetSpreadBps
+
+        // Lower bound: candle's low - target spread
+        const lowerBound = data.map((item) => {
+            return [item.time, item.low * (1 - effectiveSpreadBps / 10000)]
+        })
+
+        // For the stack, we need the difference between upper and lower
+        // Upper bound: candle's high + target spread
+        const spreadBand = data.map((item) => {
+            const lower = item.low * (1 - effectiveSpreadBps / 10000)
+            const upper = item.high * (1 + effectiveSpreadBps / 10000)
+            return [item.time, upper - lower]
+        })
+
+        // Also create explicit upper bound for the dashed line
+        const upperBound = data.map((item) => {
+            return [item.time, item.high * (1 + effectiveSpreadBps / 10000)]
+        })
+
+        // Create reference price line data if provided
+        console.log('CandlestickChart - referencePrice:', referencePrice)
+        const referencePriceLine = referencePrice
+            ? data.map((item) => {
+                  return [item.time, referencePrice]
+              })
+            : null
+        console.log('CandlestickChart - referencePriceLine:', referencePriceLine?.slice(0, 3))
+
         // Calculate the time range to determine appropriate label formatting
         const timeRange = data.length > 1 ? data[data.length - 1].time - data[0].time : 0
         const hourRange = timeRange / (1000 * 60 * 60) // Convert to hours
@@ -76,11 +112,62 @@ export default function CandlestickChart({
 
         const chartOptions: echarts.EChartsOption = {
             animation: true,
-            // grid: { top: 5, left: 0, right: 50, bottom: 90 }, // datazoom
-            grid: { top: 5, left: 0, right: 55, bottom: 40 },
+            grid: { top: 5, left: 0, right: 55, bottom: 60 },
             legend: {
-                show: false,
+                show: true,
+                bottom: 5,
+                left: 10,
+                orient: 'horizontal',
+                itemGap: 15,
+                itemWidth: 14,
+                itemHeight: 10,
+                textStyle: {
+                    fontSize: 11,
+                    color: colors.milkOpacity[600],
+                    fontFamily: INTER_FONT.style.fontFamily,
+                },
+                selectedMode: false,
+                data: [
+                    {
+                        name: '1inch OHLCV',
+                        icon: 'rect',
+                        itemStyle: {
+                            color: colors.milkOpacity[400],
+                        },
+                    },
+                    {
+                        name: 'Target Spread Band',
+                        icon: 'rect',
+                        itemStyle: {
+                            color: 'rgba(0, 255, 180, 0.5)',
+                        },
+                    },
+                    ...(referencePrice
+                        ? [
+                              {
+                                  name: 'Binance Reference Price',
+                                  icon: 'rect',
+                                  itemStyle: {
+                                      color: '#FF6B6B',
+                                  },
+                              },
+                          ]
+                        : []),
+                ],
             },
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100,
+                    minValueSpan: 3600 * 1000 * 2, // Minimum 2 hours visible
+                    zoomOnMouseWheel: true,
+                    moveOnMouseMove: true,
+                    moveOnMouseWheel: false,
+                    preventDefaultMouseMove: true,
+                },
+            ],
             tooltip: {
                 borderColor: 'rgba(55, 65, 81, 0.5)', // subtle border
                 triggerOn: 'mousemove|click',
@@ -101,6 +188,11 @@ export default function CandlestickChart({
                         show: false,
                     },
                     axisLabel: {
+                        hideOverlap: true, // ✅ avoid overlapping
+                        // @ts-expect-error TODO: fix this
+                        interval: 'auto', // ✅ let echarts auto-decide spacing
+                        showMinLabel: false,
+                        showMaxLabel: false,
                         formatter: (value: string | number) => {
                             const date = dayjs(value)
 
@@ -130,11 +222,10 @@ export default function CandlestickChart({
                         color: colors.milkOpacity[200],
                         fontSize: 10,
                         margin: 15,
-                        showMinLabel: false, // Hide min label to prevent cropping
-                        showMaxLabel: true,
                         rotate: 0, // Keep labels horizontal
                     },
                     // Control label interval separately
+                    // minInterval: 3600 * 1000 * 2, // optional: adjust min spacing between ticks (e.g. 2 hours),
                     minInterval:
                         dayRange < 1
                             ? 3600 * 1000 * 2 // 2 hours for intraday
@@ -203,8 +294,65 @@ export default function CandlestickChart({
                 fontFamily: INTER_FONT.style.fontFamily,
             },
             series: [
+                // Lower bound - base of the stack (hidden from legend)
                 {
-                    name: symbol,
+                    name: 'Lower Bound',
+                    type: 'line',
+                    data: lowerBound,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'spread',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        // type: 'dashed',
+                        color: 'transparent',
+                        opacity: 0.7,
+                        width: 1.5,
+                    },
+                    areaStyle: {
+                        opacity: 0,
+                    },
+                    z: 1,
+                },
+                // Spread band - stacked on top of lower bound (shown in legend as Target Spread Band)
+                {
+                    name: 'Target Spread Band',
+                    type: 'line',
+                    data: spreadBand,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'spread',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        color: 'rgba(0, 255, 180, 0.15)',
+                    },
+                    z: 1,
+                },
+                // Upper bound line (hidden from legend)
+                {
+                    name: 'Upper Bound',
+                    type: 'line',
+                    data: upperBound,
+                    symbol: 'none',
+                    silent: true,
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        // type: 'dashed',
+                        color: 'transparent',
+                        opacity: 0.7,
+                        width: 1.5,
+                    },
+                    z: 2,
+                },
+                // Candlestick series (shown in legend as 1inch OHLCV)
+                {
+                    name: '1inch OHLCV',
                     type: 'candlestick',
                     data: ohlc,
                     itemStyle: {
@@ -219,12 +367,50 @@ export default function CandlestickChart({
                             borderWidth: 2,
                         },
                     },
+                    z: 10,
                 },
+                // Reference price line (Binance)
+                ...(referencePriceLine
+                    ? [
+                          {
+                              name: 'Binance Reference Price',
+                              type: 'line' as const,
+                              data: referencePriceLine,
+                              symbol: 'circle',
+                              symbolSize: 0,
+                              legendHoverLink: false,
+                              showSymbol: false,
+                              lineStyle: {
+                                  color: '#FF6B6B',
+                                  width: 2.5,
+                                  type: 'dashed' as const,
+                                  dashOffset: 5,
+                                  cap: 'round' as const,
+                                  join: 'round' as const,
+                              },
+                              z: 15,
+                          },
+                      ]
+                    : []),
             ],
         }
 
         setOptions(chartOptions)
-    }, [data, isLoading, error, symbol, baseSymbol, quoteSymbol, colors, isMobile, upColor, downColor])
+    }, [
+        data,
+        isLoading,
+        error,
+        symbol,
+        baseSymbol,
+        quoteSymbol,
+        colors,
+        isMobile,
+        upColor,
+        downColor,
+        targetSpreadBps,
+        referencePrice,
+        resolvedTheme,
+    ])
 
     // Loading and no data state options
     const emptyStateOptions = useMemo((): echarts.EChartsOption => {

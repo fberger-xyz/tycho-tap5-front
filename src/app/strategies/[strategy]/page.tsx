@@ -9,7 +9,7 @@ import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import StrategyTemplate from '@/components/app/strategies/strategy/StrategyTemplate'
 import Card from '@/components/figma/Card'
 import { ChainImage, DoubleSymbol, SymbolImage } from '@/components/common/ImageWrapper'
-import { Button, ButtonDanger } from '@/components/figma/Button'
+import { ButtonDark, ButtonDanger } from '@/components/figma/Button'
 import { IconIds } from '@/enums'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { useRouter } from 'next/navigation'
@@ -30,6 +30,10 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 import { ReactNode } from 'react'
 import { getPriceSourceUrl } from '@/utils/price-source.util'
 import { cleanOutput } from '@/utils/format.util'
+import { PoolsList } from '@/components/app/pools/PoolsList'
+import RefreshCountdown from '@/components/app/pools/RefreshCountdown'
+import StyledTooltip from '@/components/common/StyledTooltip'
+import { useEthBalance } from '@/hooks/useEthBalance'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -52,6 +56,7 @@ const STRATEGY_UI_CONSTANTS = {
     SKELETON_HEIGHTS: {
         KPI: 'h-[88px]',
         CHART: 'h-[420px]',
+        POOLS: 'h-[240px]',
         CARD: 'h-[240px]',
         CONFIG: 'h-[320px]',
     },
@@ -94,6 +99,11 @@ const STRATEGY_LABELS = {
         INCLUSION_BLOCK_DELAY: 'Inclusion Block Delay',
         MIN_PUBLISH_TIMEFRAME: 'Min Publish Timeframe',
         PUBLISH_EVENTS: 'Publish Events',
+        GAS_TOKEN: 'Gas Token',
+        MAX_INVENTORY_RATIO: 'Max Inventory Ratio',
+        INFINITE_APPROVAL: 'Infinite Approval',
+        SKIP_SIMULATION: 'Skip Simulation',
+        TYCHO_ROUTER: 'Tycho Router',
     },
     PLACEHOLDERS: {
         NO_TOKENS: 'No tokens found',
@@ -103,10 +113,19 @@ const STRATEGY_LABELS = {
     },
 } as const
 
-function StatRow({ label, value }: { label: string; value: ReactNode }) {
+function StatRow({ label, explanation, value }: { label: string; explanation?: string; value: ReactNode }) {
     return (
         <div className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_ROW}>
-            <p className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_LABEL}>{label}</p>
+            {explanation ? (
+                <StyledTooltip content={explanation} className="max-w-xs">
+                    <div className="flex gap-1 cursor-help">
+                        <p className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_LABEL}>{label}</p>
+                        <IconWrapper id={IconIds.INFORMATION} className="size-4 text-milk-400" />
+                    </div>
+                </StyledTooltip>
+            ) : (
+                <p className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_LABEL}>{label}</p>
+            )}
             {typeof value === 'string' ? <p className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_VALUE}>{value}</p> : value}
         </div>
     )
@@ -121,9 +140,9 @@ const LoadingPage = ({ router }: { router: AppRouterInstance }) => {
                 header={
                     <>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:grow">
-                            <Button onClick={() => router.back()}>
+                            <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
                                 <IconWrapper id={IconIds.ARROW_LEFT} />
-                            </Button>
+                            </ButtonDark>
                             <div className="flex gap-4 items-center w-80">
                                 <DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={STRATEGY_UI_CONSTANTS.ICON_SIZES.DOUBLE_SYMBOL} gap={2} />
                                 <div className="flex flex-col gap-1 grow items-start md:w-1/3">
@@ -146,6 +165,7 @@ const LoadingPage = ({ router }: { router: AppRouterInstance }) => {
                     </div>
                 }
                 chart={<div className={`skeleton-loading ${SKELETON_HEIGHTS.CHART} w-full rounded-lg`} />}
+                pools={<div className={`skeleton-loading ${SKELETON_HEIGHTS.POOLS} w-full rounded-lg`} />}
                 trades={<div className={`skeleton-loading ${SKELETON_HEIGHTS.CARD} w-full rounded-lg`} />}
                 inventory={<div className={`skeleton-loading ${SKELETON_HEIGHTS.CARD} w-full rounded-lg`} />}
                 configurations={<div className={`skeleton-loading ${SKELETON_HEIGHTS.CONFIG} w-full rounded-lg`} />}
@@ -192,6 +212,12 @@ export default function StrategyPage() {
         isAll: false,
     })
 
+    // Get ETH balance for threshold checking
+    const { isBelowThreshold: isEthBelowThreshold } = useEthBalance({
+        walletAddress,
+        chainId,
+    })
+
     // Get price from strategy data (already fetched by useStrategies hook)
     const priceUsd = strategy?.priceUsd || 0
 
@@ -226,10 +252,10 @@ export default function StrategyPage() {
                 header={
                     <>
                         {/* left */}
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:grow">
-                            <Button onClick={() => router.back()}>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-fit">
+                            <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
                                 <IconWrapper id={IconIds.ARROW_LEFT} />
-                            </Button>
+                            </ButtonDark>
                             <div className="flex gap-4 items-center">
                                 <DoubleSymbol
                                     symbolLeft={parsedConfig.base.symbol}
@@ -255,16 +281,26 @@ export default function StrategyPage() {
                             </div>
                         </div>
 
+                        {/* right */}
                         <div className="flex gap-2">
-                            <ButtonDanger disabled>
-                                <IconWrapper id={IconIds.STOP_TRADING} />
-                                <p className="text-sm">Stop strategy</p>
-                            </ButtonDanger>
-                            <Button disabled>
+                            <StyledTooltip content="Coming soon: Control the market maker directly from your wallet">
+                                <ButtonDanger className="w-max rounded-xl">
+                                    <IconWrapper id={IconIds.STOP_TRADING} className="size-4" />
+                                    <p className="text-sm truncate">Stop strategy</p>
+                                </ButtonDanger>
+                            </StyledTooltip>
+                            <ButtonDark onClick={() => alert('To be implemented')} className="px-[10px] py-[7px] rounded-xl">
                                 <IconWrapper id={IconIds.DOTS_HORIZONTAL} />
-                            </Button>
+                            </ButtonDark>
                         </div>
                     </>
+                }
+                banner={
+                    isEthBelowThreshold && (
+                        <div className="w-full p-5 bg-folly/20 rounded-xl">
+                            <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
+                        </div>
+                    )
                 }
                 kpis={
                     <div className="grid grid-cols-3 gap-4">
@@ -290,12 +326,31 @@ export default function StrategyPage() {
                     </div>
                 }
                 chart={
-                    <ChartForPairOnChain
-                        baseTokenAddress={parsedConfig.base.address}
-                        quoteTokenAddress={parsedConfig.quote.address}
-                        chainId={parsedConfig.chain.id}
-                        className="h-[420px] w-full rounded-lg bg-milk-50"
-                    />
+                    <Card className="h-[420px] p-0">
+                        <ChartForPairOnChain
+                            baseTokenAddress={parsedConfig.base.address}
+                            quoteTokenAddress={parsedConfig.quote.address}
+                            baseTokenSymbol={parsedConfig.base.symbol}
+                            quoteTokenSymbol={parsedConfig.quote.symbol}
+                            chainId={parsedConfig.chain.id}
+                            targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
+                            className="h-[420px] w-full"
+                        />
+                    </Card>
+                }
+                pools={
+                    <Card className="gap-5 px-0 pb-0">
+                        <div className="flex items-center justify-between px-5">
+                            <h1 className="text-lg font-semibold">Pools Status</h1>
+                            <RefreshCountdown chainId={parsedConfig.chain.id} />
+                        </div>
+                        <PoolsList
+                            chainId={parsedConfig.chain.id}
+                            token0={parsedConfig.base.address}
+                            token1={parsedConfig.quote.address}
+                            targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
+                        />
+                    </Card>
                 }
                 trades={
                     <Card className="gap-5 px-0 pb-0">
@@ -323,7 +378,16 @@ export default function StrategyPage() {
                 }
                 inventory={
                     <Card className="gap-5 px-0 pb-0">
-                        <h1 className="text-lg font-semibold px-5">Your positions</h1>
+                        <div className="flex justify-between px-5 items-center">
+                            <h1 className="text-lg font-semibold">Your positions</h1>
+                            <ButtonDark
+                                onClick={() => {
+                                    alert('Manage positions')
+                                }}
+                            >
+                                <p className="truncate text-sm">Manage</p>
+                            </ButtonDark>
+                        </div>
                         <div className="flex flex-col text-xs">
                             <div className="grid grid-cols-2 px-5 mb-3">
                                 <p className="text-milk-400 truncate">Asset</p>
@@ -364,7 +428,7 @@ export default function StrategyPage() {
                 }
                 configurations={
                     <Card className="gap-5">
-                        <h1 className="text-lg font-semibold">Stats</h1>
+                        <h1 className="text-lg font-semibold">Configuration</h1>
                         <div className="flex flex-col gap-3 text-sm">
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.CHAIN}
@@ -412,11 +476,13 @@ export default function StrategyPage() {
                             <StatRow label={STRATEGY_LABELS.STATS.TOTAL_TRADES} value={trades.length.toString()} />
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.MAX_SLIPPAGE}
+                                explanation="Maximum allowed slippage"
                                 value={`${Math.round(parsedConfig.execution.maxSlippagePct * 10000) || 0} bps`}
                             />
                             <StatRow label={STRATEGY_LABELS.STATS.DAILY_GAS_BUDGET} value={STRATEGY_LABELS.PLACEHOLDERS.NOT_SET} />
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.PRICE_FEED}
+                                explanation="Price feed source type and data source URL"
                                 value={
                                     <LinkWrapper
                                         href={strategy ? getPriceSourceUrl(strategy) || '' : ''}
@@ -430,6 +496,7 @@ export default function StrategyPage() {
                             />
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.EOA}
+                                explanation="Trading wallet public address"
                                 value={
                                     <LinkWrapper
                                         href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/address/${walletAddress}`}
@@ -443,22 +510,43 @@ export default function StrategyPage() {
                             />
 
                             {parsedConfig.execution.minWatchSpreadBps !== undefined && (
-                                <StatRow label={STRATEGY_LABELS.STATS.MIN_WATCH_SPREAD} value={`${parsedConfig.execution.minWatchSpreadBps} bps`} />
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.MIN_WATCH_SPREAD}
+                                    explanation="Minimum spread to trigger a trade (in basis points)"
+                                    value={`${parsedConfig.execution.minWatchSpreadBps} bps`}
+                                />
                             )}
 
                             {parsedConfig.execution.minExecSpreadBps !== undefined && (
-                                <StatRow label={STRATEGY_LABELS.STATS.MIN_EXEC_SPREAD} value={`${parsedConfig.execution.minExecSpreadBps} bps`} />
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.MIN_EXEC_SPREAD}
+                                    explanation="Minimum profitability to execute trades (in basis points). The higher it is, the less frequent the opportunities are and the higher the revert rate"
+                                    value={`${parsedConfig.execution.minExecSpreadBps} bps`}
+                                />
                             )}
 
-                            <StatRow label={STRATEGY_LABELS.STATS.TX_GAS_LIMIT} value={numeral(parsedConfig.execution.txGasLimit).format('0,0')} />
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.TX_GAS_LIMIT}
+                                explanation="Maximum gas units per trade"
+                                value={numeral(parsedConfig.execution.txGasLimit).format('0,0')}
+                            />
 
-                            <StatRow label={STRATEGY_LABELS.STATS.POLL_INTERVAL} value={`${parsedConfig.execution.pollIntervalMs} ms`} />
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.POLL_INTERVAL}
+                                explanation="Time between market data updates (to avoid rate limits)"
+                                value={`${parsedConfig.execution.pollIntervalMs} ms`}
+                            />
 
-                            <StatRow label={STRATEGY_LABELS.STATS.BLOCK_OFFSET} value={parsedConfig.execution.blockOffset.toString()} />
+                            <StatRow
+                                label={STRATEGY_LABELS.STATS.BLOCK_OFFSET}
+                                explanation="Block number offset (for mainnet strategies)"
+                                value={parsedConfig.execution.blockOffset.toString()}
+                            />
 
                             {parsedConfig.execution.inclusionBlockDelay !== undefined && (
                                 <StatRow
                                     label={STRATEGY_LABELS.STATS.INCLUSION_BLOCK_DELAY}
+                                    explanation="Blocks to wait before confirming transaction"
                                     value={parsedConfig.execution.inclusionBlockDelay.toString()}
                                 />
                             )}
@@ -466,16 +554,22 @@ export default function StrategyPage() {
                             {parsedConfig.execution.minPublishTimeframeMs !== undefined && (
                                 <StatRow
                                     label={STRATEGY_LABELS.STATS.MIN_PUBLISH_TIMEFRAME}
+                                    explanation="Minimum time between price event publications (to avoid rate limits)"
                                     value={`${parsedConfig.execution.minPublishTimeframeMs} ms`}
                                 />
                             )}
 
                             {parsedConfig.execution.publishEvents !== undefined && (
-                                <StatRow label={STRATEGY_LABELS.STATS.PUBLISH_EVENTS} value={parsedConfig.execution.publishEvents ? 'Yes' : 'No'} />
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.PUBLISH_EVENTS}
+                                    explanation="Whether to save in DB the trading events (especially for UI)"
+                                    value={parsedConfig.execution.publishEvents ? 'Yes' : 'No'}
+                                />
                             )}
 
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.PERMIT2}
+                                explanation="Permit2 contract for token approvals"
                                 value={
                                     <LinkWrapper
                                         href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/address/${parsedConfig.tycho.permit2Address}`}
@@ -487,8 +581,59 @@ export default function StrategyPage() {
                                     </LinkWrapper>
                                 }
                             />
+
+                            {parsedConfig.tycho.tychoRouterAddress && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.TYCHO_ROUTER}
+                                    explanation="Tycho router contract address for execution"
+                                    value={
+                                        <LinkWrapper
+                                            href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/address/${parsedConfig.tycho.tychoRouterAddress}`}
+                                            className="truncate hover:underline cursor-alias"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {shortenValue(parsedConfig.tycho.tychoRouterAddress)}
+                                        </LinkWrapper>
+                                    }
+                                />
+                            )}
+
+                            {parsedConfig.execution.gasTokenSymbol && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.GAS_TOKEN}
+                                    explanation="Native token for transaction fees"
+                                    value={parsedConfig.execution.gasTokenSymbol}
+                                />
+                            )}
+
+                            {parsedConfig.inventory.maxInventoryRatio !== undefined && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.MAX_INVENTORY_RATIO}
+                                    explanation="Maximum trade size relative to total inventory"
+                                    value={`${(parsedConfig.inventory.maxInventoryRatio * 100).toFixed(1)}%`}
+                                />
+                            )}
+
+                            {parsedConfig.tycho.infiniteApproval !== undefined && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.INFINITE_APPROVAL}
+                                    explanation="Permit2 approve infinite (base and quote)"
+                                    value={parsedConfig.tycho.infiniteApproval ? 'Yes' : 'No'}
+                                />
+                            )}
+
+                            {parsedConfig.execution.skipSimulation !== undefined && (
+                                <StatRow
+                                    label={STRATEGY_LABELS.STATS.SKIP_SIMULATION}
+                                    explanation="Skip transaction simulation for speed (or if it's not possible)"
+                                    value={parsedConfig.execution.skipSimulation ? 'Yes' : 'No'}
+                                />
+                            )}
+
                             {/* <StatRow
                                 label={STRATEGY_LABELS.STATS.TYCHO_API}
+                                explanation="Tycho protocol API endpoint (secret)"
                                 value={<span className="text-xs font-mono">{parsedConfig.tycho.tychoApi}</span>}
                             /> */}
                         </div>

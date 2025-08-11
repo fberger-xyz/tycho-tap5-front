@@ -1,4 +1,4 @@
-import { AppSupportedChainIds, AppUrls } from '../enums'
+import { AppSupportedChainIds, AppSupportedProtocols, AppUrls, FileIds } from '../enums'
 
 export interface InterfaceAppLink {
     name: string
@@ -23,6 +23,14 @@ export interface ChainConfig {
     }
     debankId: string // https://docs.cloud.debank.com/en/readme/api-pro-reference/chain
     chainlinkFeeds?: Record<string, string> // Price feed addresses for this chain
+    idForOrderbookApi: string
+    showTopUpBannerIfEthBalanceBelow: number
+}
+
+export interface ProtocolConfig {
+    id: AppSupportedProtocols
+    name: string
+    fileId: FileIds
 }
 
 export interface TokenConfig {

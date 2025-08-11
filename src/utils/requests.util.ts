@@ -51,6 +51,13 @@ export const createRequest = async <T>(url: string, options: RequestOptions = {}
             headers: { ...defaultHeaders, ...options.headers },
         })
         const data = await response.json()
+
+        // If the response is already a StructuredOutput, return it as-is
+        if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+            return data as StructuredOutput<T>
+        }
+
+        // Otherwise, wrap the data in a StructuredOutput
         return { ...output, success: true, data }
     } catch (error) {
         return {

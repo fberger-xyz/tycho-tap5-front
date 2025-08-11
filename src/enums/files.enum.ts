@@ -13,6 +13,13 @@ export enum FileIds {
     APP_LOGO_MOBILE_TYCHO = '/figma/logo/mobile/market-maker.svg',
     APP_LOGO_DOUBLE_M = '/figma/logo/double-m.svg',
 
+    // protocols
+    PROTOCOL_BALANCER = 'PROTOCOL_BALANCER',
+    PROTOCOL_CURVE = 'PROTOCOL_CURVE',
+    PROTOCOL_PANCAKESWAP = 'PROTOCOL_PANCAKESWAP',
+    PROTOCOL_UNISWAP = 'PROTOCOL_UNISWAP',
+    PROTOCOL_SUSHISWAP = 'PROTOCOL_SUSHISWAP',
+
     // icons
     GRID_DROPDOWN = '/figma/dots-grid.svg',
 }

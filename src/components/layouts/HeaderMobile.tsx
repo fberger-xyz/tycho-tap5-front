@@ -1,34 +1,25 @@
 'use client'
 
-import { APP_PAGES } from '@/config/app.config'
 import { useAppStore } from '@/stores/app.store'
-import { cn, isCurrentPath } from '@/utils'
+import { cn } from '@/utils'
 import { useRef, useEffect } from 'react'
 import { useKeyboardShortcut } from '@/hooks/helpers/useKeyboardShortcutArgs'
 import Image from 'next/image'
 import { AppUrls, IconIds, FileIds } from '@/enums'
 import IconWrapper from '../icons/IconWrapper'
 import LinkWrapper from '../common/LinkWrapper'
-import { usePathname } from 'next/navigation'
 import GridDropdownButton from './GridDropdownButton'
 import { AnimatePresence, motion } from 'framer-motion'
 import Authors from './Authors'
+import { ButtonDark } from '../figma/Button'
+import { APP_PAGES } from '@/config/app.config'
 
 export default function HeaderMobile() {
     const { showMobileMenu, setShowMobileMenu } = useAppStore()
 
-    const pathname = usePathname()
-    const isStrategyPage = pathname.includes('/strategies/')
-
     // menu
     const menuDropdown = useRef<HTMLButtonElement>(null)
     useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowMobileMenu(false) })
-
-    const handleLinkClick = () => {
-        setTimeout(() => {
-            setShowMobileMenu(false)
-        }, 400)
-    }
 
     // Lock body scroll when menu is open
     useEffect(() => {
@@ -55,8 +46,6 @@ export default function HeaderMobile() {
                     <GridDropdownButton />
 
                     {/* logo */}
-                    {/* <Image src={FileIds.APP_LOGO_MOBILE_WINTERCUTE} alt={FileIds.APP_LOGO_MOBILE_WINTERCUTE} width={160} height={24} /> */}
-                    {/* <Image src={FileIds.APP_LOGO_MOBILE_TYCHO} alt={FileIds.APP_LOGO_MOBILE_TYCHO} width={160} height={24} /> */}
                     <LinkWrapper href={AppUrls.STRATEGIES} className="cursor-pointer">
                         <Image src={FileIds.APP_LOGO_DOUBLE_M} alt={FileIds.APP_LOGO_DOUBLE_M} width={151} height={24} />
                     </LinkWrapper>
@@ -65,13 +54,13 @@ export default function HeaderMobile() {
                 {/* right */}
                 <div className={cn('flex gap-2', showMobileMenu ? 'z-40' : 'z-30')}>
                     {/* menu */}
-                    <button
+                    <ButtonDark
                         ref={menuDropdown}
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
-                        className="flex items-center gap-1 bg-milk-100 transition-colors duration-300 hover:bg-milk-100 rounded-xl h-9 px-2.5"
+                        className="flex items-center gap-1 bg-milk-100 transition-colors duration-300 hover:bg-milk-100 rounded-xl px-[7px] py-1"
                     >
                         <IconWrapper id={showMobileMenu ? IconIds.CLOSE : IconIds.MENU} className="size-5" />
-                    </button>
+                    </ButtonDark>
                 </div>
             </div>
 
@@ -96,27 +85,6 @@ export default function HeaderMobile() {
                             transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
                             className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-4 pt-28"
                         >
-                            {APP_PAGES.map((page, index) => (
-                                <motion.div
-                                    key={page.path}
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -20 }}
-                                    transition={{ duration: 0.3, ease: 'easeOut', delay: 0.05 * index }}
-                                >
-                                    <LinkWrapper href={page.path} className={cn('rounded-lg', { 'bg-milk-100': isCurrentPath(pathname, page.path) })}>
-                                        <p
-                                            className={cn('text-base text-milk px-2.5 py-2 hover:bg-milk-100 rounded-xl cursor-pointer', {
-                                                'bg-milk-100':
-                                                    isCurrentPath(pathname, page.path) || (isStrategyPage && page.path === AppUrls.STRATEGIES),
-                                            })}
-                                            onClick={handleLinkClick}
-                                        >
-                                            {page.name}
-                                        </p>
-                                    </LinkWrapper>
-                                </motion.div>
-                            ))}
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}

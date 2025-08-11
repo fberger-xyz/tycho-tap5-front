@@ -21,13 +21,15 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
             'USDT/USD': '0x3E7d1eAB13ad0104d2750B8863b489D65364e32D',
             'WBTC/BTC': '0xfdFD9C85aD200c506Cf9e21F1FD8dd01932FBB23',
         },
+        idForOrderbookApi: 'ethereum',
+        showTopUpBannerIfEthBalanceBelow: 0.005, // 0.001 ETH
     },
     [AppSupportedChainIds.UNICHAIN]: {
         id: AppSupportedChainIds.UNICHAIN,
         name: 'Unichain',
         oneInchId: 'unichain',
         supported: true,
-        explorerRoot: 'https://unichain.blockscout.com',
+        explorerRoot: 'https://uniscan.xyz',
         nativeToken: {
             symbol: 'ETH',
             decimals: 18,
@@ -36,6 +38,8 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
         chainlinkFeeds: {
             // Chainlink feeds for Unichain will be added when available
         },
+        idForOrderbookApi: 'unichain',
+        showTopUpBannerIfEthBalanceBelow: 0.001, // 0.001 ETH
     },
     [AppSupportedChainIds.BASE]: {
         id: AppSupportedChainIds.BASE,
@@ -55,5 +59,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
             'USDC/USD': '0x7e860098F58bBFC8648a4311b374B1D669a2bc6B',
             'DAI/USD': '0x591e79239a7d679378eC8c847e5038150364C78F',
         },
+        idForOrderbookApi: 'base',
+        showTopUpBannerIfEthBalanceBelow: 0.001, // 0.001 ETH
     },
 }

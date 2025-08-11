@@ -30,10 +30,10 @@ export function TargetSpread({ bpsAmount }: { bpsAmount: number }) {
     )
 }
 
-export function Range({ inRange }: { inRange: boolean }) {
+export function Range({ inRange, className }: { inRange: boolean; className?: string }) {
     const variant = inRange ? 'success' : 'error'
     return (
-        <Tag variant={variant} className="rounded-r pl-1.5 pr-2 py-0.5 text-xs h-fit">
+        <Tag variant={variant} className={cn('rounded-r pl-1.5 pr-2 py-0.5 text-xs h-fit rounded-md', className)}>
             <p className={variantStyles[variant].text}>{inRange ? 'In range' : 'Out of range'}</p>
         </Tag>
     )

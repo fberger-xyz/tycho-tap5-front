@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
 import { ChartColors } from '@/config/chart-colors.config'
@@ -9,22 +9,53 @@ import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
+import { ButtonDark } from '../figma/Button'
 
 export default function ChartForPairOnChain({
     baseTokenAddress,
     quoteTokenAddress,
+    baseTokenSymbol,
+    quoteTokenSymbol,
     chainId,
+    targetSpreadBps,
     className,
 }: {
     baseTokenAddress: string
     quoteTokenAddress: string
+    baseTokenSymbol?: string
+    quoteTokenSymbol?: string
     chainId: number
+    targetSpreadBps?: number
     className?: string
 }) {
     const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(CHART_CONFIG[ChartType.CANDLES].name))
     const [selectedInterval, selectInterval] = useQueryState('interval', parseAsInteger.withDefault(CHART_CONFIG[ChartType.CANDLES].defaultInterval))
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+    const [referencePrice, setReferencePrice] = useState<number | undefined>(undefined)
+
+    // Fetch Binance reference price
+    useEffect(() => {
+        if (baseTokenSymbol && quoteTokenSymbol) {
+            console.log('Fetching Binance price for:', baseTokenSymbol, '/', quoteTokenSymbol)
+            fetch(`/api/binance/price?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}`)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log('Binance API response:', data)
+                    if (data.success && data.data?.price) {
+                        const roundedPrice = Math.round(data.data.price * 100) / 100
+                        console.log('Setting reference price to:', roundedPrice)
+                        setReferencePrice(roundedPrice)
+                    } else {
+                        console.warn('Binance price not available:', data.error || 'Unknown error')
+                    }
+                })
+                .catch((err) => {
+                    console.error('Failed to fetch Binance price:', err)
+                })
+        }
+    }, [baseTokenSymbol, quoteTokenSymbol])
+
     const { data, isLoading, error } = useOneInchCandles({
         token0: baseTokenAddress?.toLowerCase() ?? '',
         token1: quoteTokenAddress?.toLowerCase() ?? '',
@@ -37,10 +68,10 @@ export default function ChartForPairOnChain({
         if (!data?.data) return null
         return data.data.map((candle) => ({
             time: candle.time * 1000, // Convert to milliseconds
-            open: candle.open,
-            high: candle.high,
-            low: candle.low,
-            close: candle.close,
+            open: Math.round(candle.open * 100) / 100,
+            high: Math.round(candle.high * 100) / 100,
+            low: Math.round(candle.low * 100) / 100,
+            close: Math.round(candle.close * 100) / 100,
             // 1inch API doesn't provide volume, so we'll omit it
         }))
     }, [data])
@@ -48,47 +79,23 @@ export default function ChartForPairOnChain({
     return (
         <div className={cn('w-full flex flex-col', className)}>
             <div className="flex flex-col md:flex-row md:justify-between md:items-center text-xs p-5 gap-y-4">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-6">
                     {Object.values(CHART_CONFIG).map((config) => (
                         <button
                             key={config.name}
                             disabled={!config.enabled}
-                            className={cn(
-                                'px-2 py-1 rounded-lg',
-                                chartType === config.name ? 'bg-milk-100' : 'text-milk-400 hover:bg-milk-50',
-                                !config.enabled && 'cursor-not-allowed',
-                            )}
+                            className={cn(chartType === config.name ? 'text-milk' : 'text-milk-400', !config.enabled && 'cursor-not-allowed')}
                             onClick={() => setChartType(config.name)}
                         >
                             {config.name}
                         </button>
                     ))}
                 </div>
-                <div className="flex items-center gap-2 border border-milk-100 p-1 rounded-full">
+                <div className="flex items-center gap-1">
                     {CHART_CONFIG[ChartType.CANDLES].allowedIntervals.map((interval) => (
-                        <button
-                            key={interval}
-                            className={cn('px-2 py-1 rounded-xl', selectedInterval === interval ? 'bg-milk-100' : 'text-milk-400 hover:bg-milk-50')}
-                            style={
-                                selectedInterval === interval
-                                    ? {
-                                          boxShadow: [
-                                              '0px -1.92px 0px 0px #080808 inset',
-                                              '0px 0.64px 0px 0px #FFFFFF4D inset',
-                                              '0px 1.77px 1.41px 0px #0000001F',
-                                              '0px 4.25px 3.4px 0px #00000021',
-                                              '0px 8px 6.4px 0px #00000022',
-                                              '0px 14.28px 11.42px 0px #00000024',
-                                              '0px 1.92px 1.92px 0px #00000024',
-                                              '0px 1.77px 1.41px 0px #0000001F',
-                                          ].join(', '),
-                                      }
-                                    : undefined
-                            }
-                            onClick={() => selectInterval(interval)}
-                        >
+                        <ButtonDark key={interval} className="w-10 py-[3px] rounded-xl text-xs" onClick={() => selectInterval(interval)}>
                             {INTERVAL_LABELS(interval)}
-                        </button>
+                        </ButtonDark>
                     ))}
                 </div>
             </div>
@@ -97,10 +104,12 @@ export default function ChartForPairOnChain({
                     data={candlestickData}
                     isLoading={isLoading}
                     error={error}
-                    baseSymbol={baseTokenAddress}
-                    quoteSymbol={quoteTokenAddress}
+                    baseSymbol={baseTokenSymbol || baseTokenAddress}
+                    quoteSymbol={quoteTokenSymbol || quoteTokenAddress}
                     upColor={colors.aquamarine}
                     downColor={colors.folly}
+                    targetSpreadBps={targetSpreadBps}
+                    referencePrice={referencePrice}
                 />
             </div>
         </div>

@@ -1,2 +1,5 @@
 export * from './app.config'
 export * from './theme.config'
+export * from './chains.config'
+export * from './protocols.config'
+export * from './query.config'
