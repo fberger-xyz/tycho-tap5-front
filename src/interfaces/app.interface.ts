@@ -25,6 +25,7 @@ export interface ChainConfig {
     chainlinkFeeds?: Record<string, string> // Price feed addresses for this chain
     idForOrderbookApi: string
     showTopUpBannerIfEthBalanceBelow: number
+    poolRefreshIntervalMs?: number // Pool refresh interval in milliseconds
 }
 
 export interface ProtocolConfig {

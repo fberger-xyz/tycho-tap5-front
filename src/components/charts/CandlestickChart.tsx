@@ -722,6 +722,38 @@ export default function CandlestickChart({
 
                     let tooltipContent = `<div style="font-size: 11px; color: ${colors.milkOpacity[600]}; margin-bottom: 8px;">${formattedDate}</div>`
 
+                    // Get the trade zone boundaries for this point
+                    let noTradeLower = 0
+                    let noTradeUpper = 0
+
+                    // Find reference price for this data point
+                    let currentReferencePrice = 0
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    const refPriceItem = params.find((item: any) => item.seriesName === chartSeriesNames.referencePrice)
+                    if (refPriceItem && refPriceItem.value) {
+                        currentReferencePrice = Array.isArray(refPriceItem.value) ? refPriceItem.value[1] : refPriceItem.value
+                    }
+
+                    // Calculate no-trade zone boundaries based on reference price and spread
+                    if (currentReferencePrice > 0) {
+                        noTradeLower = currentReferencePrice * (1 - targetSpreadBps / 10000)
+                        noTradeUpper = currentReferencePrice * (1 + targetSpreadBps / 10000)
+                    } else {
+                        // Fallback: try to find the no-trade spread band which contains the width
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        const spreadBandItem = params.find((item: any) => item.seriesName === chartSeriesNames.noTradeSpreadBand)
+                        if (spreadBandItem && spreadBandItem.value) {
+                            const spreadBandValue = Array.isArray(spreadBandItem.value) ? spreadBandItem.value[1] : spreadBandItem.value
+                            // The spread band value is the width, so we need the lower bound
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const lowerBoundItem = params.find((item: any) => item.seriesName === chartSeriesNames.noTradeLowerBound)
+                            if (lowerBoundItem && lowerBoundItem.value) {
+                                noTradeLower = Array.isArray(lowerBoundItem.value) ? lowerBoundItem.value[1] : lowerBoundItem.value
+                                noTradeUpper = noTradeLower + spreadBandValue
+                            }
+                        }
+                    }
+
                     // Process params in reverse order to show legend items first
                     const items = [...params].reverse()
 
@@ -750,24 +782,80 @@ export default function CandlestickChart({
                                 <div style="padding-left: 18px; margin-bottom: 8px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                                         <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">open</span>
-                                        <span style="color: ${colors.milk};">${(Math.round(open * 100) / 100).toFixed(2)}</span>
+                                        <span style="color: ${colors.milk};">$${(Math.round(open * 100) / 100).toFixed(2)}</span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                                         <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">close</span>
-                                        <span style="color: ${colors.milk};">${(Math.round(close * 100) / 100).toFixed(2)}</span>
+                                        <span style="color: ${colors.milk};">$${(Math.round(close * 100) / 100).toFixed(2)}</span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
                                         <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">lowest</span>
-                                        <span style="color: ${colors.milk};">${(Math.round(low * 100) / 100).toFixed(2)}</span>
+                                        <span style="color: ${colors.milk};">$${(Math.round(low * 100) / 100).toFixed(2)}</span>
                                     </div>
                                     <div style="display: flex; justify-content: space-between;">
                                         <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">highest</span>
-                                        <span style="color: ${colors.milk};">${(Math.round(high * 100) / 100).toFixed(2)}</span>
+                                        <span style="color: ${colors.milk};">$${(Math.round(high * 100) / 100).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            `
+                        } else if (seriesName === chartSeriesNames.noTradeSpreadBand) {
+                            // No-Trade Zone with detailed explanation
+                            tooltipContent += `
+                                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                                    <span style="display: inline-block; width: 10px; height: 10px; background: rgba(128, 128, 128, 0.4); border-radius: 2px; margin-right: 8px;"></span>
+                                    <span style="color: ${colors.milkOpacity[600]};">${item.seriesName}</span>
+                                </div>
+                                <div style="padding-left: 18px; margin-bottom: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">upper bound</span>
+                                        <span style="color: ${colors.milk};">$${noTradeUpper.toFixed(2)}</span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">lower bound</span>
+                                        <span style="color: ${colors.milk};">$${noTradeLower.toFixed(2)}</span>
+                                    </div>
+                                    <div style="font-size: 10px; color: ${colors.milkOpacity[400]}; margin-top: 4px;">
+                                        Bot won't trade within this range
+                                    </div>
+                                </div>
+                            `
+                        } else if (seriesName === chartSeriesNames.lowerTradingZone) {
+                            // Trading Zone with detailed explanation
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            const candleData = params.find((p: any) => p.seriesName === chartSeriesNames.ohlc)?.data
+                            const candleLow = candleData ? candleData[3] : 0
+                            const candleHigh = candleData ? candleData[4] : 0
+
+                            // Check if trading zones are active
+                            const buyZoneActive = candleLow < noTradeLower && noTradeLower > 0
+                            const sellZoneActive = candleHigh > noTradeUpper && noTradeUpper > 0
+                            const isActive = buyZoneActive || sellZoneActive
+
+                            tooltipContent += `
+                                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                                    <span style="display: inline-block; width: 10px; height: 10px; background: rgba(255, 100, 100, 0.4); border-radius: 2px; margin-right: 8px;"></span>
+                                    <span style="color: ${colors.milkOpacity[600]};">Trade Zones</span>
+                                </div>
+                                <div style="padding-left: 18px; margin-bottom: 8px;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">buy zone</span>
+                                        <span style="color: ${colors.milk};">
+                                            ${buyZoneActive ? `$${candleLow.toFixed(2)} - $${noTradeLower.toFixed(2)}` : 'inactive'}
+                                        </span>
+                                    </div>
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                                        <span style="color: ${colors.milkOpacity[400]}; margin-right: 24px;">sell zone</span>
+                                        <span style="color: ${colors.milk};">
+                                            ${sellZoneActive ? `$${noTradeUpper.toFixed(2)} - $${candleHigh.toFixed(2)}` : 'inactive'}
+                                        </span>
+                                    </div>
+                                    <div style="font-size: 10px; color: ${colors.milkOpacity[400]}; margin-top: 4px;">
+                                        ${isActive ? 'Bot will execute trades in these ranges' : 'No profitable trades available'}
                                     </div>
                                 </div>
                             `
                         } else if (item.seriesName && item.value !== undefined) {
-                            // Line data (Target Spread Band, Binance Reference Price, Pool prices)
+                            // Line data (Binance Reference Price, Pool prices)
                             const value = Array.isArray(item.value) ? item.value[1] : item.value
 
                             // Check if this is a pool series
@@ -791,7 +879,7 @@ export default function CandlestickChart({
                                         ${showColor ? `<span style="display: inline-block; width: 10px; height: 10px; background: ${displayColor}; border-radius: 2px; margin-right: 8px;"></span>` : ''}
                                         <span style="color: ${colors.milkOpacity[600]};">${item.seriesName}</span>
                                     </div>
-                                    <span style="color: ${colors.milk}; margin-left: 24px;">${(Math.round(value * 100) / 100).toFixed(2)}</span>
+                                    <span style="color: ${colors.milk}; margin-left: 24px;">$${(Math.round(value * 100) / 100).toFixed(2)}</span>
                                 </div>
                             `
                         }
@@ -861,6 +949,7 @@ export default function CandlestickChart({
                             padding: [6, 10],
                             fontSize: 11,
                             borderRadius: 4,
+                            align: 'center', // center the text
                             formatter: ({ value }) => {
                                 // return dayjs(value).format('dddd, MMMM D, YYYY ∙ hh:mm A')
                                 return [DAYJS_FORMATS.dateLong(value), DAYJS_FORMATS.timeAgo(value)].join('\n')

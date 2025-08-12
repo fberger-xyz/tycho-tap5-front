@@ -39,15 +39,27 @@ export function usePoolsData(params?: UsePoolsDataParams) {
         return result.data || null
     }
 
-    return useQuery({
+    // Determine refetch interval based on chain
+    // Ethereum mainnet (chain: 'ethereum') gets 12 seconds, others get 5 seconds
+    const refetchInterval = params?.chain === 'ethereum' ? 12000 : 5000
+    const staleTime = refetchInterval - 1000 // Keep stale time slightly less than refetch interval
+
+    const query = useQuery({
         queryKey: ['orderbook', params?.chain, params?.token0, params?.token1, params?.pointToken, params?.pointAmount],
         queryFn: fetchOrderbook,
         enabled: params?.enabled !== false && !!params?.chain && !!params?.token0 && !!params?.token1,
-        refetchInterval: 30000, // Refetch every 30 seconds
-        staleTime: 25000, // Consider data stale after 25 seconds (close to refetch interval to prevent flicker)
+        refetchInterval, // Dynamic refetch interval based on chain
+        staleTime, // Dynamic stale time based on chain
         refetchOnMount: false, // Don't refetch when component mounts if data exists
         refetchOnWindowFocus: false, // Don't refetch on window focus
     })
+
+    // Return the query result with additional info
+    return {
+        ...query,
+        refetchInterval,
+        dataUpdatedAt: query.dataUpdatedAt, // Timestamp when data was last fetched
+    }
 }
 
 // Mock data for development

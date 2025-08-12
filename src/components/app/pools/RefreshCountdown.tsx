@@ -12,12 +12,12 @@ interface RefreshCountdownProps {
 export default function RefreshCountdown({ chainId, refreshIntervalMs, lastRefreshTime }: RefreshCountdownProps) {
     // Default refresh intervals based on chain
     const defaultIntervals = {
-        1: 30000, // Ethereum: 30 seconds
-        8453: 15000, // Base: 15 seconds
-        99999999: 15000, // Unichain: 15 seconds
+        1: 12000, // Ethereum: 12 seconds
+        8453: 5000, // Base: 5 seconds
+        99999999: 5000, // Unichain: 5 seconds
     } as const
 
-    const interval = refreshIntervalMs || defaultIntervals[chainId as keyof typeof defaultIntervals] || 30000
+    const interval = refreshIntervalMs || defaultIntervals[chainId as keyof typeof defaultIntervals] || 5000
     const intervalInSeconds = interval / 1000
 
     // Track when component mounts for initial countdown

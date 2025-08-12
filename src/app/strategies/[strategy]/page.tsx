@@ -27,7 +27,7 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import numeral from 'numeral'
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { ReactNode } from 'react'
+import React, { ReactNode } from 'react'
 import { getPriceSourceUrl } from '@/utils/price-source.util'
 import { cleanOutput } from '@/utils/format.util'
 import { PoolsList } from '@/components/app/pools/PoolsList'
@@ -128,6 +128,31 @@ function StatRow({ label, explanation, value }: { label: string; explanation?: s
             )}
             {typeof value === 'string' ? <p className={STRATEGY_UI_CONSTANTS.CLASSES.STAT_VALUE}>{value}</p> : value}
         </div>
+    )
+}
+
+// Component for Pools with refresh countdown
+function PoolsCard({ chainId, token0, token1, targetSpreadBps }: { chainId: number; token0: string; token1: string; targetSpreadBps?: number }) {
+    const [refreshInterval, setRefreshInterval] = React.useState<number>()
+    const [lastRefreshTime, setLastRefreshTime] = React.useState<number>()
+
+    return (
+        <Card className="gap-5 px-0 pb-0">
+            <div className="flex items-center justify-between px-5">
+                <h1 className="text-lg font-semibold text-milk font-inter-tight">Pools Status</h1>
+                <RefreshCountdown chainId={chainId} refreshIntervalMs={refreshInterval} lastRefreshTime={lastRefreshTime} />
+            </div>
+            <PoolsList
+                chainId={chainId}
+                token0={token0}
+                token1={token1}
+                targetSpreadBps={targetSpreadBps}
+                onRefreshData={(interval, updatedAt) => {
+                    setRefreshInterval(interval)
+                    setLastRefreshTime(updatedAt)
+                }}
+            />
+        </Card>
     )
 }
 
@@ -335,18 +360,12 @@ export default function StrategyPage() {
                     </Card>
                 }
                 pools={
-                    <Card className="gap-5 px-0 pb-0">
-                        <div className="flex items-center justify-between px-5">
-                            <h1 className="text-lg font-semibold text-milk font-inter-tight">Pools Status</h1>
-                            <RefreshCountdown chainId={parsedConfig.chain.id} />
-                        </div>
-                        <PoolsList
-                            chainId={parsedConfig.chain.id}
-                            token0={parsedConfig.base.address}
-                            token1={parsedConfig.quote.address}
-                            targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
-                        />
-                    </Card>
+                    <PoolsCard
+                        chainId={parsedConfig.chain.id}
+                        token0={parsedConfig.base.address}
+                        token1={parsedConfig.quote.address}
+                        targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
+                    />
                 }
                 trades={
                     <Card className="gap-5 px-0 pb-0">

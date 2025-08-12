@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, memo } from 'react'
+import React, { ReactNode, memo } from 'react'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { cn } from '@/utils'
 import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
@@ -10,6 +10,7 @@ import { Range } from '@/components/figma/Tags'
 import FileMapper from '@/components/icons/FileMapper'
 import { getProtocolConfig, CHAINS_CONFIG } from '@/config'
 import StyledTooltip from '@/components/common/StyledTooltip'
+import { LiveDate } from '@/components/common/LiveDate'
 
 // todo simulation failed pas de broadcast data
 
@@ -141,7 +142,7 @@ export const PoolRow = memo(function PoolRow({
             }
             depth={<p className="truncate">{depth}</p>}
             fee={<p className="truncate">{numeral(pool.fee).format('0.[00]')} bps</p>}
-            lastUpdate={<p className="truncate text-milk-400">{minutesAgo > 0 ? `${minutesAgo} min ago` : 'Just now'}</p>}
+            lastUpdate={<LiveDate date={pool.last_updated_at * 1000}>{minutesAgo > 0 ? `${minutesAgo} min ago` : 'Just now'}</LiveDate>}
             className={cn('px-4 py-3 hover:bg-milk-100 transition-colors duration-200', className)}
         />
     )
@@ -155,13 +156,19 @@ interface PoolsListProps {
     token0?: string
     token1?: string
     targetSpreadBps?: number
+    onRefreshData?: (refetchInterval: number, dataUpdatedAt: number) => void
 }
 
-export function PoolsList({ chainId, token0, token1, targetSpreadBps = 10 }: PoolsListProps) {
+export function PoolsList({ chainId, token0, token1, targetSpreadBps = 10, onRefreshData }: PoolsListProps) {
     // Get the chain name for the orderbook API
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
 
-    const { data: orderbookData, isLoading } = usePoolsData({
+    const {
+        data: orderbookData,
+        isLoading,
+        refetchInterval,
+        dataUpdatedAt,
+    } = usePoolsData({
         chain: chainName || '',
         token0: token0 || '',
         token1: token1 || '',
@@ -172,6 +179,13 @@ export function PoolsList({ chainId, token0, token1, targetSpreadBps = 10 }: Poo
 
     const pools = orderbookData?.pools || []
     const referencePrice = orderbookData?.mpd_base_to_quote?.mid || 0
+
+    // Notify parent of refresh data
+    React.useEffect(() => {
+        if (onRefreshData && refetchInterval && dataUpdatedAt) {
+            onRefreshData(refetchInterval, dataUpdatedAt)
+        }
+    }, [onRefreshData, refetchInterval, dataUpdatedAt])
 
     // easy ternary
     const showLoading = isLoading && (!pools || pools.length === 0)
