@@ -186,14 +186,9 @@ export default function StrategyPage() {
     // Get configuration and strategy with price
     const { configuration, strategy, isLoading: configLoading, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
 
-    // Get trades data
+    // Get trades data - disable automatic refetch (pass 0 as refreshInterval)
     const strategyIdStr = Array.isArray(strategyId) ? strategyId[0] : strategyId
-    const {
-        trades,
-        isLoading: tradesLoading,
-        hasError: tradesHasError,
-        error: tradesError,
-    } = useTradesData(STRATEGY_UI_CONSTANTS.DEFAULTS.MAX_TRADES, strategyIdStr)
+    const { trades, isLoading: tradesLoading, hasError: tradesHasError, error: tradesError } = useTradesData(0, strategyIdStr) // Disabled refetch to prevent re-renders
 
     // Parse configuration
     const parsedConfig = configuration ? jsonConfigParser(configuration.id, configuration.values) : null
@@ -206,7 +201,7 @@ export default function StrategyPage() {
     const { networth, debankLast24hNetWorth } = useDebankData({ walletAddress, chainId })
 
     // Get token list
-    const { tokens, isLoading: tokensLoading } = useDebankTokenList({
+    const { tokens } = useDebankTokenList({
         walletAddress,
         chainId,
         isAll: false,
@@ -230,12 +225,12 @@ export default function StrategyPage() {
     // Get price source URL - use strategy if available for consistency
     const priceSourceUrl = strategy ? getPriceSourceUrl(strategy) : null
 
-    // loading
-    const isLoading = configLoading || tradesLoading || tokensLoading
+    // Only show loading page during initial configuration load, not during refetches
+    const isInitialLoading = configLoading && !configuration
     const hasError = configHasError || tradesHasError
 
-    // loading or error
-    if (isLoading) {
+    // loading or error - only check initial loading to prevent unmounting during refetches
+    if (isInitialLoading) {
         return <LoadingPage router={router} />
     }
 
