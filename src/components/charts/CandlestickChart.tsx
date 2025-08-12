@@ -52,6 +52,7 @@ interface CandlestickChartProps {
     referencePrices?: Array<{ time: number; price: number }>
     poolsData?: AmmAsOrderbook | null
     showPoolSeries?: boolean
+    showTradeZonesInTooltip?: boolean
     className?: string
 }
 
@@ -437,6 +438,7 @@ export default function CandlestickChart({
     referencePrices,
     poolsData,
     showPoolSeries = false,
+    showTradeZonesInTooltip = false,
     className,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
@@ -716,11 +718,16 @@ export default function CandlestickChart({
                 formatter: function (params: any) {
                     if (!params || params.length === 0) return ''
 
-                    const date = dayjs(params[0].axisValue).tz('America/New_York')
-                    const formatString = hourRange <= 1 ? 'HH:mm' : dayRange <= 2 ? 'ddd, MMM D, HH:mm' : 'ddd, MMM D, YYYY'
-                    const formattedDate = date.format(formatString)
+                    const timestamp = params[0].axisValue
+                    const dateLong = DAYJS_FORMATS.dateLong(timestamp)
+                    const timeAgo = DAYJS_FORMATS.timeAgo(timestamp)
 
-                    let tooltipContent = `<div style="font-size: 11px; color: ${colors.milkOpacity[600]}; margin-bottom: 8px;">${formattedDate}</div>`
+                    let tooltipContent = `
+                        <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid ${colors.milkOpacity[100]};">
+                            <div style="font-size: 12px; font-weight: 500; color: ${colors.milk}; margin-bottom: 4px;">${dateLong}</div>
+                            <div style="font-size: 11px; color: ${colors.milkOpacity[400]};">${timeAgo}</div>
+                        </div>
+                    `
 
                     // Get the trade zone boundaries for this point
                     let noTradeLower = 0
@@ -819,8 +826,8 @@ export default function CandlestickChart({
                                     </div>
                                 </div>
                             `
-                        } else if (seriesName === chartSeriesNames.lowerTradingZone) {
-                            // Trading Zone with detailed explanation
+                        } else if (seriesName === chartSeriesNames.lowerTradingZone && showTradeZonesInTooltip) {
+                            // Trading Zone with detailed explanation (only show if enabled)
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             const candleData = params.find((p: any) => p.seriesName === chartSeriesNames.ohlc)?.data
                             const candleLow = candleData ? candleData[3] : 0
@@ -855,6 +862,11 @@ export default function CandlestickChart({
                                 </div>
                             `
                         } else if (item.seriesName && item.value !== undefined) {
+                            // Skip Trade Zone series if showTradeZonesInTooltip is false
+                            if (seriesName === chartSeriesNames.lowerTradingZone && !showTradeZonesInTooltip) {
+                                return // Skip this series
+                            }
+
                             // Line data (Binance Reference Price, Pool prices)
                             const value = Array.isArray(item.value) ? item.value[1] : item.value
 
@@ -1247,6 +1259,7 @@ export default function CandlestickChart({
         poolPriceSeries,
         isClient,
         forceReplace,
+        showTradeZonesInTooltip,
     ])
 
     // Loading and no data state options
