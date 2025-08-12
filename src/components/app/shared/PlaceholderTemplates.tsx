@@ -10,7 +10,7 @@ export function ErrorPlaceholder(props: { entryName: string; errorMessage: strin
     return (
         <div className="w-full border border-red-200 p-4 rounded-xl">
             <p className="text-folly text-sm font-medium">Failed to load {props.entryName}</p>
-            <p className="text-default text-xs">{props.errorMessage}</p>
+            <p className="text-milk-400 text-xs">{props.errorMessage}</p>
         </div>
     )
 }

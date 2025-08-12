@@ -48,7 +48,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     const [isDragging, setIsDragging] = React.useState(false)
     const isFirstRender = useRef(true)
     const handleChartResize = () => myChart.current?.resize()
-    
+
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(echarts as any).registerTransform((ecStat as any).transform.regression)
@@ -57,7 +57,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
         const handleMouseLeave = () => {
             if (myChart.current) {
                 myChart.current.dispatchAction({
-                    type: 'hideTip'
+                    type: 'hideTip',
                 })
             }
         }
@@ -67,11 +67,11 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             const isNewChart = !myChart.current
             if (isNewChart) myChart.current = echarts.init(chartRef.current)
             window.addEventListener('resize', handleChartResize, { passive: true })
-            
+
             // Determine if we should replace or merge options
             const shouldReplace = isNewChart || isFirstRender.current || props.forceReplace
-            
-            myChart.current.setOption(
+
+            myChart.current?.setOption(
                 // @ts-expect-error: poorly typed
                 props.options,
                 {
@@ -93,27 +93,27 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                     silent: false,
                 },
             )
-            
+
             // Mark first render as complete
             if (isFirstRender.current) {
                 isFirstRender.current = false
             }
 
             // attach click event listener
-            myChart.current.on('click', (params: unknown) => {
+            myChart.current?.on('click', (params: unknown) => {
                 if (props.onPointClick) props.onPointClick(params)
             })
 
             // attach dataZoom event listener
-            myChart.current.on('dataZoom', () => {
+            myChart.current?.on('dataZoom', () => {
                 const option = myChart.current?.getOption()
                 const zoom = option?.dataZoom?.[0]
                 if (!zoom) return
-                
+
                 // Get the percentage values directly
                 const startPercent = zoom?.start ?? 0
                 const endPercent = zoom?.end ?? 100
-                
+
                 if (props.onDataZoomChange) {
                     props.onDataZoomChange(startPercent, endPercent)
                 }
@@ -140,13 +140,13 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     }, [props.options])
 
     return (
-        <div 
-            ref={chartRef} 
-            className={cn('m-0 p-0', props.className)} 
-            style={{ 
-                width: '100%', 
-                height: '100%', 
-                cursor: isDragging ? 'grabbing' : 'grab' 
+        <div
+            ref={chartRef}
+            className={cn('m-0 p-0', props.className)}
+            style={{
+                width: '100%',
+                height: '100%',
+                cursor: isDragging ? 'grabbing' : 'grab',
             }}
             onMouseDown={() => setIsDragging(true)}
             onMouseUp={() => setIsDragging(false)}
