@@ -29,8 +29,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                         <IconWrapper id={IconIds.UPDATE_NOW} className="size-5" />
                     </button>
 
-                    <p className="text-sm text-milk">
-                        Or reach out for help on telegram:
+                    <p className="text-sm text-milk text-wrap">
+                        Or reach out for help:
                         <LinkWrapper href={AppUrls.PROPELLERHEADS_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine pl-1">
                             PropellerHeads
                         </LinkWrapper>

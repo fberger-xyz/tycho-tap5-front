@@ -24,7 +24,7 @@ export default function Footer(props: { className?: string }) {
     return (
         <footer
             className={cn(
-                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-6 lg:gap-0',
+                'w-full flex text-xs flex-col lg:flex-row lg:justify-between lg:items-end py-4 px-6 text-milk-400 font-light gap-6 lg:gap-0',
                 props.className,
             )}
         >

@@ -67,13 +67,12 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
     // Check if balance is below threshold
     const chainConfig = chainId ? CHAINS_CONFIG[chainId] : null
     const threshold = chainConfig?.showTopUpBannerIfEthBalanceBelow || 0
-    const isBelowThreshold = balance < threshold
 
     return {
         balance,
-        isLoading,
+        isEthBalanceLoading: isLoading,
         error,
-        isBelowThreshold,
+        isEthBelowThreshold: balance < threshold,
         threshold,
     }
 }

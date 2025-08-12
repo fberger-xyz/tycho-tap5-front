@@ -52,10 +52,10 @@ export function TradeSide({ side }: { side: 'buy' | 'sell' }) {
     )
 }
 
-export function PercentEvolution({ percentage }: { percentage: number }) {
+export function PercentEvolution({ percentage, className }: { percentage: number; className?: string }) {
     const variant = percentage > 0 ? 'success' : percentage < 0 ? 'error' : 'default'
     return (
-        <Tag variant={variant} className="rounded-xl px-1 py-0.5 text-xs h-fit">
+        <Tag variant={variant} className={cn('rounded-xl px-1 py-0.5 text-xs h-fit', className)}>
             <IconWrapper
                 id={percentage > 0 ? IconIds.ARROW_UP_RIGHT : percentage < 0 ? IconIds.ARROW_DOWN_LEFT : IconIds.ARROW_WAVE_RIGHT_UP}
                 className={cn('size-4', variantStyles[variant].text)}

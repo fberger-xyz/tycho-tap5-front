@@ -39,50 +39,65 @@ interface InterfaceEchartWrapperProps {
     onPointClick?: (params: unknown) => void
     onDataZoomChange?: (start: number, end: number) => void
     className?: string
+    forceReplace?: boolean // Add flag to force complete replacement when needed
 }
 
 export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     const chartRef = useRef<HTMLDivElement>(null)
     const myChart = useRef<echarts.ECharts | null>(null)
+    const [isDragging, setIsDragging] = React.useState(false)
+    const isFirstRender = useRef(true)
     const handleChartResize = () => myChart.current?.resize()
+    
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(echarts as any).registerTransform((ecStat as any).transform.regression)
 
+        // Define handleMouseLeave outside the condition so it's accessible in cleanup
+        const handleMouseLeave = () => {
+            if (myChart.current) {
+                myChart.current.dispatchAction({
+                    type: 'hideTip'
+                })
+            }
+        }
+
         // only if ref mounted in dom
         if (chartRef?.current) {
-            if (!myChart.current) myChart.current = echarts.init(chartRef.current)
+            const isNewChart = !myChart.current
+            if (isNewChart) myChart.current = echarts.init(chartRef.current)
             window.addEventListener('resize', handleChartResize, { passive: true })
+            
+            // Determine if we should replace or merge options
+            const shouldReplace = isNewChart || isFirstRender.current || props.forceReplace
+            
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
                 props.options,
                 {
                     /**
-                     * lazyUpdate?: boolean
-                        Default: true = ECharts merges the new options with the existing ones.
-                        false = the new option object replaces the existing one completely.
+                     * notMerge: Controls whether to merge or replace options
+                     * - true: Replace everything (for initial load or major changes)
+                     * - false: Merge and animate (for data updates)
                      */
-                    notMerge: true,
+                    notMerge: shouldReplace,
 
                     /**
-                     * lazyUpdate?: boolean
-                        Default: false
-                        What it does:
-                        - If true, ECharts will not immediately update the chart after setOption is called.
-                        - Instead, it waits until the next frame, allowing multiple setOption calls to be batched for better performance.
-                        Use case: Useful when you're calling setOption multiple times in a row and want to avoid unnecessary renders.
+                     * lazyUpdate: Batch updates for better performance
                      */
                     lazyUpdate: true,
 
                     /**
-                     * Default: false
-                        What it does:
-                        When true, calling setOption won't trigger any event dispatch (like rendered, finished, etc.).
-                        Use case: Good for silent updates where you don't want side effects like re-triggering chart-related events.
+                     * silent: false to allow animations and events
                      */
                     silent: false,
                 },
             )
+            
+            // Mark first render as complete
+            if (isFirstRender.current) {
+                isFirstRender.current = false
+            }
 
             // attach click event listener
             myChart.current.on('click', (params: unknown) => {
@@ -94,23 +109,18 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 const option = myChart.current?.getOption()
                 const zoom = option?.dataZoom?.[0]
                 if (!zoom) return
-                const xAxisArray = option?.xAxis as echarts.EChartOption.XAxis[] | undefined
-                let startValue = zoom?.startValue
-                let endValue = zoom?.endValue
-                if ((startValue === undefined || endValue === undefined) && xAxisArray && Array.isArray(xAxisArray)) {
-                    const xAxis = xAxisArray[0]
-                    const min = typeof xAxis.min === 'number' ? xAxis.min : 0
-                    const max = typeof xAxis.max === 'number' ? xAxis.max : 1
-                    const startPercent = zoom?.start ?? 0
-                    const endPercent = zoom?.end ?? 100
-
-                    startValue = min + (max - min) * (startPercent / 100)
-                    endValue = min + (max - min) * (endPercent / 100)
-                }
-                if (props.onDataZoomChange && typeof startValue === 'number' && typeof endValue === 'number') {
-                    props.onDataZoomChange(startValue, endValue)
+                
+                // Get the percentage values directly
+                const startPercent = zoom?.start ?? 0
+                const endPercent = zoom?.end ?? 100
+                
+                if (props.onDataZoomChange) {
+                    props.onDataZoomChange(startPercent, endPercent)
                 }
             })
+
+            // Fix tooltip persistence - hide tooltip on mouse leave
+            chartRef.current.addEventListener('mouseleave', handleMouseLeave)
         }
 
         return () => {
@@ -120,10 +130,27 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 myChart.current.off('click')
                 myChart.current.off('dataZoom')
             }
+            if (chartRef.current) {
+                // eslint-disable-next-line react-hooks/exhaustive-deps
+                chartRef.current.removeEventListener('mouseleave', handleMouseLeave)
+            }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.options])
 
-    return <div ref={chartRef} className={cn('m-0 p-0', props.className)} style={{ width: '100%', height: '100%' }}></div>
+    return (
+        <div 
+            ref={chartRef} 
+            className={cn('m-0 p-0', props.className)} 
+            style={{ 
+                width: '100%', 
+                height: '100%', 
+                cursor: isDragging ? 'grabbing' : 'grab' 
+            }}
+            onMouseDown={() => setIsDragging(true)}
+            onMouseUp={() => setIsDragging(false)}
+            onMouseLeave={() => setIsDragging(false)}
+        />
+    )
 }

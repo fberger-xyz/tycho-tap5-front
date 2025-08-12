@@ -65,14 +65,14 @@ export const RecentTradeRowTemplate = (props: {
 export function RecentTradesTableHeaders() {
     return (
         <RecentTradeRowTemplate
-            side={<p className="pl-2">Side</p>}
+            side={<p>Side</p>}
             protocol={<p>Protocol</p>}
             in={<p>In</p>}
             out={<p>Out</p>}
             price={<p>Price</p>}
             time={<p>Time</p>}
             tx={<p>Tx</p>}
-            className="px-4 py-3 text-milk-400 text-xs"
+            className="px-4 py-3 text-milk-600 text-xs"
         />
     )
 }
@@ -118,7 +118,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
     return (
         <RecentTradeRowTemplate
             protocol={
-                <div className="flex items-center gap-2 pl-2">
+                <div className="flex items-center gap-2">
                     <FileMapper
                         id={getProtocolConfig(trade.Instance.Configuration.values as string).fileId}
                         className="size-6 rounded-full bg-milk-100"

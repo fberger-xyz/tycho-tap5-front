@@ -15,7 +15,7 @@ import IconWrapper from '@/components/icons/IconWrapper'
 import { useRouter } from 'next/navigation'
 import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
 import { jsonConfigParser } from '@/utils/data/parser'
-import { Range, TargetSpread } from '@/components/figma/Tags'
+import { TargetSpread } from '@/components/figma/Tags'
 import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { useDebankTokenList } from '@/hooks/fetchs/useDebankTokenList'
 import UsdAmount from '@/components/figma/UsdAmount'
@@ -64,7 +64,7 @@ const STRATEGY_UI_CONSTANTS = {
     // Common class names
     CLASSES: {
         STAT_ROW: 'flex justify-between gap-4',
-        STAT_LABEL: 'text-milk-400 truncate',
+        STAT_LABEL: 'text-milk-600 truncate',
         STAT_VALUE: 'truncate',
     },
 
@@ -213,7 +213,7 @@ export default function StrategyPage() {
     })
 
     // Get ETH balance for threshold checking
-    const { isBelowThreshold: isEthBelowThreshold } = useEthBalance({
+    const { isEthBalanceLoading, isEthBelowThreshold } = useEthBalance({
         walletAddress,
         chainId,
     })
@@ -265,17 +265,17 @@ export default function StrategyPage() {
                                 />
                                 <div className="flex flex-col gap-1 grow items-start md:w-1/3">
                                     <div className="flex gap-2 items-center">
-                                        <p className="text-lg font-semibold truncate">
+                                        <p className="text-lg font-semibold truncate text-milk">
                                             {parsedConfig.base.symbol} / {parsedConfig.quote.symbol}
                                         </p>
                                         <div className="flex gap-0.5">
-                                            <TargetSpread bpsAmount={parsedConfig.execution.minWatchSpreadBps ?? 0} rounded="rounded-l" />
-                                            <Range inRange={true} className="rounded-r" />
+                                            <TargetSpread bpsAmount={parsedConfig.execution.minWatchSpreadBps ?? 0} rounded="rounded" />
+                                            {/* <Range inRange={true} className="rounded-r" /> */}
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
                                         <ChainImage id={parsedConfig.chain.id} size={20} />
-                                        <p className="truncate text-milk-400 text-sm capitalize">{parsedConfig.chain.name}</p>
+                                        <p className="truncate text-milk-600 text-sm capitalize">{parsedConfig.chain.name}</p>
                                     </div>
                                 </div>
                             </div>
@@ -296,6 +296,7 @@ export default function StrategyPage() {
                     </>
                 }
                 banner={
+                    !isEthBalanceLoading &&
                     isEthBelowThreshold && (
                         <div className="w-full p-5 bg-folly/20 rounded-xl">
                             <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
@@ -305,22 +306,22 @@ export default function StrategyPage() {
                 kpis={
                     <div className="grid grid-cols-3 gap-4">
                         <Card>
-                            <p className="text-sm text-milk-400">PnL</p>
+                            <p className="text-xs text-milk-600">PnL</p>
                             {/* <Skeleton variant="text" /> */}
-                            <p className="text-milk-200 truncate">To be computed</p>
+                            <p className="text-milk-200 truncate text-lg">To be computed</p>
                         </Card>
                         <Card>
-                            <p className="text-sm text-milk-400">AUM</p>
-                            {aum ? <UsdAmount amountUsd={aum} className="hover:underline" /> : <Skeleton variant="text" />}
+                            <p className="text-xs text-milk-600">AUM</p>
+                            {aum ? <UsdAmount amountUsd={aum} className="hover:underline" textClassName="text-lg" /> : <Skeleton variant="text" />}
                         </Card>
                         <Card>
-                            <p className="text-sm text-milk-400">Price</p>
+                            <p className="text-xs text-milk-600">Price</p>
                             {priceSourceUrl ? (
                                 <LinkWrapper href={priceSourceUrl} target="_blank">
-                                    <UsdAmount amountUsd={priceUsd} className="hover:underline cursor-alias" />
+                                    <UsdAmount amountUsd={priceUsd} className="hover:underline cursor-alias" textClassName="text-lg" />
                                 </LinkWrapper>
                             ) : (
-                                <UsdAmount amountUsd={priceUsd} />
+                                <UsdAmount amountUsd={priceUsd} textClassName="text-lg" />
                             )}
                         </Card>
                     </div>
@@ -341,7 +342,7 @@ export default function StrategyPage() {
                 pools={
                     <Card className="gap-5 px-0 pb-0">
                         <div className="flex items-center justify-between px-5">
-                            <h1 className="text-lg font-semibold">Pools Status</h1>
+                            <h1 className="text-lg font-semibold text-milk font-inter-tight">Pools Status</h1>
                             <RefreshCountdown chainId={parsedConfig.chain.id} />
                         </div>
                         <PoolsList
@@ -358,7 +359,7 @@ export default function StrategyPage() {
                             {Object.values(TradesView).map((view) => (
                                 <button key={view} className={cn('cursor-pointer')} onClick={() => setTradesTab(view)}>
                                     <p
-                                        className={cn('text-lg truncate w-max', {
+                                        className={cn('text-lg truncate w-max font-inter-tight', {
                                             'text-milk font-semibold': view === tradesTab,
                                             'text-milk-400': view !== tradesTab,
                                         })}
@@ -379,7 +380,7 @@ export default function StrategyPage() {
                 inventory={
                     <Card className="gap-5 px-0 pb-0">
                         <div className="flex justify-between px-5 items-center">
-                            <h1 className="text-lg font-semibold">Your positions</h1>
+                            <h1 className="text-lg font-semibold font-inter-tight">Your Funds</h1>
                             <StyledTooltip content="Coming soon: Manage your positions">
                                 <ButtonDark
                                     onClick={() => {
@@ -393,8 +394,8 @@ export default function StrategyPage() {
                         </div>
                         <div className="flex flex-col text-xs">
                             <div className="grid grid-cols-2 px-5 mb-3">
-                                <p className="text-milk-400 truncate">Asset</p>
-                                <p className="text-milk-400 truncate">Size</p>
+                                <p className="text-milk-600 truncate">Asset</p>
+                                <p className="text-milk-600 truncate">Size</p>
                             </div>
                             {tokens.length === 0 ? (
                                 <p className="text-milk-400 text-center py-4">{STRATEGY_LABELS.PLACEHOLDERS.NO_TOKENS}</p>
@@ -431,7 +432,7 @@ export default function StrategyPage() {
                 }
                 configurations={
                     <Card className="gap-5">
-                        <h1 className="text-lg font-semibold">Configuration</h1>
+                        <h1 className="text-lg font-semibold font-inter-tight">Configuration</h1>
                         <div className="flex flex-col gap-3 text-sm">
                             <StatRow
                                 label={STRATEGY_LABELS.STATS.CHAIN}

@@ -104,7 +104,12 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
 
     const getBoxShadow = () => {
         if (selected) {
-            return '0px -1px 1px rgba(255, 255, 255, 0.14)'
+            // Add a subtle glow effect for selected state
+            return [
+                '0px -1px 1px rgba(255, 255, 255, 0.14)',
+                '0px 0px 8px rgba(255, 244, 224, 0.15)', // Subtle milk color glow
+                'inset 0px 1px 1px 0.25px rgba(255, 244, 224, 0.3)', // Inner highlight
+            ].join(', ')
         }
         return [
             '0px -1px 1px rgba(255, 255, 255, 0.14)',
@@ -113,6 +118,9 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
             'inset 0px 1px 1px 0.25px rgba(255, 255, 255, 0.2)',
         ].join(', ')
     }
+
+    // Add transition for background and box-shadow
+    const transition = 'background 0.5s ease-in-out, box-shadow 0.3s ease-in-out'
 
     return (
         <button
@@ -123,6 +131,7 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
                 'text-milk font-medium text-sm leading-5',
                 'rounded-[12px]',
                 'transition-all duration-200 ease-in-out',
+                'relative', // Add relative positioning for pseudo-element
                 className,
             )}
             style={{
@@ -136,19 +145,32 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
                 border: '3px solid #000000',
                 borderRadius: '12px',
                 boxShadow: getBoxShadow(),
+                transition,
+                position: 'relative',
                 ...(style || {}),
             }}
             onMouseEnter={(e) => {
+                e.currentTarget.style.transition = transition
                 e.currentTarget.style.background = getHoverBackgroundGradient()
                 props.onMouseEnter?.(e)
             }}
             onMouseLeave={(e) => {
+                e.currentTarget.style.transition = transition
                 e.currentTarget.style.background = getBackgroundGradient()
                 props.onMouseLeave?.(e)
             }}
             {...props}
         >
-            {children}
+            {/* Add a subtle flashy background effect for selected state */}
+            {selected && (
+                <div
+                    className="absolute inset-0 rounded-[9px] pointer-events-none animate-pulse z-0"
+                    style={{
+                        background: 'radial-gradient(ellipse at center, rgba(255, 244, 224, 0.08) 0%, transparent 70%)',
+                    }}
+                />
+            )}
+            <span className="relative z-10">{children}</span>
         </button>
     )
 })

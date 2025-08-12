@@ -49,7 +49,7 @@ export const TradeRowTemplate = (props: {
 }) => {
     return (
         <div className={cn('flex w-full items-center text-sm gap-1', props.className)}>
-            <div className={`w-[200px]`}>{props.strategy}</div>
+            <div className={`w-[190px]`}>{props.strategy}</div>
             <div className={`w-[100px]`}>{props.time}</div>
             <div className={`w-[60px]`}>{props.side}</div>
             <div className={`w-[120px]`}>{props.chain}</div>
@@ -76,7 +76,7 @@ export function TradesTableHeaders() {
             out={<p>Out</p>}
             price={<p>Price</p>}
             tx={<p>Tx</p>}
-            className="px-4 py-3 text-milk-400 text-xs"
+            className="px-4 py-3 text-milk-600 text-xs"
         />
     )
 }

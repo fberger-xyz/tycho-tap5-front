@@ -80,6 +80,8 @@ export function useOneInchCandles({ token0, token1, seconds, chainId, enabled = 
         staleTime: seconds === 300 || seconds === 900 ? 10000 : 25000,
         // Cache time - keep data in cache for 10 minutes
         gcTime: 10 * 60 * 1000,
+        // Keep previous data while fetching
+        placeholderData: (previousData) => previousData,
     })
 
     const { data, error } = queryResult

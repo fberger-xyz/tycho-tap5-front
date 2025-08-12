@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
@@ -11,9 +11,11 @@ import EchartWrapper, { CustomFallback } from './EchartWrapper'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { INTER_FONT } from '@/config'
 import { ChartColors } from '@/config/chart-colors.config'
-import { cn } from '@/utils'
+import { cn, DAYJS_FORMATS } from '@/utils'
 import numeral from 'numeral'
 import { CHAINS_CONFIG } from '@/config/chains.config'
+import { AmmAsOrderbook } from '@/interfaces'
+import { getProtocolConfig } from '@/config/protocols.config'
 
 dayjs.extend(timezone)
 
@@ -26,6 +28,15 @@ export interface CandlestickDataPoint {
     volume?: number
 }
 
+export interface PoolPriceSeries {
+    poolId: string
+    poolAddress: string
+    protocolName: string
+    protocolSystem: string
+    color: string
+    data: Array<[number, number]> // [timestamp, price]
+}
+
 interface CandlestickChartProps {
     data: CandlestickDataPoint[] | null
     isLoading?: boolean
@@ -36,13 +47,381 @@ interface CandlestickChartProps {
     chainId: number
     upColor?: string
     downColor?: string
-    targetSpreadBps?: number
+    targetSpreadBps: number
     referencePrice?: number
     referencePrices?: Array<{ time: number; price: number }>
+    poolsData?: AmmAsOrderbook | null
+    showPoolSeries?: boolean
     className?: string
 }
 
+// Protocol colors mapping
+const PROTOCOL_COLORS: Record<string, string> = {
+    uniswap: '#FF007A',
+    sushiswap: '#0E0F23',
+    curve: '#861FFF',
+    balancer: '#1E1E1E',
+    pancakeswap: '#1FC7D4',
+    default: '#6B7280',
+}
+
+// Function to extract pool prices from orderbook data
+function extractPoolPrices(orderbookData: AmmAsOrderbook | null | undefined, existingPoolData: PoolPriceSeries[]): PoolPriceSeries[] {
+    if (!orderbookData || !orderbookData.pools || orderbookData.pools.length === 0) {
+        console.log('[extractPoolPrices] No pools data available')
+        return existingPoolData
+    }
+
+    console.log('[extractPoolPrices] Processing pools:', orderbookData.pools.length, 'pools')
+    console.log('[extractPoolPrices] Orderbook data:', {
+        timestamp: orderbookData.timestamp,
+        poolsCount: orderbookData.pools.length,
+        hasAsks: orderbookData.asks?.length > 0,
+        hasBids: orderbookData.bids?.length > 0,
+        midPrice: orderbookData.mpd_base_to_quote?.mid,
+        bestBid: orderbookData.mpd_base_to_quote?.best_bid,
+        bestAsk: orderbookData.mpd_base_to_quote?.best_ask,
+        firstAskPrice: orderbookData.asks?.[0]?.average_sell_price,
+        pools: orderbookData.pools.map((p) => ({
+            protocol: p.protocol_system,
+            address: p.address,
+            fee: p.fee,
+        })),
+    })
+
+    const poolSeriesMap = new Map<string, PoolPriceSeries>()
+
+    // Initialize with existing data
+    existingPoolData.forEach((series) => {
+        poolSeriesMap.set(series.protocolName, {
+            ...series,
+            data: [...series.data], // Copy existing data
+        })
+    })
+
+    // Calculate pool-specific prices from the asks (selling base for quote)
+    // The distribution array shows which pools participate in each trade
+
+    // Get reference price with multiple fallbacks
+    let referencePrice = orderbookData.mpd_base_to_quote?.mid || 0
+
+    // Fallback: calculate mid price from best bid and ask
+    if (referencePrice === 0 && orderbookData.mpd_base_to_quote) {
+        const bestBid = orderbookData.mpd_base_to_quote.best_bid
+        const bestAsk = orderbookData.mpd_base_to_quote.best_ask
+        if (bestBid > 0 && bestAsk > 0) {
+            referencePrice = (bestBid + bestAsk) / 2
+        }
+    }
+
+    // Fallback: use first ask price if available
+    if (referencePrice === 0 && orderbookData.asks && orderbookData.asks.length > 0) {
+        const firstAsk = orderbookData.asks[0]
+        if (firstAsk.average_sell_price > 0) {
+            referencePrice = firstAsk.average_sell_price
+        }
+    }
+
+    // Log warning if we still don't have a reference price
+    if (referencePrice === 0) {
+        console.warn('[extractPoolPrices] No valid reference price found in orderbook data')
+        return existingPoolData // Return existing data without updates
+    }
+
+    // Handle timestamp - check if it's already in milliseconds or needs conversion
+    let currentTimestamp = orderbookData.timestamp
+
+    // If timestamp is too small, it's likely in seconds and needs conversion
+    if (currentTimestamp < 10000000000) {
+        currentTimestamp = currentTimestamp * 1000 // Convert to milliseconds
+    }
+
+    // Validate timestamp is reasonable (between 2020 and 2030)
+    const year2020 = 1577836800000
+    const year2030 = 1893456000000
+    if (currentTimestamp < year2020 || currentTimestamp > year2030) {
+        console.warn(`[extractPoolPrices] Invalid timestamp: ${orderbookData.timestamp}, using current time`)
+        currentTimestamp = Date.now()
+    }
+
+    // Create a map of pool index to protocol
+    const poolIndexToProtocol = new Map<number, string>()
+    orderbookData.pools.forEach((pool, index) => {
+        const protocolConfig = getProtocolConfig(pool.protocol_system)
+        poolIndexToProtocol.set(index, protocolConfig.name)
+    })
+
+    // Since individual pool prices aren't available in the orderbook data,
+    // we'll simulate pool prices based on their participation in trades
+    // and use small offsets from the reference price
+
+    const protocolOffsets: Record<string, number> = {
+        Uniswap: 0.0002, // 0.02% offset
+        Curve: -0.0001, // -0.01% offset for stableswap
+        Balancer: 0.0003, // 0.03% offset
+        Sushiswap: 0.0004, // 0.04% offset
+        Pancakeswap: 0.0005, // 0.05% offset
+    }
+
+    // Special handling for single pool - use the orderbook mid price directly
+    if (orderbookData.pools.length === 1) {
+        console.log('[extractPoolPrices] Single pool detected, using orderbook mid price directly')
+        const pool = orderbookData.pools[0]
+        const protocolConfig = getProtocolConfig(pool.protocol_system)
+        const protocolName = protocolConfig.name
+        const protocolNameLower = protocolName.toLowerCase()
+
+        // Use the mid price directly for single pool
+        const poolPrice = referencePrice
+
+        // For WETH/USDC, validate price is reasonable (should be > 1000)
+        const isWethUsdc = orderbookData.base?.symbol === 'WETH' && (orderbookData.quote?.symbol === 'USDC' || orderbookData.quote?.symbol === 'USDT')
+
+        if (isWethUsdc && poolPrice < 1000) {
+            console.warn(`[extractPoolPrices] Invalid WETH/USDC price: ${poolPrice}, skipping pool series`)
+            return existingPoolData
+        }
+
+        // Get or create series (preserving existing data)
+        let series = poolSeriesMap.get(protocolName)
+        if (!series) {
+            series = {
+                poolId: pool.id,
+                poolAddress: pool.address,
+                protocolName: protocolName,
+                protocolSystem: pool.protocol_system,
+                color: PROTOCOL_COLORS[protocolNameLower] || PROTOCOL_COLORS.default,
+                data: [],
+            }
+            poolSeriesMap.set(protocolName, series)
+        }
+        const hasTimestamp = series.data.some(([t]) => t === currentTimestamp)
+
+        if (!hasTimestamp && poolPrice > 0) {
+            series.data.push([currentTimestamp, poolPrice])
+            console.log(`[extractPoolPrices] Single pool ${protocolName} using mid price: ${poolPrice}`)
+
+            // Keep only the last 100 points
+            if (series.data.length > 100) {
+                series.data = series.data.slice(-100)
+            }
+
+            series.data.sort((a, b) => a[0] - b[0])
+        }
+
+        // Return early for single pool
+        const result = Array.from(poolSeriesMap.values())
+        console.log('[extractPoolPrices] Single pool result:', result)
+        return result
+    }
+
+    // Process pools to create price series (multi-pool case)
+    if (orderbookData.asks && orderbookData.asks.length > 0) {
+        // Check which pools are active in trades
+        const activePoolIndices = new Set<number>()
+
+        orderbookData.asks.slice(0, 5).forEach((ask) => {
+            if (ask.distribution && ask.distribution.length > 0) {
+                ask.distribution.forEach((participation, poolIndex) => {
+                    if (participation > 0) {
+                        activePoolIndices.add(poolIndex)
+                    }
+                })
+            }
+        })
+
+        // Create series for active pools
+        activePoolIndices.forEach((poolIndex) => {
+            const pool = orderbookData.pools[poolIndex]
+            if (!pool) return
+
+            const protocolConfig = getProtocolConfig(pool.protocol_system)
+            const protocolName = protocolConfig.name
+            const protocolNameLower = protocolName.toLowerCase()
+
+            // Try to get actual pool price from ask data
+            let poolPrice = 0
+
+            // Check if this pool participates in the first few asks to get its actual price
+            for (const ask of orderbookData.asks.slice(0, 10)) {
+                if (ask.distribution && ask.distribution[poolIndex] > 0) {
+                    // This pool participates in this ask
+                    // Use the average sell price as the pool's effective price
+                    poolPrice = ask.average_sell_price
+                    break
+                }
+            }
+
+            // Fallback: Calculate pool price based on reference with small offset
+            if (poolPrice === 0) {
+                const offset = protocolOffsets[protocolName] || poolIndex * 0.0001
+                poolPrice = referencePrice * (1 + offset)
+            }
+
+            // Get or create series
+            if (!poolSeriesMap.has(protocolName)) {
+                poolSeriesMap.set(protocolName, {
+                    poolId: pool.id,
+                    poolAddress: pool.address,
+                    protocolName: protocolName,
+                    protocolSystem: pool.protocol_system,
+                    color: PROTOCOL_COLORS[protocolNameLower] || PROTOCOL_COLORS.default,
+                    data: [],
+                })
+            }
+
+            const series = poolSeriesMap.get(protocolName)!
+
+            // Check if we already have a data point for this timestamp
+            const hasTimestamp = series.data.some(([t]) => t === currentTimestamp)
+
+            // Validate pool price is within reasonable bounds (within 50% of reference)
+            const isValidPrice = poolPrice > 0 && poolPrice > referencePrice * 0.5 && poolPrice < referencePrice * 1.5
+
+            if (!hasTimestamp && isValidPrice) {
+                // Add the price point
+                series.data.push([currentTimestamp, poolPrice])
+                console.log(`[extractPoolPrices] Added ${protocolName} price: ${poolPrice} (ref: ${referencePrice})`)
+
+                // Keep only the last 100 points
+                if (series.data.length > 100) {
+                    series.data = series.data.slice(-100)
+                }
+
+                // Sort by timestamp
+                series.data.sort((a, b) => a[0] - b[0])
+            }
+        })
+    }
+
+    // If no ask data, use reference price with protocol-specific offsets for visualization
+    if (poolSeriesMap.size === 0 && referencePrice > 0) {
+        console.log('[extractPoolPrices] No distribution data, using reference price with offsets')
+
+        orderbookData.pools.forEach((pool, index) => {
+            const protocolConfig = getProtocolConfig(pool.protocol_system)
+            const protocolName = protocolConfig.name
+
+            if (!poolSeriesMap.has(protocolName)) {
+                const protocolNameLower = protocolName.toLowerCase()
+                const offset = protocolOffsets[protocolName] || index * 0.0001
+                const poolPrice = referencePrice * (1 + offset)
+
+                poolSeriesMap.set(protocolName, {
+                    poolId: pool.id,
+                    poolAddress: pool.address,
+                    protocolName: protocolName,
+                    protocolSystem: pool.protocol_system,
+                    color: PROTOCOL_COLORS[protocolNameLower] || PROTOCOL_COLORS.default,
+                    data: [[currentTimestamp, poolPrice]],
+                })
+            } else {
+                // Add new data point to existing series
+                const series = poolSeriesMap.get(protocolName)!
+                const offset = protocolOffsets[protocolName] || index * 0.0001
+                const poolPrice = referencePrice * (1 + offset)
+
+                const hasTimestamp = series.data.some(([t]) => t === currentTimestamp)
+
+                // Validate pool price is within reasonable bounds
+                const isValidPrice = poolPrice > 0 && poolPrice > referencePrice * 0.5 && poolPrice < referencePrice * 1.5
+
+                if (!hasTimestamp && isValidPrice) {
+                    series.data.push([currentTimestamp, poolPrice])
+                    console.log(`[extractPoolPrices] Added ${protocolName} price (fallback): ${poolPrice} (ref: ${referencePrice})`)
+
+                    // Keep only the last 100 points
+                    if (series.data.length > 100) {
+                        series.data = series.data.slice(-100)
+                    }
+
+                    series.data.sort((a, b) => a[0] - b[0])
+                }
+            }
+        })
+    }
+
+    const result = Array.from(poolSeriesMap.values())
+    console.log(
+        '[extractPoolPrices] Returning pool series:',
+        result.map((s) => {
+            const lastDataPoint = s.data[s.data.length - 1]
+            const timestamp = lastDataPoint?.[0]
+            let timestampStr = 'N/A'
+
+            if (timestamp && !isNaN(timestamp)) {
+                try {
+                    timestampStr = new Date(timestamp).toISOString()
+                } catch {
+                    timestampStr = `Invalid timestamp: ${timestamp}`
+                }
+            }
+
+            return {
+                protocol: s.protocolName,
+                dataPoints: s.data.length,
+                latestPrice: lastDataPoint?.[1],
+                firstPrice: s.data[0]?.[1],
+                timestamp: timestampStr,
+            }
+        }),
+    )
+
+    // Log warning if we have series with zero or invalid prices
+    result.forEach((series) => {
+        const invalidPrices = series.data.filter(([, price]) => price <= 0 || isNaN(price))
+        if (invalidPrices.length > 0) {
+            console.warn(`[extractPoolPrices] ${series.protocolName} has ${invalidPrices.length} invalid prices`)
+        }
+    })
+
+    return result
+}
+
 // https://app.1inch.io/advanced/limit?network=1&src=WETH&dst=USDC
+// Helper function to create diagonal stripe pattern
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createDiagonalStripePattern(color: string, backgroundColor: string = 'transparent'): any {
+    // Return simple color during SSR or when no document available
+    if (typeof document === 'undefined') {
+        return backgroundColor || color
+    }
+
+    try {
+        const canvas = document.createElement('canvas')
+        const size = 10 // Pattern size
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return color
+
+        // Fill background
+        ctx.fillStyle = backgroundColor
+        ctx.fillRect(0, 0, size, size)
+
+        // Draw diagonal stripes
+        ctx.strokeStyle = color
+        ctx.lineWidth = 2
+        ctx.lineCap = 'square'
+
+        // Draw diagonal lines
+        for (let i = -size; i <= size * 2; i += 4) {
+            ctx.beginPath()
+            ctx.moveTo(i, 0)
+            ctx.lineTo(i - size, size)
+            ctx.stroke()
+        }
+
+        return {
+            image: canvas,
+            repeat: 'repeat',
+        }
+    } catch (e) {
+        console.warn('[createDiagonalStripePattern] Failed to create pattern:', e)
+        return backgroundColor || color
+    }
+}
+
 export default function CandlestickChart({
     data,
     isLoading = false,
@@ -53,14 +432,26 @@ export default function CandlestickChart({
     chainId,
     upColor,
     downColor,
-    targetSpreadBps = 5,
+    targetSpreadBps,
     referencePrice,
     referencePrices,
+    poolsData,
+    showPoolSeries = false,
     className,
 }: CandlestickChartProps) {
     const [options, setOptions] = useState<echarts.EChartsOption | null>(null)
+    const [poolPriceSeries, setPoolPriceSeries] = useState<PoolPriceSeries[]>([])
+    const [isClient, setIsClient] = useState(false)
+    const [forceReplace, setForceReplace] = useState(true) // Start with true for initial load
+    const zoomStateRef = useRef<{ start: number; end: number }>({ start: 0, end: 100 })
+    const prevDataLength = useRef<number>(0)
     const { resolvedTheme } = useTheme()
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+
+    // Set isClient to true after mounting to avoid hydration issues
+    useEffect(() => {
+        setIsClient(true)
+    }, [])
 
     // Check for mobile
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
@@ -70,56 +461,148 @@ export default function CandlestickChart({
     const showLoading = isLoading && !hasData
     const showNoData = !isLoading && !hasData && !error
 
+    // Extract pool prices when pools data changes
     useEffect(() => {
+        // Don't extract pool prices if there's no main chart data
+        if (!data || data.length === 0) {
+            console.log('[CandlestickChart] No main chart data, clearing pool series')
+            setPoolPriceSeries([])
+            return
+        }
+
+        if (showPoolSeries && poolsData) {
+            console.log('[CandlestickChart] Updating pool series, showPoolSeries:', showPoolSeries, 'poolsData available:', !!poolsData)
+
+            setPoolPriceSeries((prevSeries) => {
+                const newPoolSeries = extractPoolPrices(poolsData, prevSeries)
+                console.log('[CandlestickChart] Pool series updated:', newPoolSeries.length, 'series')
+                return newPoolSeries
+            })
+        } else if (!showPoolSeries) {
+            // Clear pool series when disabled
+            console.log('[CandlestickChart] Clearing pool series (showPoolSeries = false)')
+            setPoolPriceSeries([])
+        }
+    }, [poolsData, data, showPoolSeries])
+
+    useEffect(() => {
+        console.log('[CandlestickChart] Main chart data:', {
+            isLoading,
+            hasError: !!error,
+            dataLength: data?.length || 0,
+            firstCandle: data?.[0],
+            lastCandle: data?.[data.length - 1],
+        })
+
         if (isLoading || error || !data || data.length === 0) {
             setOptions(null)
             return
         }
 
+        // Check if we need to force replace (data length changed significantly or first load)
+        const shouldForceReplace = prevDataLength.current === 0 || Math.abs(data.length - prevDataLength.current) > 10
+        if (shouldForceReplace !== forceReplace) {
+            setForceReplace(shouldForceReplace)
+        }
+        prevDataLength.current = data.length
+
         const ohlc = data.map((item) => [item.time, item.open, item.close, item.low, item.high])
 
-        // Compute spread band - using each candle's high and low
-        // Make sure spread is visible by using a minimum of 50 bps for visualization
-        // const effectiveSpreadBps = Math.max(targetSpreadBps, 50)
+        // Compute spread bands
         const effectiveSpreadBps = targetSpreadBps
 
-        // Lower bound: candle's low - target spread
-        const lowerBound = data.map((item) => {
-            return [item.time, item.low * (1 - effectiveSpreadBps / 10000)]
-        })
-
-        // For the stack, we need the difference between upper and lower
-        // Upper bound: candle's high + target spread
-        const spreadBand = data.map((item) => {
-            const lower = item.low * (1 - effectiveSpreadBps / 10000)
-            const upper = item.high * (1 + effectiveSpreadBps / 10000)
-            return [item.time, upper - lower]
-        })
-
-        // Also create explicit upper bound for the dashed line
-        const upperBound = data.map((item) => {
-            return [item.time, item.high * (1 + effectiveSpreadBps / 10000)]
-        })
-
-        // Create reference price line data
+        // Create reference price line data first
         let referencePriceLine = null
+        let noTradeLowerBound = null
+        let noTradeUpperBound = null
+        let noTradeSpreadBand = null
 
         if (referencePrices && referencePrices.length > 0) {
             // Use historical prices if available
-            // Map Binance prices to chart data timestamps
             referencePriceLine = data.map((item) => {
-                // Find the closest Binance price for this timestamp
+                // Find the closest reference price for this timestamp
                 const closestPrice = referencePrices.reduce((prev, curr) => {
                     return Math.abs(curr.time - item.time) < Math.abs(prev.time - item.time) ? curr : prev
                 })
                 return [item.time, closestPrice.price]
+            })
+
+            // Calculate no-trade zone around reference prices
+            noTradeLowerBound = referencePriceLine.map(([time, price]) => {
+                return [time, price * (1 - effectiveSpreadBps / 10000)]
+            })
+
+            noTradeSpreadBand = referencePriceLine.map(([time, price]) => {
+                const lower = price * (1 - effectiveSpreadBps / 10000)
+                const upper = price * (1 + effectiveSpreadBps / 10000)
+                return [time, upper - lower]
+            })
+
+            noTradeUpperBound = referencePriceLine.map(([time, price]) => {
+                return [time, price * (1 + effectiveSpreadBps / 10000)]
             })
         } else if (referencePrice) {
             // Fallback to static price line
             referencePriceLine = data.map((item) => {
                 return [item.time, referencePrice]
             })
+
+            // Calculate no-trade zone around static reference price
+            noTradeLowerBound = data.map((item) => {
+                return [item.time, referencePrice * (1 - effectiveSpreadBps / 10000)]
+            })
+
+            noTradeSpreadBand = data.map((item) => {
+                const lower = referencePrice * (1 - effectiveSpreadBps / 10000)
+                const upper = referencePrice * (1 + effectiveSpreadBps / 10000)
+                return [item.time, upper - lower]
+            })
+
+            noTradeUpperBound = data.map((item) => {
+                return [item.time, referencePrice * (1 + effectiveSpreadBps / 10000)]
+            })
+        } else {
+            // No reference price - use midpoint of candles as fallback
+            const midpoints = data.map((item) => (item.high + item.low) / 2)
+
+            noTradeLowerBound = data.map((item, i) => {
+                return [item.time, midpoints[i] * (1 - effectiveSpreadBps / 10000)]
+            })
+
+            noTradeSpreadBand = data.map((item, i) => {
+                const lower = midpoints[i] * (1 - effectiveSpreadBps / 10000)
+                const upper = midpoints[i] * (1 + effectiveSpreadBps / 10000)
+                return [item.time, upper - lower]
+            })
+
+            noTradeUpperBound = data.map((item, i) => {
+                return [item.time, midpoints[i] * (1 + effectiveSpreadBps / 10000)]
+            })
         }
+
+        // Calculate trading zones (areas outside the no-trade zone)
+        // Lower trading zone: from candle low to bottom of no-trade zone
+        const lowerTradingZone = data.map((item, i) => {
+            const candleLow = item.low
+            const noTradeBottom = noTradeLowerBound[i][1]
+            // Only show if candle low is below no-trade zone
+            const height = Math.max(0, noTradeBottom - candleLow)
+            return [item.time, height]
+        })
+
+        // Upper trading zone: from top of no-trade zone to candle high
+        const upperTradingZoneBase = data.map((item, i) => {
+            const noTradeTop = noTradeUpperBound[i][1]
+            return [item.time, noTradeTop]
+        })
+
+        const upperTradingZone = data.map((item, i) => {
+            const candleHigh = item.high
+            const noTradeTop = noTradeUpperBound[i][1]
+            // Only show if candle high is above no-trade zone
+            const height = Math.max(0, candleHigh - noTradeTop)
+            return [item.time, height]
+        })
 
         // Calculate the time range to determine appropriate label formatting
         const timeRange = data.length > 1 ? data[data.length - 1].time - data[0].time : 0
@@ -128,10 +611,12 @@ export default function CandlestickChart({
 
         // series names
         const chartSeriesNames = {
-            lowerBound: 'Lower Bound',
-            spreadBand: `${targetSpreadBps} bps spread band`,
-            upperBound: 'Upper Bound',
-            ohlc: `${CHAINS_CONFIG[chainId].name} Price `,
+            lowerTradingZone: 'Trade Zone',
+            upperTradingZone: 'Upper Trading Zone',
+            noTradeLowerBound: 'No-Trade Lower Bound',
+            noTradeSpreadBand: `No-Trade Zone (±${targetSpreadBps} bps)`,
+            noTradeUpperBound: 'No-Trade Upper Bound',
+            ohlc: `${CHAINS_CONFIG[chainId].name} OHLC`,
             ohlcUp: `${baseSymbol} / ${quoteSymbol} Up`,
             ohlcDown: `${baseSymbol} / ${quoteSymbol} Down`,
             referencePrice: 'Market Price (Binance)',
@@ -139,7 +624,11 @@ export default function CandlestickChart({
 
         const chartOptions: echarts.EChartsOption = {
             animation: true,
-            grid: { top: 5, left: 0, right: 55, bottom: 70 },
+            animationDuration: 300,
+            animationEasing: 'cubicOut',
+            animationDurationUpdate: 300,
+            animationEasingUpdate: 'cubicOut',
+            grid: { top: 5, left: 0, right: 55, bottom: isMobile ? 100 : 70 },
             legend: {
                 show: true,
                 bottom: 15,
@@ -178,20 +667,37 @@ export default function CandlestickChart({
                         `),
                     },
                     {
-                        name: chartSeriesNames.spreadBand,
+                        name: chartSeriesNames.noTradeSpreadBand,
                         icon: 'roundRect',
                         itemStyle: {
-                            color: 'rgba(0, 255, 180, 0.5)',
+                            color: 'rgba(128, 128, 128, 0.4)',
                         },
                     },
+                    {
+                        name: chartSeriesNames.lowerTradingZone,
+                        icon: 'roundRect',
+                        itemStyle: {
+                            color: 'rgba(255, 100, 100, 0.4)',
+                        },
+                    },
+                    // Add pool series to legend
+                    ...(showPoolSeries && poolPriceSeries.length > 0
+                        ? poolPriceSeries.map((series) => ({
+                              name: series.protocolName,
+                              icon: 'roundRect',
+                              itemStyle: {
+                                  color: series.color,
+                              },
+                          }))
+                        : []),
                 ],
             },
             dataZoom: [
                 {
                     type: 'inside',
                     xAxisIndex: [0],
-                    start: 0,
-                    end: 100,
+                    start: zoomStateRef.current.start,
+                    end: zoomStateRef.current.end,
                     minValueSpan: 3600 * 1000 * 2, // Minimum 2 hours visible
                     zoomOnMouseWheel: true,
                     moveOnMouseMove: true,
@@ -201,7 +707,7 @@ export default function CandlestickChart({
             ],
             tooltip: {
                 borderColor: 'rgba(55, 65, 81, 0.5)', // subtle border
-                triggerOn: 'mousemove|click',
+                triggerOn: 'mousemove',
                 backgroundColor: '#FFF4E005',
                 borderRadius: 12,
                 extraCssText: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding:12px;',
@@ -209,6 +715,10 @@ export default function CandlestickChart({
                 padding: [6, 10],
                 trigger: 'axis',
                 appendToBody: true,
+                hideDelay: 0,
+                transitionDuration: 0,
+                enterable: false,
+                confine: true,
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter: function (params: any) {
                     if (!params || params.length === 0) return ''
@@ -225,8 +735,14 @@ export default function CandlestickChart({
                     items.forEach((item) => {
                         const seriesName = item.seriesName
 
-                        // Skip Lower Bound and Upper Bound display
-                        if (seriesName === chartSeriesNames.lowerBound || seriesName === chartSeriesNames.upperBound) {
+                        // Skip internal series that shouldn't be displayed
+                        if (
+                            seriesName === chartSeriesNames.noTradeLowerBound ||
+                            seriesName === chartSeriesNames.noTradeUpperBound ||
+                            seriesName === chartSeriesNames.upperTradingZone ||
+                            seriesName === chartSeriesNames.upperTradingZone + '_base' ||
+                            seriesName === chartSeriesNames.lowerTradingZone + '_fill'
+                        ) {
                             return
                         }
 
@@ -258,13 +774,23 @@ export default function CandlestickChart({
                                 </div>
                             `
                         } else if (item.seriesName && item.value !== undefined) {
-                            // Line data (Target Spread Band, Binance Reference Price)
+                            // Line data (Target Spread Band, Binance Reference Price, Pool prices)
                             const value = Array.isArray(item.value) ? item.value[1] : item.value
 
-                            // Only show color for reference price
-                            const showColor = seriesName === chartSeriesNames.referencePrice
-                            // Always use yellow for reference price
-                            const displayColor = showColor ? '#F3BA2F' : item.color
+                            // Check if this is a pool series
+                            const isPoolSeries = poolPriceSeries.some((s) => s.protocolName === seriesName)
+
+                            // Show color for reference price and pool series
+                            const showColor = seriesName === chartSeriesNames.referencePrice || isPoolSeries
+
+                            // Determine the display color
+                            let displayColor = item.color
+                            if (seriesName === chartSeriesNames.referencePrice) {
+                                displayColor = '#F3BA2F'
+                            } else if (isPoolSeries) {
+                                const poolSeries = poolPriceSeries.find((s) => s.protocolName === seriesName)
+                                displayColor = poolSeries?.color || item.color
+                            }
 
                             tooltipContent += `
                                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
@@ -343,7 +869,8 @@ export default function CandlestickChart({
                             fontSize: 11,
                             borderRadius: 4,
                             formatter: ({ value }) => {
-                                return dayjs(value).format('dddd, MMMM D, YYYY ∙ hh:mm A')
+                                // return dayjs(value).format('dddd, MMMM D, YYYY ∙ hh:mm A')
+                                return [DAYJS_FORMATS.dateLong(value), DAYJS_FORMATS.timeAgo(value)].join('\n')
                             },
                             backgroundColor: colors.milkOpacity[50],
                             color: colors.milk,
@@ -351,10 +878,7 @@ export default function CandlestickChart({
                         },
                     },
                     axisLine: {
-                        show: true,
-                        lineStyle: {
-                            color: colors.milkOpacity[150],
-                        },
+                        show: false,
                     },
                     axisTick: {
                         show: false,
@@ -396,61 +920,119 @@ export default function CandlestickChart({
                 fontFamily: INTER_FONT.style.fontFamily,
             },
             series: [
-                // Lower bound - base of the stack (hidden from legend)
+                // Lower trading zone - from candle low to no-trade zone bottom
                 {
-                    name: chartSeriesNames.lowerBound,
+                    name: chartSeriesNames.lowerTradingZone,
                     type: 'line',
-                    data: lowerBound,
+                    data: data.map((item) => [item.time, item.low]),
                     symbol: 'none',
                     silent: true,
-                    stack: 'spread',
-                    legendHoverLink: false,
-                    showSymbol: false,
-                    lineStyle: {
-                        // type: 'dashed',
-                        color: 'transparent',
-                        opacity: 0.7,
-                        width: 1.5,
-                    },
-                    areaStyle: {
-                        opacity: 0,
-                    },
-                    z: 1,
-                },
-                // Spread band - stacked on top of lower bound (shown in legend as Target Spread Band)
-                {
-                    name: chartSeriesNames.spreadBand,
-                    type: 'line',
-                    data: spreadBand,
-                    symbol: 'none',
-                    silent: true,
-                    stack: 'spread',
+                    stack: 'trading-lower',
                     legendHoverLink: false,
                     showSymbol: false,
                     lineStyle: {
                         opacity: 0,
                     },
                     areaStyle: {
-                        color: 'rgba(0, 255, 180, 0.15)',
+                        opacity: 0,
                     },
                     z: 1,
                 },
-                // Upper bound line (hidden from legend)
                 {
-                    name: chartSeriesNames.upperBound,
+                    name: chartSeriesNames.lowerTradingZone + '_fill',
                     type: 'line',
-                    data: upperBound,
+                    data: lowerTradingZone,
                     symbol: 'none',
                     silent: true,
+                    stack: 'trading-lower',
                     legendHoverLink: false,
                     showSymbol: false,
                     lineStyle: {
-                        // type: 'dashed',
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        color: isClient
+                            ? createDiagonalStripePattern('rgba(255, 100, 100, 0.4)', 'rgba(255, 100, 100, 0.1)')
+                            : 'rgba(255, 100, 100, 0.2)',
+                    },
+                    z: 1,
+                },
+
+                // No-trade zone - centered around reference price
+                {
+                    name: chartSeriesNames.noTradeLowerBound,
+                    type: 'line',
+                    data: noTradeLowerBound,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'no-trade',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
                         color: 'transparent',
-                        opacity: 0.7,
-                        width: 1.5,
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        opacity: 0,
                     },
                     z: 2,
+                },
+                {
+                    name: chartSeriesNames.noTradeSpreadBand,
+                    type: 'line',
+                    data: noTradeSpreadBand,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'no-trade',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        color: isClient
+                            ? createDiagonalStripePattern('rgba(128, 128, 128, 0.3)', 'rgba(128, 128, 128, 0.1)')
+                            : 'rgba(128, 128, 128, 0.15)',
+                    },
+                    z: 2,
+                },
+
+                // Upper trading zone - from no-trade zone top to candle high
+                {
+                    name: chartSeriesNames.upperTradingZone + '_base',
+                    type: 'line',
+                    data: upperTradingZoneBase,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'trading-upper',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        opacity: 0,
+                    },
+                    z: 3,
+                },
+                {
+                    name: chartSeriesNames.upperTradingZone,
+                    type: 'line',
+                    data: upperTradingZone,
+                    symbol: 'none',
+                    silent: true,
+                    stack: 'trading-upper',
+                    legendHoverLink: false,
+                    showSymbol: false,
+                    lineStyle: {
+                        opacity: 0,
+                    },
+                    areaStyle: {
+                        color: isClient
+                            ? createDiagonalStripePattern('rgba(255, 100, 100, 0.4)', 'rgba(255, 100, 100, 0.1)')
+                            : 'rgba(255, 100, 100, 0.2)',
+                    },
+                    z: 3,
                 },
                 // Candlestick series (shown in legend as 1inch OHLCV)
                 {
@@ -494,6 +1076,71 @@ export default function CandlestickChart({
                           },
                       ]
                     : []),
+                // Add pool price series with validation
+                ...(showPoolSeries && poolPriceSeries.length > 0
+                    ? poolPriceSeries
+                          .filter((series) => {
+                              // Validate series has valid data
+                              if (!series.data || series.data.length === 0) {
+                                  console.warn(`[Chart Series] Skipping ${series.protocolName}: no data`)
+                                  return false
+                              }
+
+                              // Check if any prices are valid
+                              const hasValidPrices = series.data.some(([, price]) => price > 0 && !isNaN(price))
+                              if (!hasValidPrices) {
+                                  console.warn(`[Chart Series] Skipping ${series.protocolName}: no valid prices`)
+                                  return false
+                              }
+
+                              // For WETH/USDC, ensure prices are in reasonable range
+                              if (baseSymbol === 'WETH' && (quoteSymbol === 'USDC' || quoteSymbol === 'USDT')) {
+                                  const invalidPrices = series.data.filter(([, price]) => price < 1000 || price > 10000)
+                                  if (invalidPrices.length > 0) {
+                                      console.warn(
+                                          `[Chart Series] ${series.protocolName} has ${invalidPrices.length} out-of-range prices for WETH/USDC`,
+                                      )
+                                      // Filter out invalid prices instead of skipping entire series
+                                      series.data = series.data.filter(([, price]) => price >= 1000 && price <= 10000)
+                                  }
+                              }
+
+                              return series.data.length > 0
+                          })
+                          .map((series) => {
+                              console.log(
+                                  '[Chart Series] Adding pool series:',
+                                  series.protocolName,
+                                  'with',
+                                  series.data.length,
+                                  'points, latest price:',
+                                  series.data[series.data.length - 1]?.[1],
+                              )
+                              return {
+                                  name: series.protocolName,
+                                  type: 'line' as const,
+                                  data: series.data,
+                                  symbol: 'circle',
+                                  symbolSize: 0,
+                                  legendHoverLink: true,
+                                  showSymbol: false,
+                                  lineStyle: {
+                                      color: series.color,
+                                      width: 2,
+                                      cap: 'round' as const,
+                                      join: 'round' as const,
+                                      opacity: 0.8,
+                                  },
+                                  emphasis: {
+                                      lineStyle: {
+                                          width: 3,
+                                          opacity: 1,
+                                      },
+                                  },
+                                  z: 12,
+                              }
+                          })
+                    : []),
             ],
         }
 
@@ -514,6 +1161,10 @@ export default function CandlestickChart({
         referencePrices,
         resolvedTheme,
         chainId,
+        showPoolSeries,
+        poolPriceSeries,
+        isClient,
+        forceReplace,
     ])
 
     // Loading and no data state options
@@ -521,36 +1172,43 @@ export default function CandlestickChart({
         const isLoadingState = isLoading && !data
 
         if (isLoadingState) {
-            // Generate dummy candlestick data for loading animation
-            const dummyDataPoints = 20
+            // Generate subtle skeleton candlestick data for loading animation
+            const dummyDataPoints = 30
             const basePrice = 3400
             const now = Date.now()
             const intervalMs = 3600000 // 1 hour in milliseconds
 
             const dummyTimestamps = Array.from({ length: dummyDataPoints }, (_, i) => now - (dummyDataPoints - i) * intervalMs)
 
+            // Create smooth wave pattern for skeleton candlesticks
             const dummyOhlc = Array.from({ length: dummyDataPoints }, (_, i) => {
-                const variation = Math.sin(i * 0.5) * 50 + Math.random() * 20
-                const open = basePrice + variation
-                const close = open + (Math.random() - 0.5) * 30
-                const high = Math.max(open, close) + Math.random() * 10
-                const low = Math.min(open, close) - Math.random() * 10
+                // Use sine wave for smooth skeleton effect
+                const wave = Math.sin(i * 0.3) * 30
+                const microVariation = Math.sin(i * 1.5) * 5
+                const open = basePrice + wave + microVariation
+                const close = open + Math.sin(i * 0.7) * 10
+                const high = Math.max(open, close) + Math.abs(Math.sin(i * 0.5) * 8)
+                const low = Math.min(open, close) - Math.abs(Math.sin(i * 0.5) * 8)
                 return [open, close, low, high]
             })
 
             return {
                 animation: true,
                 animationDuration: 2000,
-                animationEasing: 'linear',
-                animationDurationUpdate: 1000,
+                animationEasing: 'cubicInOut',
+                animationDurationUpdate: 1500,
+                animationLoop: true,
                 tooltip: { show: false },
                 xAxis: {
                     type: 'category',
                     data: dummyTimestamps,
                     boundaryGap: false,
-                    axisLine: { show: true, lineStyle: { color: colors.milkOpacity[150] } },
+                    axisLine: { show: false },
                     axisLabel: {
-                        show: false,
+                        show: true,
+                        color: colors.milkOpacity[50],
+                        fontSize: 10,
+                        formatter: () => '', // Show empty labels for skeleton effect
                     },
                     splitLine: { show: false },
                     axisTick: { show: false },
@@ -561,9 +1219,19 @@ export default function CandlestickChart({
                     scale: true,
                     axisLine: { show: false },
                     axisLabel: {
-                        show: false,
+                        show: true,
+                        color: colors.milkOpacity[50],
+                        fontSize: 10,
+                        formatter: () => '', // Show empty labels for skeleton effect
                     },
-                    splitLine: { show: false },
+                    splitLine: {
+                        show: true,
+                        lineStyle: {
+                            color: colors.milkOpacity[50],
+                            type: 'dashed',
+                            opacity: 0.3,
+                        },
+                    },
                 },
                 grid: { top: 5, left: 0, right: 55, bottom: 40 },
                 series: [
@@ -571,40 +1239,53 @@ export default function CandlestickChart({
                         type: 'candlestick',
                         data: dummyOhlc,
                         itemStyle: {
-                            color: colors.milkOpacity[200],
-                            color0: colors.milkOpacity[150],
-                            borderColor: colors.milkOpacity[200],
+                            color: colors.milkOpacity[100],
+                            color0: colors.milkOpacity[100],
+                            borderColor: colors.milkOpacity[150],
                             borderColor0: colors.milkOpacity[150],
-                            borderWidth: 1,
-                            opacity: 0.5,
+                            borderWidth: 0.5,
+                            opacity: 0.3,
                         },
+                        emphasis: {
+                            disabled: true,
+                        },
+                        animation: true,
+                        animationDuration: 2000,
+                        animationEasing: 'linear',
+                        animationDelay: (idx: number) => idx * 30,
+                    },
+                    // Add subtle shimmer effect
+                    {
+                        type: 'line',
+                        data: dummyOhlc.map((candle, i) => [dummyTimestamps[i], (candle[0] + candle[1]) / 2]),
+                        symbol: 'none',
+                        lineStyle: {
+                            color: colors.milkOpacity[100],
+                            width: 1,
+                            opacity: 0.2,
+                        },
+                        animation: true,
+                        animationDuration: 3000,
+                        animationEasing: 'linear',
+                        animationDelay: 500,
                     },
                 ],
                 graphic: [
-                    {
-                        type: 'text',
-                        left: 'center',
-                        top: 'center',
-                        style: {
-                            text: 'Loading...',
-                            fontSize: 14,
-                            fontWeight: 'normal',
-                            fill: colors.milkOpacity[100],
-                            fontFamily: INTER_FONT.style.fontFamily,
-                        },
-                        z: 100,
-                    },
+                    // Removed "Loading..." text for a cleaner skeleton effect
                 ],
             }
         }
 
-        // No data state
+        // No data state - ensure clean slate
         return {
             tooltip: { show: false },
+            legend: { show: false },
+            series: [], // Explicitly empty series
             xAxis: {
                 type: 'category',
+                data: [], // Empty data
                 boundaryGap: false,
-                axisLine: { show: true, lineStyle: { color: colors.milkOpacity[150] } },
+                axisLine: { show: false },
                 axisLabel: {
                     color: colors.milkOpacity[200],
                     fontSize: 10,
@@ -647,10 +1328,31 @@ export default function CandlestickChart({
     // Determine which options to use
     const displayOptions = showLoading || showNoData ? emptyStateOptions : options
 
+    console.log('[CandlestickChart] Render state:', {
+        hasData,
+        showLoading,
+        showNoData,
+        hasOptions: !!options,
+        usingEmptyState: showLoading || showNoData,
+        poolSeriesCount: poolPriceSeries.length,
+    })
+
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <EchartWrapper options={displayOptions || emptyStateOptions} className={cn('size-full', className)} />
+                <EchartWrapper
+                    options={displayOptions || emptyStateOptions}
+                    className={cn('size-full', className)}
+                    forceReplace={forceReplace || showLoading || showNoData}
+                    onDataZoomChange={(start, end) => {
+                        // Save zoom state directly as percentages
+                        // ECharts already provides these as percentages when using percentage-based zoom
+                        zoomStateRef.current = {
+                            start: start,
+                            end: end,
+                        }
+                    }}
+                />
             </ErrorBoundary>
         </Suspense>
     )

@@ -37,14 +37,14 @@ html.dark {
     --color-folly: 345 100% 65%; /* #ff4d7a */
     --color-aquamarine: 165 100% 55%; /* #00ffc4 */
 
-    /* Milk colors */
-    --color-milk: 39 100% 97%; /* #fff9f0ff */
-    --color-milk-600: 39 100% 97% / 0.64; /* 64% opacity */
-    --color-milk-400: 39 100% 97% / 0.4; /* 40% opacity */
-    --color-milk-200: 39 100% 97% / 0.2; /* 20% opacity */
-    --color-milk-150: 39 100% 97% / 0.1; /* 10% opacity */
-    --color-milk-100: 39 100% 97% / 0.06; /* 6% opacity */
-    --color-milk-50: 39 100% 97% / 0.02; /* 2% opacity */
+    /* Milk colors (opacity-derivated from #FFF4E0) */
+    --color-milk: 36 100% 94%; /* #FFF4E0 */
+    --color-milk-600: 36 100% 94% / 0.64; /* 64% opacity */
+    --color-milk-400: 36 100% 94% / 0.4; /* 40% opacity */
+    --color-milk-200: 36 100% 94% / 0.2; /* 20% opacity */
+    --color-milk-150: 36 100% 94% / 0.15; /* 15% opacity */
+    --color-milk-100: 36 100% 94% / 0.07; /* 7% opacity */
+    --color-milk-50: 36 100% 94% / 0.04; /* 4% opacity */
 }
 
 /* Dark theme */
@@ -64,14 +64,14 @@ html.dark {
     --color-folly: 345 100% 65%; /* #ff4d7a */
     --color-aquamarine: 165 100% 55%; /* #00ffc4 */
 
-    /* Milk colors */
-    --color-milk: 39 100% 97%; /* #fff9f0ff */
-    --color-milk-600: 39 100% 97% / 0.64; /* 64% opacity */
-    --color-milk-400: 39 100% 97% / 0.4; /* 40% opacity */
-    --color-milk-200: 39 100% 97% / 0.2; /* 20% opacity */
-    --color-milk-150: 39 100% 97% / 0.1; /* 10% opacity */
-    --color-milk-100: 39 100% 97% / 0.07; /* 7% opacity */
-    --color-milk-50: 39 100% 97% / 0.02; /* 2% opacity */
+    /* Milk colors (opacity-derivated from #FFF4E0) */
+    --color-milk: 36 100% 94%; /* #FFF4E0 */
+    --color-milk-600: 36 100% 94% / 0.64; /* 64% opacity */
+    --color-milk-400: 36 100% 94% / 0.4; /* 40% opacity */
+    --color-milk-200: 36 100% 94% / 0.2; /* 20% opacity */
+    --color-milk-150: 36 100% 94% / 0.15; /* 15% opacity */
+    --color-milk-100: 36 100% 94% / 0.07; /* 7% opacity */
+    --color-milk-50: 36 100% 94% / 0.04; /* 4% opacity */
 }
 
 @layer utilities {

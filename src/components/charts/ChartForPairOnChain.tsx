@@ -9,6 +9,8 @@ import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
+import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
+import { CHAINS_CONFIG } from '@/config/chains.config'
 import { ButtonDark } from '../figma/Button'
 
 interface BinanceKline {
@@ -35,7 +37,7 @@ export default function ChartForPairOnChain({
     baseTokenSymbol?: string
     quoteTokenSymbol?: string
     chainId: number
-    targetSpreadBps?: number
+    targetSpreadBps: number
     className?: string
 }) {
     const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(CHART_CONFIG[ChartType.CANDLES].name))
@@ -107,8 +109,47 @@ export default function ChartForPairOnChain({
         enabled: !!baseTokenAddress && !!quoteTokenAddress,
     })
 
+    // Enhanced debug logging
+    useEffect(() => {
+        const timestamp = new Date().toISOString()
+        console.log(`[ChartForPairOnChain ${timestamp}] Component state:`, {
+            isLoading,
+            hasError: !!error,
+            hasData: !!data,
+            dataLength: data?.data?.length || 0,
+            baseToken: baseTokenAddress,
+            quoteToken: quoteTokenAddress,
+            chainId,
+            selectedInterval,
+            enabled: !!baseTokenAddress && !!quoteTokenAddress,
+            errorMessage: error?.message,
+            firstCandle: data?.data?.[0],
+            lastCandle: data?.data?.[data?.data?.length - 1],
+        })
+        if (error) {
+            console.error(`[ChartForPairOnChain ${timestamp}] 1inch API error:`, error)
+        }
+        if (data?.data?.length === 0) {
+            console.warn(`[ChartForPairOnChain ${timestamp}] API returned empty data array`)
+        }
+    }, [data, isLoading, error, baseTokenAddress, quoteTokenAddress, chainId, selectedInterval])
+
+    // Fetch pool data
+    const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
+    const { data: poolsData } = usePoolsData({
+        chain: chainName || '',
+        token0: baseTokenAddress?.toLowerCase() || '',
+        token1: quoteTokenAddress?.toLowerCase() || '',
+        enabled: !!chainName && !!baseTokenAddress && !!quoteTokenAddress,
+    })
+
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
-        if (!data?.data) return null
+        if (!data?.data || data.data.length === 0) {
+            console.log('[ChartForPairOnChain] No candle data available from 1inch API')
+            return null
+        }
+
+        console.log('[ChartForPairOnChain] Processing', data.data.length, 'candles from 1inch API')
         return data.data.map((candle) => ({
             time: candle.time * 1000, // Convert to milliseconds
             open: Math.round(candle.open * 100) / 100,
@@ -122,7 +163,7 @@ export default function ChartForPairOnChain({
     return (
         <div className={cn('w-full flex flex-col', className)}>
             <div className="flex flex-col md:flex-row md:justify-between md:items-center text-xs p-5 gap-y-4">
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-6 font-inter-tight">
                     {Object.values(CHART_CONFIG).map((config) => (
                         <button
                             key={config.name}
@@ -136,7 +177,12 @@ export default function ChartForPairOnChain({
                 </div>
                 <div className="flex items-center gap-1">
                     {CHART_CONFIG[ChartType.CANDLES].allowedIntervals.map((interval) => (
-                        <ButtonDark key={interval} className="w-10 py-[3px] rounded-xl text-xs" onClick={() => selectInterval(interval)}>
+                        <ButtonDark
+                            key={interval}
+                            selected={interval === selectedInterval}
+                            className={cn('py-[3px] px-2.5 rounded-xl text-xs')}
+                            onClick={() => selectInterval(interval)}
+                        >
                             {INTERVAL_LABELS(interval)}
                         </ButtonDark>
                     ))}
@@ -145,7 +191,7 @@ export default function ChartForPairOnChain({
             <div className="flex-1 h-full">
                 <CandlestickChart
                     data={candlestickData}
-                    isLoading={isLoading}
+                    isLoading={isLoading && !candlestickData}
                     error={error}
                     chainId={chainId}
                     baseSymbol={baseTokenSymbol || baseTokenAddress}
@@ -155,6 +201,7 @@ export default function ChartForPairOnChain({
                     targetSpreadBps={targetSpreadBps}
                     referencePrice={referencePrice}
                     referencePrices={referencePrices}
+                    poolsData={poolsData}
                 />
             </div>
         </div>

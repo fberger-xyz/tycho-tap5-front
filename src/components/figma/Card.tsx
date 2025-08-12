@@ -1,8 +1,14 @@
 import { cn } from '@/utils'
 
-export default function Card({ children, className }: { children: React.ReactNode; className?: string }) {
+export default function Card({ children, className, hoverable = false }: { children: React.ReactNode; className?: string; hoverable?: boolean }) {
     return (
-        <div className={cn('flex flex-col gap-1 bg-milk-50 rounded-xl p-5 hover:bg-milk-100 transition-colors duration-200', className)}>
+        <div
+            className={cn(
+                'flex flex-col gap-1 bg-milk-50 rounded-xl p-5 transition-colors duration-300',
+                hoverable && 'hover:bg-milk-100',
+                className,
+            )}
+        >
             {children}
         </div>
     )

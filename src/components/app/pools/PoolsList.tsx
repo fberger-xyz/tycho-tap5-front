@@ -57,14 +57,14 @@ export const PoolRowTemplate = (props: {
 export function PoolsTableHeaders() {
     return (
         <PoolRowTemplate
-            protocol={<p className="pl-2">Protocol</p>}
+            protocol={<p>Protocol</p>}
             status={<p>Status</p>}
             spotPrice={<p>Spot Price</p>}
             delta={<p>Delta</p>}
             depth={<p>2% Depth</p>}
             fee={<p>Fee</p>}
             lastUpdate={<p>Last update</p>}
-            className="px-4 py-3 text-milk-400 text-xs"
+            className="px-4 py-3 text-milk-600 text-xs"
         />
     )
 }
@@ -124,7 +124,7 @@ export const PoolRow = memo(function PoolRow({
     return (
         <PoolRowTemplate
             protocol={
-                <div className="flex items-center gap-2 pl-2">
+                <div className="flex items-center gap-2">
                     <FileMapper id={getProtocolConfig(pool.protocol_system).fileId} className="size-6 rounded-full bg-milk-100" />
                     <p className="truncate">{getProtocolConfig(pool.protocol_system).name}</p>
                 </div>

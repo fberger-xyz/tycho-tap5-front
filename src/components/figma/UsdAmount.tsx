@@ -7,7 +7,7 @@ export default function UsdAmount({
     variationPercentage,
     decimals = 0,
     className,
-    textClassName = 'text-base font-semibold',
+    textClassName = 'text-base',
 }: {
     amountUsd: number
     variationPercentage?: number
@@ -17,7 +17,7 @@ export default function UsdAmount({
 }) {
     return (
         <div className={cn('flex gap-2 items-center', className)}>
-            <p className={cn('text-base font-semibold', textClassName)}>{numeral(amountUsd).format(`$0,0.${'0'.repeat(decimals)}`)}</p>
+            <p className={cn('font-semibold', textClassName)}>{numeral(amountUsd).format(`$0,0.${'0'.repeat(decimals)}`)}</p>
             {variationPercentage !== undefined && <PercentEvolution percentage={variationPercentage} />}
         </div>
     )

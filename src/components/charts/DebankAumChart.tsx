@@ -109,7 +109,7 @@ export default function DebankAumChart({ data, className }: { data: number[] | A
                 },
                 endLabel: {
                     show: true,
-                    formatter: (params: { value: unknown }) => `$${numeral(params.value).format('0,0')}`,
+                    formatter: (params: { value: unknown }) => `$${numeral(params.value).format('0,0a')}`,
                     color: AppColors.gray[500],
                     fontSize: 10,
                     opacity: 0.5,

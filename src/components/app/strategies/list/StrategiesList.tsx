@@ -173,7 +173,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
             chains={
                 <div className="flex gap-2 items-center">
                     <ChainImage id={data.config.chain.id} size={18} />
-                    <p className="truncate text-milk-400 text-sm">{CHAINS_CONFIG[data.config.chain.id]?.name ?? 'unknown'}</p>
+                    <p className="truncate text-milk-600 text-sm">{CHAINS_CONFIG[data.config.chain.id]?.name ?? 'unknown'}</p>
                 </div>
             }
             className={className}
@@ -192,7 +192,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
     const aum = debankLast24hNetWorth.length ? debankLast24hNetWorth[debankLast24hNetWorth.length - 1].usd_value : networth?.usd_value || 0
 
     // Check ETH balance threshold
-    const { isBelowThreshold: isEthBelowThreshold } = useEthBalance({
+    const { isEthBalanceLoading, isEthBelowThreshold } = useEthBalance({
         walletAddress,
         chainId: data.chainId,
     })
@@ -217,15 +217,15 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             kpis={
                 <>
                     <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-400 text-sm">PnL</p>
+                        <p className="truncate text-milk-600 text-xs">PnL</p>
                         <p className="text-milk-200 truncate">To be computed</p>
                     </div>
                     <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-400 text-sm">AUM</p>
+                        <p className="truncate text-milk-600 text-xs">AUM</p>
                         {aum ? <UsdAmount amountUsd={aum} className="hover:underline cursor-alias" /> : <Skeleton variant="text" />}
                     </LinkWrapper>
                     <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-400 text-sm">Price</p>
+                        <p className="truncate text-milk-600 text-xs">Price</p>
                         {priceSourceUrl ? (
                             <LinkWrapper href={priceSourceUrl} target="_blank">
                                 <UsdAmount amountUsd={data.priceUsd} className="hover:underline cursor-alias" />
@@ -236,12 +236,13 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                     </div>
 
                     <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-400 text-sm">Trades</p>
+                        <p className="truncate text-milk-600 text-xs">Trades</p>
                         <p className="truncate">{data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)}</p>
                     </div>
                 </>
             }
             banner={
+                !isEthBalanceLoading &&
                 isEthBelowThreshold && (
                     <div className="w-full p-5 bg-folly/20">
                         <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>

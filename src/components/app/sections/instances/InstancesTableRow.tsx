@@ -37,7 +37,7 @@ export const InstanceRowTemplate = (props: {
         <div className={cn('w-full grid grid-cols-12 items-center text-sm gap-3', props.className)}>
             {/* A */}
             <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-3">
-                <div className="w-full col-span-2 pl-2">{props.index}</div>
+                <div className="w-full col-span-2">{props.index}</div>
                 <div className="w-full col-span-3">{props.instance}</div>
                 <div className="w-full col-span-2">{props.chain}</div>
                 <div className="w-full col-span-5">{props.pair}</div>
@@ -104,7 +104,7 @@ export function InstancesTableHeaders() {
 
     return (
         <InstanceRowTemplate
-            index={<p className="pl-2">#</p>}
+            index={<p>#</p>}
             instance={<p className="truncate">Instance</p>}
             chain={<p className="truncate">Chain</p>}
             pair={<p className="truncate text-center">Pair</p>}
