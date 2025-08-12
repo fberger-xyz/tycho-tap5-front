@@ -76,12 +76,13 @@ export function useOneInchCandles({ token0, token1, seconds, chainId, enabled = 
         },
         refetchOnWindowFocus: false,
         refetchIntervalInBackground: false,
+        refetchOnMount: false, // Don't refetch when component mounts if data exists
+        // Keep previous data during refetches to prevent flickering
+        placeholderData: (previousData) => previousData,
         // Stale time - match server cache
         staleTime: seconds === 300 || seconds === 900 ? 10000 : 25000,
         // Cache time - keep data in cache for 10 minutes
         gcTime: 10 * 60 * 1000,
-        // Keep previous data while fetching
-        placeholderData: (previousData) => previousData,
     })
 
     const { data, error } = queryResult

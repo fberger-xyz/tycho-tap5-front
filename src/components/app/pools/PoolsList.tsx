@@ -38,7 +38,7 @@ export const PoolRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex w-full items-center text-sm gap-2', props.className)}>
+        <div className={cn('flex w-full items-center text-sm gap-2 overflow-hidden', props.className)}>
             <div className={`w-[140px]`}>{props.protocol}</div>
             <div className={`w-[100px]`}>{props.status}</div>
             <div className={`w-[100px]`}>{props.spotPrice}</div>

@@ -486,15 +486,8 @@ export default function CandlestickChart({
     }, [poolsData, data, showPoolSeries])
 
     useEffect(() => {
-        console.log('[CandlestickChart] Main chart data:', {
-            isLoading,
-            hasError: !!error,
-            dataLength: data?.length || 0,
-            firstCandle: data?.[0],
-            lastCandle: data?.[data.length - 1],
-        })
-
-        if (isLoading || error || !data || data.length === 0) {
+        // Only clear options if we have no data at all (not during refetches)
+        if ((isLoading && !data) || error || !data || data.length === 0) {
             setOptions(null)
             return
         }
@@ -1327,15 +1320,6 @@ export default function CandlestickChart({
 
     // Determine which options to use
     const displayOptions = showLoading || showNoData ? emptyStateOptions : options
-
-    console.log('[CandlestickChart] Render state:', {
-        hasData,
-        showLoading,
-        showNoData,
-        hasOptions: !!options,
-        usingEmptyState: showLoading || showNoData,
-        poolSeriesCount: poolPriceSeries.length,
-    })
 
     return (
         <Suspense fallback={<CustomFallback />}>
