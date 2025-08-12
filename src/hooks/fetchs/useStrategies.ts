@@ -66,15 +66,16 @@ export function useStrategies() {
             return failureCount < 3
         },
         retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
-        // Refetch configuration
+        // Refetch configuration - offset from pools data to prevent overlapping
         refetchInterval: (data) => {
-            // Only refetch if we have data
-            return data ? 30000 : false
+            // Only refetch if we have data, offset by 15 seconds from pools
+            return data ? 45000 : false
         },
         refetchOnWindowFocus: false,
         refetchIntervalInBackground: false,
-        // Stale time - data is fresh for 10 seconds
-        staleTime: 10000,
+        refetchOnMount: false, // Don't refetch when component mounts if data exists
+        // Stale time - data is fresh for 40 seconds (close to refetch interval)
+        staleTime: 40000,
         // Cache time - keep data in cache for 5 minutes
         gcTime: 5 * 60 * 1000,
     })

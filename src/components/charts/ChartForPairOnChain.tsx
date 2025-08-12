@@ -109,31 +109,6 @@ export default function ChartForPairOnChain({
         enabled: !!baseTokenAddress && !!quoteTokenAddress,
     })
 
-    // Enhanced debug logging
-    useEffect(() => {
-        const timestamp = new Date().toISOString()
-        console.log(`[ChartForPairOnChain ${timestamp}] Component state:`, {
-            isLoading,
-            hasError: !!error,
-            hasData: !!data,
-            dataLength: data?.data?.length || 0,
-            baseToken: baseTokenAddress,
-            quoteToken: quoteTokenAddress,
-            chainId,
-            selectedInterval,
-            enabled: !!baseTokenAddress && !!quoteTokenAddress,
-            errorMessage: error?.message,
-            firstCandle: data?.data?.[0],
-            lastCandle: data?.data?.[data?.data?.length - 1],
-        })
-        if (error) {
-            console.error(`[ChartForPairOnChain ${timestamp}] 1inch API error:`, error)
-        }
-        if (data?.data?.length === 0) {
-            console.warn(`[ChartForPairOnChain ${timestamp}] API returned empty data array`)
-        }
-    }, [data, isLoading, error, baseTokenAddress, quoteTokenAddress, chainId, selectedInterval])
-
     // Fetch pool data
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
     const { data: poolsData } = usePoolsData({
@@ -145,11 +120,8 @@ export default function ChartForPairOnChain({
 
     const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
         if (!data?.data || data.data.length === 0) {
-            console.log('[ChartForPairOnChain] No candle data available from 1inch API')
             return null
         }
-
-        console.log('[ChartForPairOnChain] Processing', data.data.length, 'candles from 1inch API')
         return data.data.map((candle) => ({
             time: candle.time * 1000, // Convert to milliseconds
             open: Math.round(candle.open * 100) / 100,

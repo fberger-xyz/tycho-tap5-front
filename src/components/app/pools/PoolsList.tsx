@@ -161,27 +161,14 @@ export function PoolsList({ chainId, token0, token1, targetSpreadBps = 10 }: Poo
     // Get the chain name for the orderbook API
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
 
-    const {
-        data: orderbookData,
-        isLoading,
-        error,
-    } = usePoolsData({
+    const { data: orderbookData, isLoading } = usePoolsData({
         chain: chainName || '',
         token0: token0 || '',
         token1: token1 || '',
         enabled: !!chainName && !!token0 && !!token1,
     })
 
-    // Debug logging
-    console.log('PoolsList Debug:', {
-        chainId,
-        chainName,
-        token0,
-        token1,
-        orderbookData,
-        isLoading,
-        error,
-    })
+    // Debug logging removed to prevent re-renders
 
     const pools = orderbookData?.pools || []
     const referencePrice = orderbookData?.mpd_base_to_quote?.mid || 0

@@ -29,11 +29,8 @@ export function usePoolsData(params?: UsePoolsDataParams) {
         }
 
         const url = `/api/orderbook?${searchParams.toString()}`
-        console.log('Fetching orderbook from:', url)
 
         const result = await createRequest<AmmAsOrderbook>(url)
-
-        console.log('Orderbook API response:', result)
 
         if (!result.success) {
             throw new Error(result.error || 'Failed to fetch orderbook data')
@@ -47,7 +44,9 @@ export function usePoolsData(params?: UsePoolsDataParams) {
         queryFn: fetchOrderbook,
         enabled: params?.enabled !== false && !!params?.chain && !!params?.token0 && !!params?.token1,
         refetchInterval: 30000, // Refetch every 30 seconds
-        staleTime: 20000, // Consider data stale after 20 seconds
+        staleTime: 25000, // Consider data stale after 25 seconds (close to refetch interval to prevent flicker)
+        refetchOnMount: false, // Don't refetch when component mounts if data exists
+        refetchOnWindowFocus: false, // Don't refetch on window focus
     })
 }
 
