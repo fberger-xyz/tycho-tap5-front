@@ -22,16 +22,18 @@ export default function FileMapper({
     // theme
     if (props.id === FileIds.THEME_LIGHT) return <LightThemeSVG className={className} />
     if (props.id === FileIds.THEME_DARK) return <DarkThemeSVG className={className} />
+
+    // chains
     if (props.id === FileIds.BASE)
         return (
             <FileWrapper className={className}>
-                <Image src={`/chains/base.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
+                <Image src={`/figma/chains/base.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
             </FileWrapper>
         )
     if (props.id === FileIds.UNICHAIN)
         return (
             <FileWrapper className={className}>
-                <Image src={`/chains/unichain.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
+                <Image src={`/figma/chains/unichain.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
             </FileWrapper>
         )
 

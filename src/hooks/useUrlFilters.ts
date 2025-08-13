@@ -75,17 +75,24 @@ export function useUrlFilters() {
             (updates.teams || filters.teams) === ''
 
         if (hasNoFilters) {
-            // Set defaults
-            setFilters({
-                chains: DEFAULT_CHAINS,
-                pairs: DEFAULT_PAIRS,
-                teams: DEFAULT_TEAMS,
-            })
+            // Set defaults - use setTimeout to avoid update during render
+            const timeoutId = setTimeout(() => {
+                setFilters({
+                    chains: DEFAULT_CHAINS,
+                    pairs: DEFAULT_PAIRS,
+                    teams: DEFAULT_TEAMS,
+                })
+            }, 0)
+            return () => clearTimeout(timeoutId)
         } else if (needsUpdate) {
-            // Apply validation updates
-            setFilters((prev) => ({ ...prev, ...updates }))
+            // Apply validation updates - use setTimeout to avoid update during render
+            const timeoutId = setTimeout(() => {
+                setFilters((prev) => ({ ...prev, ...updates }))
+            }, 0)
+            return () => clearTimeout(timeoutId)
         }
-    }, [filters.chains, filters.pairs, filters.teams, setFilters])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filters.chains, filters.pairs, filters.teams]) // setFilters excluded intentionally to prevent loops
 
     // Helper function to get chain IDs from chain names
     const getChainIdsFromNames = (chainNames: string[]): number[] => {

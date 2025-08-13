@@ -1,0 +1,42 @@
+import React from 'react'
+import Card from '@/components/figma/Card'
+import UsdAmount from '@/components/figma/UsdAmount'
+import LinkWrapper from '@/components/common/LinkWrapper'
+import Skeleton from '@/components/common/Skeleton'
+
+interface StrategyKPIsProps {
+    aum?: number
+    priceUsd?: number
+    priceSourceUrl?: string | null
+    isLoading?: boolean
+}
+
+export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading }: StrategyKPIsProps) {
+    return (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+                <p className="text-xs text-milk-600">AUM (Assets Under Management)</p>
+                {isLoading ? (
+                    <Skeleton variant="text" />
+                ) : aum ? (
+                    <UsdAmount amountUsd={aum} className="hover:underline" textClassName="text-lg" />
+                ) : (
+                    <p className="text-milk-200 truncate text-lg">$0.00</p>
+                )}
+            </Card>
+
+            <Card>
+                <p className="text-xs text-milk-600">Current Price</p>
+                {isLoading ? (
+                    <Skeleton variant="text" />
+                ) : priceSourceUrl ? (
+                    <LinkWrapper href={priceSourceUrl} target="_blank">
+                        <UsdAmount amountUsd={priceUsd || 0} className="hover:underline cursor-alias" textClassName="text-lg" />
+                    </LinkWrapper>
+                ) : (
+                    <UsdAmount amountUsd={priceUsd || 0} textClassName="text-lg" />
+                )}
+            </Card>
+        </div>
+    )
+}

@@ -14,6 +14,7 @@ export interface StructuredOutput<Data> {
 export interface ChainConfig {
     id: AppSupportedChainIds
     name: string
+    fileId: FileIds
     oneInchId: string
     supported: boolean
     explorerRoot: string

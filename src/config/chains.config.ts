@@ -1,3 +1,4 @@
+import { FileIds } from '@/enums'
 import { AppSupportedChainIds } from '@/enums/app.enum'
 import { ChainConfig } from '@/interfaces'
 
@@ -5,6 +6,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
     [AppSupportedChainIds.ETHEREUM]: {
         id: AppSupportedChainIds.ETHEREUM,
         name: 'Ethereum',
+        fileId: FileIds.MAINNET,
         oneInchId: 'ethereum',
         supported: true,
         explorerRoot: 'https://etherscan.io',
@@ -28,6 +30,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
     [AppSupportedChainIds.UNICHAIN]: {
         id: AppSupportedChainIds.UNICHAIN,
         name: 'Unichain',
+        fileId: FileIds.UNICHAIN,
         oneInchId: 'unichain',
         supported: true,
         explorerRoot: 'https://uniscan.xyz',
@@ -46,6 +49,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
     [AppSupportedChainIds.BASE]: {
         id: AppSupportedChainIds.BASE,
         name: 'Base',
+        fileId: FileIds.BASE,
         oneInchId: 'base',
         supported: true,
         explorerRoot: 'https://basescan.org',

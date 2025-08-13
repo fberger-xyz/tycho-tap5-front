@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
@@ -13,6 +13,7 @@ import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { ButtonDark } from '../figma/Button'
+import { roundPrice } from '@/config/chart-constants.config'
 
 interface BinanceKline {
     time: number
@@ -47,96 +48,121 @@ export default function ChartForPairOnChain({
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const [referencePrice, setReferencePrice] = useState<number | undefined>(undefined)
     const [referencePrices, setReferencePrices] = useState<BinancePrice[] | undefined>(undefined)
+    const [binanceFetchError, setBinanceFetchError] = useState<boolean>(false)
 
-    // Fallback: Fetch single Binance price
-    const fetchSinglePrice = useCallback(async () => {
+    // Get refresh interval from chain config for synchronized updates
+    const refreshInterval = chainId ? CHAINS_CONFIG[chainId]?.poolRefreshIntervalMs || 12000 : 12000
+
+    // Reset data when chart type changes
+    useEffect(() => {
+        setReferencePrice(undefined)
+        setReferencePrices(undefined)
+        setBinanceFetchError(false)
+    }, [chartType])
+
+    // Simple Binance data fetching - no memoization needed
+    useEffect(() => {
         if (!baseTokenSymbol || !quoteTokenSymbol) return
 
-        try {
-            const response = await fetch(`/api/binance/price?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}`)
-            const data = await response.json()
-
-            if (data.price) {
-                const roundedPrice = Math.round(data.price * 100) / 100
-                setReferencePrice(roundedPrice)
-                setReferencePrices(undefined) // Clear historical prices
-            }
-        } catch {
-            // Silently fail if Binance price is unavailable
-        }
-    }, [baseTokenSymbol, quoteTokenSymbol])
-
-    // Fetch Binance historical prices (klines)
-    const fetchBinanceKlines = useCallback(async () => {
-        if (!baseTokenSymbol || !quoteTokenSymbol || !selectedInterval) return
-
-        try {
-            const response = await fetch(`/api/binance/klines?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}&seconds=${selectedInterval}`)
-            const data = await response.json()
-
-            if (data.data && Array.isArray(data.data)) {
-                // Transform klines to price points
-                const prices: BinancePrice[] = data.data.map((kline: BinanceKline) => ({
-                    time: kline.time * 1000, // Convert to milliseconds
-                    price: Math.round(kline.close * 100) / 100,
-                }))
-
-                setReferencePrices(prices)
-
-                // Also set the latest price as the current reference
-                if (prices.length > 0) {
-                    setReferencePrice(prices[prices.length - 1].price)
+        const fetchBinanceData = async () => {
+            // For spread chart, only fetch single price
+            if (chartType === ChartType.SPREAD) {
+                try {
+                    const response = await fetch(`/api/binance/price?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}`)
+                    const data = await response.json()
+                    if (data.price) {
+                        setReferencePrice(roundPrice(data.price))
+                        setReferencePrices(undefined)
+                        setBinanceFetchError(false)
+                    } else {
+                        setBinanceFetchError(true)
+                    }
+                } catch (error) {
+                    console.warn('Failed to fetch Binance price:', error)
+                    setBinanceFetchError(true)
                 }
-            } else if (data.error) {
-                // Fallback to single price
-                fetchSinglePrice()
+                return
             }
-        } catch {
-            // Fallback to single price on any error
-            fetchSinglePrice()
-        }
-    }, [baseTokenSymbol, quoteTokenSymbol, selectedInterval, fetchSinglePrice])
 
-    // Fetch Binance data when parameters change
-    useEffect(() => {
-        // For Spread view, only fetch single price
+            // For candles chart, fetch historical data
+            if (chartType === ChartType.CANDLES && selectedInterval) {
+                try {
+                    const response = await fetch(`/api/binance/klines?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}&seconds=${selectedInterval}`)
+                    const data = await response.json()
+
+                    if (data.data && Array.isArray(data.data)) {
+                        const prices: BinancePrice[] = data.data.map((kline: BinanceKline) => ({
+                            time: kline.time * 1000,
+                            price: roundPrice(kline.close),
+                        }))
+
+                        setReferencePrices(prices)
+                        if (prices.length > 0) {
+                            setReferencePrice(prices[prices.length - 1].price)
+                        }
+                        setBinanceFetchError(false)
+                    } else {
+                        // Fallback to single price
+                        const priceResponse = await fetch(`/api/binance/price?base=${baseTokenSymbol}&quote=${quoteTokenSymbol}`)
+                        const priceData = await priceResponse.json()
+                        if (priceData.price) {
+                            setReferencePrice(roundPrice(priceData.price))
+                            setReferencePrices(undefined)
+                            setBinanceFetchError(false)
+                        } else {
+                            setBinanceFetchError(true)
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to fetch Binance klines:', error)
+                    setBinanceFetchError(true)
+                }
+            }
+        }
+
+        // Initial fetch
+        fetchBinanceData()
+
+        // Set up periodic fetching for spread chart
+        let intervalId: NodeJS.Timeout | undefined
         if (chartType === ChartType.SPREAD) {
-            fetchSinglePrice()
-        } else {
-            fetchBinanceKlines()
+            intervalId = setInterval(fetchBinanceData, refreshInterval)
         }
-    }, [chartType, fetchBinanceKlines, fetchSinglePrice])
 
+        return () => {
+            if (intervalId) clearInterval(intervalId)
+        }
+    }, [baseTokenSymbol, quoteTokenSymbol, chartType, selectedInterval, refreshInterval])
+
+    // Fetch 1inch candles data - only for candles chart
     const { data, isLoading, error } = useOneInchCandles({
         token0: baseTokenAddress?.toLowerCase() ?? '',
         token1: quoteTokenAddress?.toLowerCase() ?? '',
         seconds: selectedInterval,
         chainId,
-        enabled: !!baseTokenAddress && !!quoteTokenAddress,
+        enabled: !!baseTokenAddress && !!quoteTokenAddress && chartType === ChartType.CANDLES,
     })
 
-    // Fetch pool data
+    // Fetch pool data - always needed for both charts
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
-    const { data: poolsData } = usePoolsData({
+    const { data: poolsData, isLoading: poolsLoading } = usePoolsData({
         chain: chainName || '',
         token0: baseTokenAddress?.toLowerCase() || '',
         token1: quoteTokenAddress?.toLowerCase() || '',
         enabled: !!chainName && !!baseTokenAddress && !!quoteTokenAddress,
     })
 
-    const candlestickData = useMemo<CandlestickDataPoint[] | null>(() => {
-        if (!data?.data || data.data.length === 0) {
-            return null
-        }
-        return data.data.map((candle) => ({
-            time: candle.time * 1000, // Convert to milliseconds
-            open: Math.round(candle.open * 100) / 100,
-            high: Math.round(candle.high * 100) / 100,
-            low: Math.round(candle.low * 100) / 100,
-            close: Math.round(candle.close * 100) / 100,
-            // 1inch API doesn't provide volume, so we'll omit it
+    // Simple candlestick data transformation - no useMemo
+    let candlestickData: CandlestickDataPoint[] | null = null
+    if (data?.data && data.data.length > 0) {
+        candlestickData = data.data.map((candle) => ({
+            time: candle.time * 1000,
+            open: roundPrice(candle.open),
+            high: roundPrice(candle.high),
+            low: roundPrice(candle.low),
+            close: roundPrice(candle.close),
         }))
-    }, [data])
+    }
 
     return (
         <div className={cn('w-full flex flex-col', className)}>
@@ -169,20 +195,23 @@ export default function ChartForPairOnChain({
                 )}
             </div>
             <div className="flex-1 h-full">
-                {chartType === ChartType.SPREAD ? (
+                {chartType === ChartType.SPREAD && (
                     <SpreadChart
-                        referencePrice={referencePrice}
+                        referencePrice={referencePrice || poolsData?.mpd_base_to_quote?.mid}
                         poolsData={poolsData}
                         targetSpreadBps={targetSpreadBps}
                         baseSymbol={baseTokenSymbol}
                         quoteSymbol={quoteTokenSymbol}
-                        isLoading={!referencePrice || !poolsData}
+                        isLoading={poolsLoading}
                         error={null}
+                        chainId={chainId}
+                        useFallbackPrice={binanceFetchError && !!poolsData?.mpd_base_to_quote?.mid}
                     />
-                ) : (
+                )}
+                {chartType === ChartType.CANDLES && (
                     <CandlestickChart
                         data={candlestickData}
-                        isLoading={isLoading && !candlestickData}
+                        isLoading={isLoading}
                         error={error}
                         chainId={chainId}
                         baseSymbol={baseTokenSymbol || baseTokenAddress}
