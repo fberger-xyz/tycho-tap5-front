@@ -17,6 +17,7 @@ import DebankAumChart from '@/components/charts/DebankAumChart'
 import Skeleton from '@/components/common/Skeleton'
 import { DEFAULT_PADDING_X } from '@/config'
 import { useEthBalance } from '@/hooks/useEthBalance'
+import numeral from 'numeral'
 
 /**
  * ------------------------ 1 template
@@ -237,7 +238,9 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
 
                     <div className="flex flex-col gap-1 items-start">
                         <p className="truncate text-milk-600 text-xs">Trades</p>
-                        <p className="truncate">{data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)}</p>
+                        <p className="truncate">
+                            {numeral(data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)).format('0,0')}
+                        </p>
                     </div>
                 </>
             }

@@ -12,6 +12,7 @@ import { useStrategies } from '@/hooks/fetchs/useStrategies'
 import Skeleton from '@/components/common/Skeleton'
 import { useTabFromUrl } from '@/hooks/useTabFromUrl'
 import { DEFAULT_PADDING_X } from '@/config'
+import numeral from 'numeral'
 
 export default function Page() {
     const { tab, setTab } = useTabFromUrl()
@@ -38,11 +39,13 @@ export default function Page() {
                 <Card>
                     <p className="text-xs text-milk-600">Total Trades</p>
                     {strategies.length ? (
-                        <p className="text-lg font-semibold">
-                            {strategies.reduce(
-                                (acc, strategy) => acc + strategy.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0),
-                                0,
-                            )}
+                        <p className="text-lg font-semibold text-milk">
+                            {numeral(
+                                strategies.reduce(
+                                    (acc, strategy) => acc + strategy.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0),
+                                    0,
+                                ),
+                            ).format('0,0')}
                         </p>
                     ) : (
                         <Skeleton variant="text" />

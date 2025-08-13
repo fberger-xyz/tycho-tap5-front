@@ -253,7 +253,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                         {trade.Instance.Configuration?.baseTokenSymbol.toUpperCase()} / {trade.Instance.Configuration?.quoteTokenSymbol.toUpperCase()}
                     </p>
                     <Tag variant="default" className="rounded pl-2 pr-1.5 py-0.5 text-xs">
-                        <p className="text-milk-600">{numeral(spread).format('0,0.[0000]')} bps</p>
+                        <p className="text-milk">{numeral(spread).format('0,0.[0000]')} bps</p>
                     </Tag>
                 </LinkWrapper>
             }
@@ -333,16 +333,16 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk-600 cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="text-sm text-milk cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={
-                <p className="text-sm text-milk-600" title={`Transaction nonce: ${validTradeValues.data.inventory.nonce}`}>
+                <p className="text-sm text-milk" title={`Transaction nonce: ${validTradeValues.data.inventory.nonce}`}>
                     {numeral(validTradeValues.data.inventory.nonce).format('0,0')}
                 </p>
             }
             sim={
-                <p className="text-xs text-milk-600" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
+                <p className="text-xs text-milk" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
                     {validTradeValues.data.simulation.simulated_took_ms}ms
                 </p>
             }
@@ -354,7 +354,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                             validTradeValues.data.broadcast.receipt.transaction_index <= 5
                                 ? 'text-aquamarine'
                                 : validTradeValues.data.broadcast.receipt.transaction_index <= 10
-                                  ? 'text-milk-600'
+                                  ? 'text-milk'
                                   : 'text-folly',
                         )}
                         title={`Transaction index in block: ${validTradeValues.data.broadcast.receipt.transaction_index}`}

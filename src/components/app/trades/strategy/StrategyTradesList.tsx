@@ -317,28 +317,28 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk-600 cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="text-sm text-milk cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={
-                <p className="text-sm text-milk-600" title={`Transaction nonce: ${validTradeValues.data.inventory.nonce}`}>
+                <p className="text-sm text-milk" title={`Transaction nonce: ${validTradeValues.data.inventory.nonce}`}>
                     {numeral(validTradeValues.data.inventory.nonce).format('0,0')}
                 </p>
             }
             sim={
-                <p className="text-xs text-milk-600" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
-                    {validTradeValues.data.simulation.simulated_took_ms}ms
+                <p className="text-sm text-milk" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
+                    {validTradeValues.data.simulation.simulated_took_ms} ms
                 </p>
             }
             idx={
                 hasValidTx && validTradeValues.data.broadcast ? (
                     <p
                         className={cn(
-                            'text-xs font-medium',
+                            'font-medium',
                             validTradeValues.data.broadcast.receipt.transaction_index <= 5
                                 ? 'text-aquamarine'
                                 : validTradeValues.data.broadcast.receipt.transaction_index <= 10
-                                  ? 'text-milk-600'
+                                  ? 'text-milk'
                                   : 'text-folly',
                         )}
                         title={`Transaction index in block: ${validTradeValues.data.broadcast.receipt.transaction_index}`}
