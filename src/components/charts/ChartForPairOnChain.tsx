@@ -222,6 +222,8 @@ export default function ChartForPairOnChain({
                         referencePrice={referencePrice}
                         referencePrices={referencePrices}
                         poolsData={poolsData}
+                        showPoolSeries={false}
+                        showTradeZonesInTooltip={true}
                     />
                 )}
             </div>
