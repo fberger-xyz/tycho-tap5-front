@@ -4,6 +4,7 @@ import { useMemo, useEffect, useState, useCallback } from 'react'
 import { useTheme } from 'next-themes'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
 import CandlestickChart, { CandlestickDataPoint } from './CandlestickChart'
+import SpreadChart from './SpreadChart'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
@@ -98,8 +99,13 @@ export default function ChartForPairOnChain({
 
     // Fetch Binance data when parameters change
     useEffect(() => {
-        fetchBinanceKlines()
-    }, [fetchBinanceKlines])
+        // For Spread view, only fetch single price
+        if (chartType === ChartType.SPREAD) {
+            fetchSinglePrice()
+        } else {
+            fetchBinanceKlines()
+        }
+    }, [chartType, fetchBinanceKlines, fetchSinglePrice])
 
     const { data, isLoading, error } = useOneInchCandles({
         token0: baseTokenAddress?.toLowerCase() ?? '',
@@ -147,34 +153,48 @@ export default function ChartForPairOnChain({
                         </button>
                     ))}
                 </div>
-                <div className="flex items-center gap-1">
-                    {CHART_CONFIG[ChartType.CANDLES].allowedIntervals.map((interval) => (
-                        <ButtonDark
-                            key={interval}
-                            selected={interval === selectedInterval}
-                            className={cn('py-[3px] px-2.5 rounded-xl text-xs')}
-                            onClick={() => selectInterval(interval)}
-                        >
-                            {INTERVAL_LABELS(interval)}
-                        </ButtonDark>
-                    ))}
-                </div>
+                {chartType !== ChartType.SPREAD && (
+                    <div className="flex items-center gap-1">
+                        {CHART_CONFIG[ChartType.CANDLES].allowedIntervals.map((interval) => (
+                            <ButtonDark
+                                key={interval}
+                                selected={interval === selectedInterval}
+                                className={cn('py-[3px] px-2.5 rounded-xl text-xs')}
+                                onClick={() => selectInterval(interval)}
+                            >
+                                {INTERVAL_LABELS(interval)}
+                            </ButtonDark>
+                        ))}
+                    </div>
+                )}
             </div>
             <div className="flex-1 h-full">
-                <CandlestickChart
-                    data={candlestickData}
-                    isLoading={isLoading && !candlestickData}
-                    error={error}
-                    chainId={chainId}
-                    baseSymbol={baseTokenSymbol || baseTokenAddress}
-                    quoteSymbol={quoteTokenSymbol || quoteTokenAddress}
-                    upColor={colors.aquamarine}
-                    downColor={colors.folly}
-                    targetSpreadBps={targetSpreadBps}
-                    referencePrice={referencePrice}
-                    referencePrices={referencePrices}
-                    poolsData={poolsData}
-                />
+                {chartType === ChartType.SPREAD ? (
+                    <SpreadChart
+                        referencePrice={referencePrice}
+                        poolsData={poolsData}
+                        targetSpreadBps={targetSpreadBps}
+                        baseSymbol={baseTokenSymbol}
+                        quoteSymbol={quoteTokenSymbol}
+                        isLoading={!referencePrice || !poolsData}
+                        error={null}
+                    />
+                ) : (
+                    <CandlestickChart
+                        data={candlestickData}
+                        isLoading={isLoading && !candlestickData}
+                        error={error}
+                        chainId={chainId}
+                        baseSymbol={baseTokenSymbol || baseTokenAddress}
+                        quoteSymbol={quoteTokenSymbol || quoteTokenAddress}
+                        upColor={colors.aquamarine}
+                        downColor={colors.folly}
+                        targetSpreadBps={targetSpreadBps}
+                        referencePrice={referencePrice}
+                        referencePrices={referencePrices}
+                        poolsData={poolsData}
+                    />
+                )}
             </div>
         </div>
     )

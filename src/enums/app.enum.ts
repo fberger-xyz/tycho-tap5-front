@@ -124,12 +124,6 @@ export enum ChartIntervalInSeconds {
     ONE_DAY = 86400,
 }
 
-export enum StrategyTabs {
-    TRADES = 'Trades',
-    INSTANCES = 'Instances',
-    INVENTORY = 'Inventory',
-}
-
 export enum ListToShow {
     STRATEGIES = 'Strategies',
     TRADES = 'Trades History',
