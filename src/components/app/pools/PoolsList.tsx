@@ -18,16 +18,6 @@ import { LiveDate } from '@/components/common/LiveDate'
  * ------------------------ 1 template
  */
 
-export const CELL_WIDTHS = {
-    protocol: 120,
-    status: 100,
-    spotPrice: 100,
-    delta: 80,
-    depth: 100,
-    fee: 80,
-    lastUpdate: 120,
-}
-
 export const PoolRowTemplate = (props: {
     protocol: ReactNode
     status: ReactNode

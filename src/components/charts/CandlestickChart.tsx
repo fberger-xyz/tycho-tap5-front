@@ -724,7 +724,7 @@ export default function CandlestickChart({
 
                     let tooltipContent = `
                         <div style="margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid ${colors.milkOpacity[100]};">
-                            <div style="font-size: 12px; font-weight: 500; color: ${colors.milk}; margin-bottom: 4px;">${dateLong}</div>
+                            <div style="font-size: 12px; font-weight: 500; color: ${colors.milk}; margin-bottom: 2px;">${dateLong}</div>
                             <div style="font-size: 11px; color: ${colors.milkOpacity[400]};">${timeAgo}</div>
                         </div>
                     `
@@ -964,7 +964,8 @@ export default function CandlestickChart({
                             align: 'center', // center the text
                             formatter: ({ value }) => {
                                 // return dayjs(value).format('dddd, MMMM D, YYYY ∙ hh:mm A')
-                                return [DAYJS_FORMATS.dateLong(value), DAYJS_FORMATS.timeAgo(value)].join('\n')
+                                // return [DAYJS_FORMATS.dateLong(value), DAYJS_FORMATS.timeAgo(value)].join('\n')
+                                return DAYJS_FORMATS.dateLong(value)
                             },
                             backgroundColor: colors.milkOpacity[50],
                             color: colors.milk,
