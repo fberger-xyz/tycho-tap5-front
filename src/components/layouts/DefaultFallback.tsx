@@ -9,7 +9,7 @@ import { ListToShow } from '@/enums'
 export function DefaultFallbackContent() {
     return (
         <>
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10">
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10 max-w-[980px] mx-auto">
                 <Card>
                     <p className="text-sm text-milk-400">Total PnL</p>
                     <Skeleton variant="text" />
@@ -27,7 +27,7 @@ export function DefaultFallbackContent() {
             </div>
 
             {/* list to show */}
-            <div className={cn('flex gap-6 mb-8', DEFAULT_PADDING_X)}>
+            <div className={cn('flex gap-6 mb-8 max-w-[980px] mx-auto', DEFAULT_PADDING_X)}>
                 {Object.values(ListToShow).map((list) => (
                     <button key={list}>
                         <p
@@ -41,7 +41,7 @@ export function DefaultFallbackContent() {
                     </button>
                 ))}
             </div>
-            <div className={cn('flex flex-col gap-5 mx-auto w-full', DEFAULT_PADDING_X)}>
+            <div className={cn('flex flex-col gap-5 max-w-[980px] mx-auto', DEFAULT_PADDING_X)}>
                 <LoadingStrategiesList />
             </div>
         </>

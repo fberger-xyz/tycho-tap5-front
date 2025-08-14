@@ -41,31 +41,31 @@ export default function FileMapper({
     if (props.id === FileIds.PROTOCOL_BALANCER)
         return (
             <div className={cn(className, 'bg-white p-0.5')}>
-                <Image src={`/protocols/balancer.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
+                <Image src={`/protocols/Balancer.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
     if (props.id === FileIds.PROTOCOL_CURVE)
         return (
             <div className={cn(className, 'bg-white p-0.5')}>
-                <Image src={`/protocols/curve.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
+                <Image src={`/protocols/Curve.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
     if (props.id === FileIds.PROTOCOL_PANCAKESWAP)
         return (
             <div className={cn(className, 'bg-white p-0.5')}>
-                <Image src={`/protocols/pancakeswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
+                <Image src={`/protocols/Pancakeswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
     if (props.id === FileIds.PROTOCOL_SUSHISWAP)
         return (
             <div className={cn(className, 'bg-white p-0.5')}>
-                <Image src={`/protocols/sushiswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
+                <Image src={`/protocols/Sushiswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
     if (props.id === FileIds.PROTOCOL_UNISWAP)
         return (
             <div className={cn(className, 'bg-white p-0.5 rounded-full')}>
-                <Image src={`/protocols/uniswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
+                <Image src={`/protocols/Uniswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
 

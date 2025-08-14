@@ -34,41 +34,13 @@ enum TradesView {
     DEPOSITS_AND_WITHDRAWS = 'Deposits & Withdrawals',
 }
 
-const STRATEGY_UI_CONSTANTS = {
-    // Layout
-    MAX_WIDTH: 'max-w-[1400px]',
-
-    // Sizes
-    ICON_SIZES: {
-        TOKEN: 20,
-        CHAIN_SMALL: 18,
-        CHAIN_MEDIUM: 20,
-        DOUBLE_SYMBOL: 48,
-    },
-
-    // Heights for skeleton loading
-    SKELETON_HEIGHTS: {
-        KPI: 'h-[88px]',
-        CHART: 'h-[420px]',
-        POOLS: 'h-[240px]',
-        CARD: 'h-[240px]',
-        CONFIG: 'h-[320px]',
-    },
-
-    // Common class names
-    CLASSES: {
-        STAT_ROW: 'flex justify-between gap-4',
-        STAT_LABEL: 'text-milk-600 truncate',
-        STAT_VALUE: 'truncate',
-    },
-
-    // Default values
-    DEFAULTS: {
-        MAX_TRADES: 5000,
-        TOKEN_DECIMALS: 4,
-        PRICE_FORMAT: '0,0.[00]',
-    },
+const SKELETON_HEIGHTS = {
+    CHART: 'h-[420px]',
+    POOLS: 'h-[240px]',
+    TRADES: 'h-48',
 } as const
+
+const MAX_WIDTH = 'max-w-[1400px]'
 
 // Component for Pools with refresh countdown
 function PoolsCard({
@@ -77,6 +49,7 @@ function PoolsCard({
     token1,
     targetSpreadBps,
     isInRange,
+    referencePrice,
     isLoading,
 }: {
     chainId?: number
@@ -84,6 +57,7 @@ function PoolsCard({
     token1?: string
     targetSpreadBps?: number
     isInRange?: boolean
+    referencePrice?: number
     isLoading?: boolean
 }) {
     const [refreshInterval, setRefreshInterval] = React.useState<number>()
@@ -105,6 +79,7 @@ function PoolsCard({
                 token1={token1}
                 isInRange={isInRange ?? true}
                 targetSpreadBps={targetSpreadBps}
+                referencePrice={referencePrice}
                 onRefreshData={(interval, updatedAt) => {
                     setRefreshInterval(interval)
                     setLastRefreshTime(updatedAt)
@@ -120,6 +95,9 @@ export default function StrategyPage() {
 
     // trades view tab state with URL sync
     const [tradesTab, setTradesTab] = useQueryState('view', parseAsString.withDefault(TradesView.RECENT_TRADES))
+
+    // State for live reference price from Binance
+    const [liveReferencePrice, setLiveReferencePrice] = React.useState<number | undefined>()
 
     // Get configuration and strategy with price
     const { configuration, strategy, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
@@ -158,7 +136,7 @@ export default function StrategyPage() {
     // Early returns for invalid state - progressive loading instead of full page skeleton
     if (!strategyId) {
         return (
-            <HydratedPageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
+            <HydratedPageWrapper className={MAX_WIDTH}>
                 <div className="flex items-center justify-center h-64">
                     <p className="text-milk-600">Invalid strategy ID</p>
                 </div>
@@ -175,7 +153,7 @@ export default function StrategyPage() {
     // Handle errors
     if (configHasError) {
         return (
-            <HydratedPageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
+            <HydratedPageWrapper className={MAX_WIDTH}>
                 <ErrorPlaceholder entryName="Configuration" errorMessage={configError?.message || 'Failed to load configuration'} />
             </HydratedPageWrapper>
         )
@@ -187,7 +165,7 @@ export default function StrategyPage() {
 
     // render
     return (
-        <HydratedPageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
+        <HydratedPageWrapper className={MAX_WIDTH}>
             <StrategyTemplate
                 header={
                     <StrategyHeader
@@ -222,6 +200,7 @@ export default function StrategyPage() {
                                 targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
                                 strategyId={strategyIdStr}
                                 className="size-full"
+                                onReferencePriceUpdate={setLiveReferencePrice}
                             />
                         )}
                     </Card>
@@ -233,12 +212,13 @@ export default function StrategyPage() {
                         token1={parsedConfig?.quote.address}
                         targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
                         isInRange={!isEthBalanceBelowThreshold}
+                        referencePrice={liveReferencePrice || priceUsd}
                         isLoading={isInitialLoading}
                     />
                 }
                 trades={
                     isInitialLoading ? (
-                        <div className="skeleton-loading w-full h-48 rounded-lg" />
+                        <div className={`skeleton-loading w-full ${SKELETON_HEIGHTS.TRADES} rounded-lg`} />
                     ) : (
                         <Card className="gap-5 px-0 pb-0">
                             <div className="flex gap-x-6 gap-y-2 px-5 flex-wrap">
@@ -278,7 +258,7 @@ export default function StrategyPage() {
                 }
                 inventory={
                     isInitialLoading ? (
-                        <div className="skeleton-loading w-full h-48 rounded-lg" />
+                        <div className={`skeleton-loading w-full ${SKELETON_HEIGHTS.TRADES} rounded-lg`} />
                     ) : (
                         <StrategyInventory tokens={tokens} isLoading={isInitialLoading} />
                     )

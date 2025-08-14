@@ -1,6 +1,6 @@
 'use client'
 
-import React, { ReactNode, memo, useMemo } from 'react'
+import React, { ReactNode } from 'react'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { cn, DAYJS_FORMATS, mapProtocolIdToProtocolConfig } from '@/utils'
 import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
@@ -16,6 +16,27 @@ import { DoubleSymbol, SymbolImage } from '@/components/common/ImageWrapper'
 import { Range } from '@/components/figma/Tags'
 
 // todo simulation failed pas de broadcast data
+
+/**
+ * Helper function to calculate if a pool is within the target spread range
+ */
+function calculatePoolInRange(
+    poolPrice: number,
+    referencePrice: number | undefined,
+    targetSpreadBps: number | undefined,
+    defaultInRange: boolean,
+): boolean {
+    // Use default if we don't have the necessary data
+    if (!referencePrice || !targetSpreadBps || poolPrice <= 0) {
+        return defaultInRange
+    }
+
+    const spreadDecimal = targetSpreadBps / 10000
+    const lowerBound = referencePrice * (1 - spreadDecimal)
+    const upperBound = referencePrice * (1 + spreadDecimal)
+
+    return poolPrice >= lowerBound && poolPrice <= upperBound
+}
 
 /**
  * ------------------------ 1 template
@@ -41,8 +62,8 @@ export const PoolRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('grid grid-cols-10 w-full items-center text-sm gap-4 px-4', props.className)}>
-            <div className="col-span-2">{props.protocol}</div>
+        <div className={cn('grid grid-cols-9 w-full items-center text-sm gap-4 px-4', props.className)}>
+            <div className="col-span-1">{props.protocol}</div>
             <div className="col-span-1">{props.range}</div>
             <div className="col-span-1">{props.poolPrice}</div>
             <div className="col-span-1">{props.lastUpdate}</div>
@@ -76,11 +97,11 @@ export const PoolRowTemplate = (props: {
 
 export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }: { baseSymbol?: string; quoteSymbol?: string }) {
     return (
-        <div className="grid grid-cols-10 w-full items-end gap-3 px-4 text-milk-400 text-xs pb-2">
-            <div className="col-span-2">Protocol</div>
+        <div className="grid grid-cols-9 w-full items-end gap-3 px-4 text-milk-400 text-xs pb-2">
+            <div className="col-span-1">Protocol</div>
             <div className="col-span-1">Range</div>
             <div className="col-span-1">Pool price</div>
-            <div className="col-span-1">Last updated</div>
+            <div className="col-span-1">Last trade</div>
 
             {/* Base token columns */}
             <div className="flex flex-col gap-2 col-span-2">
@@ -166,8 +187,9 @@ export function LoadingPoolsRows() {
 // Type for PoolRow props
 type PoolRowProps = {
     pool: AmmPool
-    poolIndex: number
     poolPrice?: number
+    baseSymbol?: string
+    quoteSymbol?: string
     isInRange?: boolean
     baseLiquidity?: number
     quoteLiquidity?: number
@@ -180,31 +202,13 @@ type PoolRowProps = {
     className?: string
 }
 
-// Custom comparison function for memo to ensure updates when pool data changes
-const arePoolRowPropsEqual = (prevProps: PoolRowProps, nextProps: PoolRowProps) => {
-    // Check if pool price changed
-    if (prevProps.poolPrice !== nextProps.poolPrice) return false
-    // Check if liquidity values changed
-    if (prevProps.baseLiquidity !== nextProps.baseLiquidity) return false
-    if (prevProps.quoteLiquidity !== nextProps.quoteLiquidity) return false
-    // Check if USD values changed
-    if (prevProps.ethUsd !== nextProps.ethUsd) return false
-    if (prevProps.baseWorthEth !== nextProps.baseWorthEth) return false
-    if (prevProps.quoteWorthEth !== nextProps.quoteWorthEth) return false
-    // Check if totals changed
-    if (prevProps.totalBaseLiquidity !== nextProps.totalBaseLiquidity) return false
-    if (prevProps.totalQuoteLiquidity !== nextProps.totalQuoteLiquidity) return false
-    // Check if pool object reference changed
-    if (prevProps.pool !== nextProps.pool) return false
-
-    return true
-}
-
-export const PoolRow = memo(function PoolRow({
+// Removed memo for now to ensure updates happen
+export const PoolRow = function PoolRow({
     pool,
-    poolIndex,
     poolPrice,
     isInRange,
+    baseSymbol,
+    quoteSymbol,
     baseLiquidity,
     quoteLiquidity,
     ethUsd,
@@ -215,9 +219,6 @@ export const PoolRow = memo(function PoolRow({
     chainId,
     className,
 }: PoolRowProps) {
-    // Calculate time since last update (last_updated_at is in seconds, not milliseconds)
-    // const minutesAgo = pool.last_updated_at ? Math.floor((Date.now() / 1000 - pool.last_updated_at) / 60) : 0
-
     // Calculate USD values
     const baseUsd = (baseLiquidity || 0) * (baseWorthEth || 0) * (ethUsd || 0)
     const quoteUsd = (quoteLiquidity || 0) * (quoteWorthEth || 0) * (ethUsd || 0)
@@ -250,11 +251,20 @@ export const PoolRow = memo(function PoolRow({
             poolPrice={
                 <StyledTooltip
                     content={
-                        <div className="flex flex-col">
-                            <p className="font-semibold">Pool spot price (mid-price)</p>
-                            <p className="text-xs">Pool index: {poolIndex}</p>
-                            <p className="text-xs mt-1">Price: {numeral(poolPrice).format('0,0.[0000000]')}</p>
-                        </div>
+                        poolPrice ? (
+                            <div className="flex flex-col">
+                                {/* <p className="font-semibold">Pool spot price (mid-price)</p> */}
+                                {/* <p className="text-xs">Pool index: {poolIndex}</p> */}
+                                <p className="text-xs mt-1">
+                                    {numeral(poolPrice).format('0,0.[0000000]')} {quoteSymbol} / {baseSymbol}
+                                </p>
+                                <p className="text-xs mt-1">
+                                    {numeral(1 / poolPrice).format('0,0.[0000000]')} {baseSymbol} / {quoteSymbol}
+                                </p>
+                            </div>
+                        ) : (
+                            <p className="text-xs mt-1">No price</p>
+                        )
                     }
                 >
                     <p className="truncate cursor-help text-milk">{poolPrice ? numeral(poolPrice).format('0,0.[00]') : '-'}</p>
@@ -276,7 +286,7 @@ export const PoolRow = memo(function PoolRow({
             className={cn('py-3 hover:bg-milk-100 transition-colors duration-200', className)}
         />
     )
-}, arePoolRowPropsEqual)
+}
 /**
  * ------------------------ 5 list
  */
@@ -287,10 +297,11 @@ interface PoolsListProps {
     token1?: string
     isInRange: boolean
     targetSpreadBps?: number
+    referencePrice?: number
     onRefreshData?: (refetchInterval: number, dataUpdatedAt: number) => void
 }
 
-export function PoolsList({ chainId, token0, token1, isInRange, onRefreshData }: PoolsListProps) {
+export function PoolsList({ chainId, token0, token1, isInRange, targetSpreadBps, referencePrice, onRefreshData }: PoolsListProps) {
     // Get the chain name for the orderbook API
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
 
@@ -306,9 +317,9 @@ export function PoolsList({ chainId, token0, token1, isInRange, onRefreshData }:
         enabled: !!chainName && !!token0 && !!token1,
     })
 
-    // Extract data from orderbook
+    // Extract data from orderbook - no useMemo needed for simple references
     const pools = orderbookData?.pools || []
-    const poolPrices = useMemo(() => orderbookData?.prices_base_to_quote || [], [orderbookData?.prices_base_to_quote])
+    const poolPrices = orderbookData?.prices_base_to_quote || []
     const baseLiquidities = orderbookData?.base_lqdty || []
     const quoteLiquidities = orderbookData?.quote_lqdty || []
     const ethUsd = orderbookData?.eth_usd || 0
@@ -333,22 +344,12 @@ export function PoolsList({ chainId, token0, token1, isInRange, onRefreshData }:
             return tvlB - tvlA
         })
 
-    // Notify parent of refresh data and log updates
+    // Notify parent of refresh data
     React.useEffect(() => {
         if (onRefreshData && refetchInterval && dataUpdatedAt) {
             onRefreshData(refetchInterval, dataUpdatedAt)
         }
-
-        // Log data updates for debugging
-        if (poolPrices.length > 0) {
-            console.log('[PoolsList] Data updated at:', new Date(dataUpdatedAt).toISOString(), {
-                poolsCount: pools.length,
-                firstPoolPrice: poolPrices[0],
-                timestamp: orderbookData?.timestamp,
-                block: orderbookData?.block,
-            })
-        }
-    }, [onRefreshData, refetchInterval, dataUpdatedAt, poolPrices, pools.length, orderbookData?.timestamp, orderbookData?.block])
+    }, [onRefreshData, refetchInterval, dataUpdatedAt])
 
     // easy ternary
     const showLoading = isLoading && (!pools || pools.length === 0)
@@ -368,15 +369,21 @@ export function PoolsList({ chainId, token0, token1, isInRange, onRefreshData }:
                         <div className="flex flex-col overflow-y-auto">
                             {sortedPoolIndices.map((poolIndex) => {
                                 const pool = pools[poolIndex]
-                                // Include data timestamp in key to force re-render on data updates
-                                const uniqueKey = `${pool.id}-${poolIndex}-${poolPrices[poolIndex]}-${dataUpdatedAt}`
+                                // Simple key with pool id and current price to force updates
+                                const poolPrice = poolPrices[poolIndex] || 0
+                                const uniqueKey = `${pool.id}-${poolIndex}`
+
+                                // Calculate if this specific pool is in range
+                                const poolIsInRange = calculatePoolInRange(poolPrice, referencePrice, targetSpreadBps, isInRange)
+
                                 return (
                                     <PoolRow
                                         key={uniqueKey}
                                         pool={pool}
-                                        poolIndex={poolIndex}
-                                        poolPrice={poolPrices[poolIndex]}
-                                        isInRange={isInRange}
+                                        poolPrice={poolPrice}
+                                        isInRange={poolIsInRange}
+                                        baseSymbol={baseSymbol}
+                                        quoteSymbol={quoteSymbol}
                                         baseLiquidity={baseLiquidities[poolIndex]}
                                         quoteLiquidity={quoteLiquidities[poolIndex]}
                                         ethUsd={ethUsd}

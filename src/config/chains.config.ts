@@ -44,7 +44,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
         },
         idForOrderbookApi: 'unichain',
         showTopUpBannerIfEthBalanceBelow: 0.001, // 0.001 ETH
-        poolRefreshIntervalMs: 5000, // 5 seconds for Unichain
+        poolRefreshIntervalMs: 6000, // 6 seconds for Unichain
     },
     [AppSupportedChainIds.BASE]: {
         id: AppSupportedChainIds.BASE,
@@ -67,6 +67,6 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
         },
         idForOrderbookApi: 'base',
         showTopUpBannerIfEthBalanceBelow: 0.001, // 0.001 ETH
-        poolRefreshIntervalMs: 5000, // 5 seconds for Base
+        poolRefreshIntervalMs: 6000, // 6 seconds for Base
     },
 }

@@ -379,12 +379,6 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     itemStyle: {
                         color: '#10B981',
                     },
-                    emphasis: {
-                        focus: 'series',
-                        lineStyle: {
-                            width: 3,
-                        },
-                    },
                 },
                 {
                     name: quoteSymbol || 'Quote',
@@ -400,12 +394,6 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     },
                     itemStyle: {
                         color: '#3B82F6',
-                    },
-                    emphasis: {
-                        focus: 'series',
-                        lineStyle: {
-                            width: 3,
-                        },
                     },
                 },
             ],
@@ -439,16 +427,20 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
         } as EChartsOption
     }, [inventoryData, baseSymbol, quoteSymbol, colors, isMobile])
 
-    // Loading state
+    // Loading state with animated placeholder
     const loadingOptions = useMemo((): EChartsOption => {
         const now = Date.now()
         const skeletonPoints = 30
         const timePoints = Array.from({ length: skeletonPoints }, (_, i) => now - (skeletonPoints - i - 1) * 60000)
 
+        // Create more visually interesting skeleton lines with stepped patterns
         const createSkeletonLine = (offset: number, base: number, amplitude: number) => {
             return timePoints.map((time, i) => {
-                const wave = Math.sin((i + offset) * 0.2) * amplitude
-                return [time, base + wave]
+                // Create a stepped pattern that looks like inventory changes
+                const step = Math.floor(i / 5) * 0.2
+                const wave = Math.sin((i + offset) * 0.3) * amplitude
+                const noise = Math.sin((i + offset) * 1.5) * (amplitude * 0.2)
+                return [time, base + wave + noise + step * amplitude]
             })
         }
 
@@ -512,8 +504,9 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     name: 'skeleton1',
                     type: 'line',
                     yAxisIndex: 0,
-                    data: createSkeletonLine(0, 0.05, 0.005),
-                    smooth: true,
+                    data: createSkeletonLine(0, 0.05, 0.008),
+                    smooth: false, // Straight lines for inventory
+                    step: 'end', // Stepped pattern like inventory changes
                     symbol: 'none',
                     lineStyle: {
                         color: colors.milkOpacity[200],
@@ -528,8 +521,9 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     name: 'skeleton2',
                     type: 'line',
                     yAxisIndex: 1,
-                    data: createSkeletonLine(10, 1000, 50),
-                    smooth: true,
+                    data: createSkeletonLine(15, 1000, 80),
+                    smooth: false, // Straight lines for inventory
+                    step: 'end', // Stepped pattern like inventory changes
                     symbol: 'none',
                     lineStyle: {
                         color: colors.milkOpacity[150],
@@ -538,7 +532,7 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     },
                     animation: true,
                     animationDuration: 3000,
-                    animationDelay: 200,
+                    animationDelay: 300,
                 },
             ],
             legend: {

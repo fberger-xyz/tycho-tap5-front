@@ -2,6 +2,7 @@
 
 import { useMemo, useEffect, useState, useRef, Suspense } from 'react'
 import EchartWrapper, { CustomFallback } from './EchartWrapper'
+import { IS_DEV } from '@/config/app.config'
 import { useTheme } from 'next-themes'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
@@ -14,6 +15,13 @@ import { DAYJS_FORMATS } from '@/utils'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { ErrorBoundary } from 'react-error-boundary'
 import { CHART_CONSTANTS } from '@/config/chart-constants.config'
+
+// Debug logging helper
+const debugLog = (message: string, data?: unknown) => {
+    if (IS_DEV) {
+        console.log(message, data)
+    }
+}
 
 // Simple protocol colors
 const PROTOCOL_COLORS: Record<string, string> = {
@@ -148,14 +156,14 @@ export default function SpreadChart({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [poolsData, referencePrice, refreshInterval, maxPoints, binanceTimeSeries.length, poolsTimeSeries.size])
 
-    // Check if we have enough data points to show actual chart (need at least 1 point to start showing)
+    // Check if we have enough data points to show actual chart (need at least 2 points for a line)
     const hasEnoughData = useMemo(() => {
-        // Check if Binance has any points
-        if (binanceTimeSeries.length >= 1) return true
+        // Need at least 2 points to draw a meaningful line
+        if (binanceTimeSeries.length >= 2) return true
 
-        // Check if any pool has any points
+        // Check if any pool has at least 2 points
         for (const pool of poolsTimeSeries.values()) {
-            if (pool.data.length >= 1) return true
+            if (pool.data.length >= 2) return true
         }
 
         return false
@@ -163,7 +171,7 @@ export default function SpreadChart({
 
     const chartOptions = useMemo(() => {
         // Build the chart configuration for when we have real data
-        console.log('[SpreadChart] Building chart options with:', {
+        debugLog('[SpreadChart] Building chart options with:', {
             binanceTimeSeriesLength: binanceTimeSeries.length,
             poolsTimeSeriesSize: poolsTimeSeries.size,
             referencePrice,
@@ -305,17 +313,11 @@ export default function SpreadChart({
                         if (!value) return
 
                         let displayColor = item.color
-                        let displayName = item.seriesName
+                        const displayName = item.seriesName
 
-                        // Format Market price (Binance or fallback)
-                        if (item.seriesName.includes('Market Price')) {
-                            if (item.seriesName.includes('Orderbook')) {
-                                displayColor = '#888888'
-                                displayName = 'Market Price (Orderbook Mid)'
-                            } else {
-                                displayColor = '#F3BA2F'
-                                displayName = 'Market Price (Binance)'
-                            }
+                        // Format Market price
+                        if (item.seriesName === 'Market Price (Binance)') {
+                            displayColor = useFallbackPrice ? '#888888' : '#F3BA2F'
                         }
 
                         // Skip if we've already shown this series name
@@ -371,7 +373,7 @@ export default function SpreadChart({
                 ...(binanceTimeSeries.length > 0
                     ? [
                           {
-                              name: useFallbackPrice ? 'Market Price (Orderbook Mid)' : 'Market Price (Binance)',
+                              name: 'Market Price (Binance)',
                               type: 'line' as const,
                               data: binanceTimeSeries.map((point) => [point.time, point.value]),
                               smooth: true,
@@ -440,7 +442,7 @@ export default function SpreadChart({
                     ...(binanceTimeSeries.length
                         ? [
                               {
-                                  name: useFallbackPrice ? 'Market Price (Orderbook Mid)' : 'Market Price (Binance)',
+                                  name: 'Market Price (Binance)',
                                   icon: 'roundRect',
                                   itemStyle: {
                                       color: useFallbackPrice ? '#888888' : '#F3BA2F',
@@ -618,7 +620,7 @@ export default function SpreadChart({
     // Simple logic: show chart if we have enough data, otherwise show loading
     const options = hasEnoughData ? chartOptions : loadingOptions
 
-    console.log('[SpreadChart] Rendering with:', {
+    debugLog('[SpreadChart] Rendering with:', {
         hasEnoughData,
         binanceTimeSeriesLength: binanceTimeSeries.length,
         poolsTimeSeriesSize: poolsTimeSeries.size,
