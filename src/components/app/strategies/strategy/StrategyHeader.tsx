@@ -4,16 +4,18 @@ import { IconIds } from '@/enums'
 import { DoubleSymbol, ChainImage } from '@/components/common/ImageWrapper'
 import StyledTooltip from '@/components/common/StyledTooltip'
 import { useRouter } from 'next/navigation'
+import { TargetSpread } from '@/components/figma/Tags'
 
 interface StrategyHeaderProps {
     baseSymbol?: string
     quoteSymbol?: string
     chainId?: number
     chainName?: string
+    targetSpreadBps?: number
     isLoading: boolean
 }
 
-export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chainName, isLoading }: StrategyHeaderProps) {
+export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chainName, targetSpreadBps, isLoading }: StrategyHeaderProps) {
     const router = useRouter()
 
     if (isLoading || !baseSymbol || !quoteSymbol || !chainId || !chainName) {
@@ -69,6 +71,7 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
                             <p className="text-lg font-semibold truncate text-milk">
                                 {baseSymbol} / {quoteSymbol}
                             </p>
+                            {targetSpreadBps && <TargetSpread bpsAmount={targetSpreadBps} />}
                         </div>
                         <div className="flex gap-2">
                             <ChainImage id={chainId} size={20} />

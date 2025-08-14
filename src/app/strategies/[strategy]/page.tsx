@@ -76,12 +76,14 @@ function PoolsCard({
     token0,
     token1,
     targetSpreadBps,
+    isInRange,
     isLoading,
 }: {
     chainId?: number
     token0?: string
     token1?: string
     targetSpreadBps?: number
+    isInRange?: boolean
     isLoading?: boolean
 }) {
     const [refreshInterval, setRefreshInterval] = React.useState<number>()
@@ -101,6 +103,7 @@ function PoolsCard({
                 chainId={chainId}
                 token0={token0}
                 token1={token1}
+                isInRange={isInRange ?? true}
                 targetSpreadBps={targetSpreadBps}
                 onRefreshData={(interval, updatedAt) => {
                     setRefreshInterval(interval)
@@ -192,6 +195,7 @@ export default function StrategyPage() {
                         quoteSymbol={parsedConfig?.quote.symbol}
                         chainId={parsedConfig?.chain.id}
                         chainName={parsedConfig?.chain.name}
+                        targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
                         isLoading={isInitialLoading}
                     />
                 }
@@ -228,6 +232,7 @@ export default function StrategyPage() {
                         token0={parsedConfig?.base.address}
                         token1={parsedConfig?.quote.address}
                         targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
+                        isInRange={!isEthBalanceBelowThreshold}
                         isLoading={isInitialLoading}
                     />
                 }

@@ -12,7 +12,8 @@ import StyledTooltip from '@/components/common/StyledTooltip'
 import { LiveDate } from '@/components/common/LiveDate'
 import PoolLink from './LinkToPool'
 import { AppSupportedChainIds } from '@/enums'
-import { SymbolImage } from '@/components/common/ImageWrapper'
+import { DoubleSymbol, SymbolImage } from '@/components/common/ImageWrapper'
+import { Range } from '@/components/figma/Tags'
 
 // todo simulation failed pas de broadcast data
 
@@ -22,6 +23,7 @@ import { SymbolImage } from '@/components/common/ImageWrapper'
 
 export const PoolRowTemplate = (props: {
     protocol: ReactNode
+    range: ReactNode
     poolPrice: ReactNode
     lastUpdate: ReactNode
     base: {
@@ -39,28 +41,31 @@ export const PoolRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('grid grid-cols-12 w-full items-center text-sm gap-4 px-4', props.className)}>
+        <div className={cn('grid grid-cols-10 w-full items-center text-sm gap-4 px-4', props.className)}>
             <div className="col-span-2">{props.protocol}</div>
+            <div className="col-span-1">{props.range}</div>
             <div className="col-span-1">{props.poolPrice}</div>
             <div className="col-span-1">{props.lastUpdate}</div>
 
             {/* Base token columns */}
-            <div className="col-span-3 grid grid-cols-3 w-full">
+            <div className="col-span-2 grid grid-cols-3 w-full">
                 <div className="col-span-1 text-right">{props.base.balance}</div>
                 <div className="col-span-1 text-right">{props.base.usd}</div>
                 <div className="col-span-1 text-right">{props.base.percent}</div>
             </div>
 
             {/* Quote token columns */}
-            <div className="col-span-3 grid grid-cols-3 w-full">
+            <div className="col-span-2 grid grid-cols-3 w-full">
                 <div className="col-span-1 text-right">{props.quote.balance}</div>
                 <div className="col-span-1 text-right">{props.quote.usd}</div>
                 <div className="col-span-1 text-right">{props.quote.percent}</div>
             </div>
 
             {/* TVL columns */}
-            <div className="col-span-1 text-right">{props.tvlUsd}</div>
-            <div className="col-span-1 text-right">{props.tvlPercent}</div>
+            <div className="col-span-1 grid grid-cols-2 w-full">
+                <div className="col-span-1 text-right">{props.tvlUsd}</div>
+                <div className="col-span-1 text-right">{props.tvlPercent}</div>
+            </div>
         </div>
     )
 }
@@ -71,13 +76,14 @@ export const PoolRowTemplate = (props: {
 
 export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }: { baseSymbol?: string; quoteSymbol?: string }) {
     return (
-        <div className="grid grid-cols-12 w-full items-end gap-3 px-4 text-milk-400 text-xs pb-2">
+        <div className="grid grid-cols-10 w-full items-end gap-3 px-4 text-milk-400 text-xs pb-2">
             <div className="col-span-2">Protocol</div>
+            <div className="col-span-1">Range</div>
             <div className="col-span-1">Pool price</div>
             <div className="col-span-1">Last updated</div>
 
             {/* Base token columns */}
-            <div className="flex flex-col gap-2 col-span-3">
+            <div className="flex flex-col gap-2 col-span-2">
                 <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
                     <SymbolImage symbol={baseSymbol} size={20} />
                     <p className="truncate">{baseSymbol}</p>
@@ -90,7 +96,7 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
             </div>
 
             {/* Quote token columns */}
-            <div className="flex flex-col gap-2 col-span-3">
+            <div className="flex flex-col gap-2 col-span-2">
                 <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
                     <SymbolImage symbol={quoteSymbol} size={20} />
                     <p className="truncate">{quoteSymbol}</p>
@@ -103,11 +109,14 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
             </div>
 
             {/* TVL columns */}
-            <div className="flex flex-col gap-2 col-span-2">
-                <div className="font-semibold text-milk text-center pb-1 border-b border-milk-100">TVL</div>
-                <div className="grid grid-cols-2 gap-1">
-                    <div className="text-right">k$</div>
-                    <div className="text-right">%</div>
+            <div className="flex flex-col gap-2 col-span-1">
+                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+                    <DoubleSymbol symbolLeft={baseSymbol} symbolRight={quoteSymbol} size={20} gap={1} />
+                    <p className="truncate">TVL</p>
+                </div>
+                <div className="grid grid-cols-2 w-full">
+                    <div className="col-span-1 text-right">k$</div>
+                    <div className="col-span-1 text-right">%</div>
                 </div>
             </div>
         </div>
@@ -127,6 +136,7 @@ export function LoadingPoolsRows() {
                     <PoolRowTemplate
                         key={i}
                         protocol={loadingParagraph}
+                        range={loadingParagraph}
                         poolPrice={loadingParagraph}
                         lastUpdate={loadingParagraph}
                         base={{
@@ -158,6 +168,7 @@ type PoolRowProps = {
     pool: AmmPool
     poolIndex: number
     poolPrice?: number
+    isInRange?: boolean
     baseLiquidity?: number
     quoteLiquidity?: number
     ethUsd?: number
@@ -193,6 +204,7 @@ export const PoolRow = memo(function PoolRow({
     pool,
     poolIndex,
     poolPrice,
+    isInRange,
     baseLiquidity,
     quoteLiquidity,
     ethUsd,
@@ -234,6 +246,7 @@ export const PoolRow = memo(function PoolRow({
                     </div>
                 )
             }
+            range={<Range inRange={!!isInRange} />}
             poolPrice={
                 <StyledTooltip
                     content={
@@ -272,11 +285,12 @@ interface PoolsListProps {
     chainId?: number
     token0?: string
     token1?: string
+    isInRange: boolean
     targetSpreadBps?: number
     onRefreshData?: (refetchInterval: number, dataUpdatedAt: number) => void
 }
 
-export function PoolsList({ chainId, token0, token1, onRefreshData }: PoolsListProps) {
+export function PoolsList({ chainId, token0, token1, isInRange, onRefreshData }: PoolsListProps) {
     // Get the chain name for the orderbook API
     const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
 
@@ -362,6 +376,7 @@ export function PoolsList({ chainId, token0, token1, onRefreshData }: PoolsListP
                                         pool={pool}
                                         poolIndex={poolIndex}
                                         poolPrice={poolPrices[poolIndex]}
+                                        isInRange={isInRange}
                                         baseLiquidity={baseLiquidities[poolIndex]}
                                         quoteLiquidity={quoteLiquidities[poolIndex]}
                                         ethUsd={ethUsd}
@@ -379,6 +394,7 @@ export function PoolsList({ chainId, token0, token1, onRefreshData }: PoolsListP
                             {pools.length > 0 && (
                                 <PoolRowTemplate
                                     protocol={<span className="text-milk-400">Total</span>}
+                                    range={<span></span>}
                                     poolPrice={<span></span>}
                                     lastUpdate={<span></span>}
                                     base={{
