@@ -15,8 +15,9 @@ export const INTERVAL_LABELS = (interval: ChartIntervalInSeconds) => {
     }
 }
 
-export const CHART_CONFIG: Partial<
-    Record<ChartType, { name: string; enabled: boolean; defaultInterval: ChartIntervalInSeconds; allowedIntervals: ChartIntervalInSeconds[] }>
+export const CHART_CONFIG: Record<
+    ChartType,
+    { name: string; enabled: boolean; defaultInterval: ChartIntervalInSeconds; allowedIntervals: ChartIntervalInSeconds[] }
 > = {
     [ChartType.CANDLES]: {
         name: 'Price',

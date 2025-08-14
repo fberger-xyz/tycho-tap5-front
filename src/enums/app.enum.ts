@@ -110,9 +110,9 @@ export enum ReactQueryKeys {
 
 export enum ChartType {
     CANDLES = 'Candles',
-    PNL = 'P&L',
+    // PNL = 'P&L',
     SPREAD = 'Spread',
-    AUM = 'AUM',
+    // AUM = 'AUM',
     INVENTORY = 'Inventory',
 }
 
