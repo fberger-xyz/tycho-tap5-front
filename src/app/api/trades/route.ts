@@ -9,7 +9,16 @@ export async function GET(request: Request) {
         if (error) return createApiError(error, { status: 400 })
         const configurationId = searchParams.get('configurationId') || undefined
         const trades = await getTrades({ limit, skip, configurationId })
-        return createApiSuccess({ trades })
+
+        // Aggressive caching for 5 users - cache for 3 seconds
+        return createApiSuccess(
+            { trades },
+            {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=3, stale-while-revalidate=10',
+                },
+            },
+        )
     } catch (error) {
         return handleApiError(error, 'fetch trades')
     }

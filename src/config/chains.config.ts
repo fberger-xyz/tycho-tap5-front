@@ -6,7 +6,7 @@ export const CHAINS_CONFIG: Record<number, ChainConfig> = {
     [AppSupportedChainIds.ETHEREUM]: {
         id: AppSupportedChainIds.ETHEREUM,
         name: 'Ethereum',
-        fileId: FileIds.MAINNET,
+        fileId: undefined,
         oneInchId: 'ethereum',
         supported: true,
         explorerRoot: 'https://etherscan.io',

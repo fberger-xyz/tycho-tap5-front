@@ -72,10 +72,10 @@ function reverseSymbol(symbol: string): string | null {
     return null
 }
 
-// Create cached version with shorter duration to match pool refresh intervals
+// Create cached version optimized for 5 concurrent users
 const cachedFetchBinancePrice = createCachedFunction(fetchBinancePrice, ['binance-price'], {
     tags: ['binance-price'],
-    revalidate: 5, // 5 seconds cache to match the fastest pool refresh (Unichain/Base)
+    revalidate: 10, // 10 seconds cache - aggressive for low user count
 })
 
 // Convert token symbols to Binance format

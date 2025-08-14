@@ -13,7 +13,15 @@ export async function GET(request: Request) {
 
         const configurations = await getConfigurations({ limit, skip })
 
-        return createApiSuccess({ configurations })
+        // Cache strategies for 30 seconds - they don't change often
+        return createApiSuccess(
+            { configurations },
+            {
+                headers: {
+                    'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+                },
+            },
+        )
     } catch (error) {
         return handleApiError(error, 'fetch configurations')
     }

@@ -12,11 +12,11 @@ export function FileWrapper(props: { children: ReactNode; className?: string }) 
 
 export default function FileMapper({
     className = 'size-5',
-    sizes = '20px',
+    size = 20,
     ...props
 }: {
     id?: FileIds | IconIds | string
-    sizes?: string
+    size?: number
     className?: string
 }) {
     // theme
@@ -26,47 +26,47 @@ export default function FileMapper({
     // chains
     if (props.id === FileIds.BASE)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/figma/chains/base.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
-            </FileWrapper>
+            <div className={className}>
+                <Image src={`/figma/chains/base.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
     if (props.id === FileIds.UNICHAIN)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/figma/chains/unichain.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={className} />
-            </FileWrapper>
+            <div className={className}>
+                <Image src={`/figma/chains/unichain.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
 
     // protocols
     if (props.id === FileIds.PROTOCOL_BALANCER)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/protocols/balancer.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={cn(className, 'bg-white p-0.5')} />
-            </FileWrapper>
+            <div className={cn(className, 'bg-white p-0.5')}>
+                <Image src={`/protocols/balancer.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
     if (props.id === FileIds.PROTOCOL_CURVE)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/protocols/curve.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={cn(className, 'bg-white p-0.5')} />
-            </FileWrapper>
+            <div className={cn(className, 'bg-white p-0.5')}>
+                <Image src={`/protocols/curve.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
     if (props.id === FileIds.PROTOCOL_PANCAKESWAP)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/protocols/pancakeswap.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={cn(className, 'bg-white p-0.5')} />
-            </FileWrapper>
+            <div className={cn(className, 'bg-white p-0.5')}>
+                <Image src={`/protocols/pancakeswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
     if (props.id === FileIds.PROTOCOL_SUSHISWAP)
         return (
-            <FileWrapper className={className}>
-                <Image src={`/protocols/sushiswap.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={cn(className, 'bg-white p-0.5')} />
-            </FileWrapper>
+            <div className={cn(className, 'bg-white p-0.5')}>
+                <Image src={`/protocols/sushiswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
     if (props.id === FileIds.PROTOCOL_UNISWAP)
         return (
-            <FileWrapper className={cn(className, 'rounded-full')}>
-                <Image src={`/protocols/uniswap.svg`} alt={`${props.id} logo`} sizes={sizes} fill className={cn(className, 'bg-white p-0.5')} />
-            </FileWrapper>
+            <div className={cn(className, 'bg-white p-0.5 rounded-full')}>
+                <Image src={`/protocols/uniswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="w-full h-full" />
+            </div>
         )
 
     // icon

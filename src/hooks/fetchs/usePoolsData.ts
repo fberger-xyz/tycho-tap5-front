@@ -48,11 +48,12 @@ export function usePoolsData(params?: UsePoolsDataParams) {
         queryFn: fetchOrderbook,
         enabled: params?.enabled !== false && !!params?.chain && !!params?.token0 && !!params?.token1,
         refetchInterval, // Dynamic refetch interval based on chain
-        staleTime: 0, // Always consider data stale to ensure updates
-        gcTime: refetchInterval * 2, // Garbage collect after 2x the refetch interval
+        // Aggressive caching for 5 users
+        staleTime: 5000, // Data is fresh for 5 seconds (matches server cache)
+        gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
         refetchOnMount: true, // Always refetch when component mounts
         refetchOnWindowFocus: false, // Don't refetch on window focus
-        refetchIntervalInBackground: true, // Continue refetching in background
+        refetchIntervalInBackground: false, // Save resources - only 5 users
     })
 
     // Return the query result with additional info

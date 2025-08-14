@@ -64,10 +64,11 @@ export function useTradesData(refreshInterval = 5000, configurationId?: string, 
         },
         refetchOnWindowFocus: false,
         refetchIntervalInBackground: false,
-        // Stale time - data is fresh for 2 seconds
-        staleTime: 2000,
-        // Cache time - keep data in cache for 5 minutes
-        gcTime: 5 * 60 * 1000,
+        // Aggressive caching for 5 users
+        // Data is fresh for 3 seconds (matches server cache)
+        staleTime: 3000,
+        // Keep data in cache for 30 minutes
+        gcTime: 30 * 60 * 1000,
     })
 
     const { data, isLoading, error, refetch, isRefetching } = queryResult

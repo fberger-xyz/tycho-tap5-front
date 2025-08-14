@@ -15,8 +15,8 @@ export const createApiError = (message: string, options: ApiErrorOptions = {}): 
     return NextResponse.json({ error: message }, { status })
 }
 
-export const createApiSuccess = <T>(data: T): NextResponse => {
-    return NextResponse.json(data)
+export const createApiSuccess = <T>(data: T, options?: { headers?: HeadersInit }): NextResponse => {
+    return NextResponse.json(data, options)
 }
 
 export const handleApiError = (error: unknown, context: string): NextResponse => {

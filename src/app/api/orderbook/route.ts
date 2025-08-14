@@ -84,8 +84,12 @@ export async function GET(req: NextRequest) {
             res.error = '' // Clear any error if we have data
         }
 
-        // res
-        return NextResponse.json(res)
+        // res with aggressive caching for 5 users
+        return NextResponse.json(res, {
+            headers: {
+                'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=15',
+            },
+        })
     } catch (error) {
         const parsedError = extractErrorMessage(error)
 

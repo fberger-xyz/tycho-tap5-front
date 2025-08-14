@@ -40,7 +40,7 @@ export default function StrategyInventory({ tokens, isLoading }: StrategyInvento
                     displayTokens.map((token) => (
                         <div key={token.id} className="grid grid-cols-2 items-center border-t border-milk-100 py-3 px-5">
                             <div className="flex items-center gap-2">
-                                <SymbolImage symbol={token.optimized_symbol || token.symbol || '?'} size={20} />
+                                <SymbolImage symbol={token.optimized_symbol || token.symbol || undefined} size={20} />
                                 <p className="truncate">{token.optimized_symbol || token.symbol || 'Unknown'}</p>
                             </div>
                             <p className="truncate">

@@ -107,7 +107,7 @@ function LoadingStrategyHeader() {
     const loadingParagraph = <Skeleton className="w-3/4" />
     return (
         <StrategyHeaderTemplate
-            pairImages={<DoubleSymbol symbolLeft={'?'} symbolRight={'?'} size={48} gap={2} className="text-transparent" />}
+            pairImages={<DoubleSymbol symbolLeft={undefined} symbolRight={undefined} size={48} gap={2} className="text-transparent" />}
             pairSymbols={loadingParagraph}
             spread={loadingParagraph}
             chains={loadingParagraph}
