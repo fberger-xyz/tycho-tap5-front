@@ -2,7 +2,6 @@
 
 import { lazy } from 'react'
 import { useParams } from 'next/navigation'
-import { ErrorBoundary } from 'react-error-boundary'
 import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
 import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
@@ -29,7 +28,6 @@ import StrategyHeader from '@/components/app/strategies/strategy/StrategyHeader'
 import StrategyKPIs from '@/components/app/strategies/strategy/StrategyKPIs'
 import StrategyInventory from '@/components/app/strategies/strategy/StrategyInventory'
 import StrategyConfiguration from '@/components/app/strategies/strategy/StrategyConfiguration'
-import PageWrapper from '@/components/common/PageWrapper'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -137,11 +135,12 @@ export default function StrategyPage() {
     // Get debank data
     const { networth, debankLast24hNetWorth } = useDebankData({ walletAddress, chainId })
 
-    // Get token list
+    // Get token list with same refresh interval as trades (5 seconds)
     const { tokens } = useDebankTokenList({
         walletAddress,
         chainId,
         isAll: false,
+        refreshInterval: 5000,
     })
 
     // Get ETH balance for threshold checking
@@ -173,9 +172,9 @@ export default function StrategyPage() {
     // Handle errors
     if (configHasError) {
         return (
-            <PageWrapper>
+            <HydratedPageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
                 <ErrorPlaceholder entryName="Configuration" errorMessage={configError?.message || 'Failed to load configuration'} />
-            </PageWrapper>
+            </HydratedPageWrapper>
         )
     }
 
@@ -217,6 +216,7 @@ export default function StrategyPage() {
                                 quoteTokenSymbol={parsedConfig?.quote.symbol}
                                 chainId={parsedConfig?.chain.id}
                                 targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
+                                strategyId={strategyIdStr}
                                 className="size-full"
                             />
                         )}

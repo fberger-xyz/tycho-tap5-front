@@ -4,11 +4,13 @@ import { useEffect, useState } from 'react'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
 import CandlestickChart, { type CandlestickDataPoint } from './CandlestickChart'
 import SpreadChart from './SpreadChart'
+import InventoryChart from './InventoryChart'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
+import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { ButtonDark } from '../figma/Button'
 import { roundPrice } from '@/config/chart-constants.config'
@@ -21,6 +23,7 @@ export default function ChartForPairOnChain({
     chainId,
     targetSpreadBps,
     className,
+    strategyId,
 }: {
     baseTokenAddress: string
     quoteTokenAddress: string
@@ -29,6 +32,7 @@ export default function ChartForPairOnChain({
     chainId: number
     targetSpreadBps: number
     className?: string
+    strategyId?: string
 }) {
     const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(CHART_CONFIG[ChartType.CANDLES].name))
     const [selectedInterval, selectInterval] = useQueryState('interval', parseAsInteger.withDefault(CHART_CONFIG[ChartType.CANDLES].defaultInterval))
@@ -145,6 +149,9 @@ export default function ChartForPairOnChain({
         enabled: !!chainName && !!baseTokenAddress && !!quoteTokenAddress,
     })
 
+    // Fetch trades data for inventory chart
+    const { trades, isLoading: tradesLoading } = useTradesData(5000, strategyId, 500)
+
     console.log('🏊 [ChartForPairOnChain] Pools data fetch:', {
         poolsLoading,
         hasPoolsData: !!poolsData,
@@ -179,7 +186,7 @@ export default function ChartForPairOnChain({
                         </button>
                     ))}
                 </div>
-                {chartType !== CHART_CONFIG[ChartType.SPREAD].name && (
+                {chartType === CHART_CONFIG[ChartType.CANDLES].name && (
                     <div className="flex items-center gap-1">
                         {CHART_CONFIG[ChartType.CANDLES].allowedIntervals.map((interval) => (
                             <ButtonDark
@@ -257,6 +264,9 @@ export default function ChartForPairOnChain({
                             />
                         )
                     })()}
+                {chartType === CHART_CONFIG[ChartType.INVENTORY].name && (
+                    <InventoryChart trades={trades || []} baseSymbol={baseTokenSymbol} quoteSymbol={quoteTokenSymbol} isLoading={tradesLoading} />
+                )}
             </div>
         </div>
     )

@@ -15,9 +15,8 @@ export const INTERVAL_LABELS = (interval: ChartIntervalInSeconds) => {
     }
 }
 
-export const CHART_CONFIG: Record<
-    ChartType,
-    { name: string; enabled: boolean; defaultInterval: ChartIntervalInSeconds; allowedIntervals: ChartIntervalInSeconds[] }
+export const CHART_CONFIG: Partial<
+    Record<ChartType, { name: string; enabled: boolean; defaultInterval: ChartIntervalInSeconds; allowedIntervals: ChartIntervalInSeconds[] }>
 > = {
     [ChartType.CANDLES]: {
         name: 'Price',
@@ -31,39 +30,39 @@ export const CHART_CONFIG: Record<
             ChartIntervalInSeconds.ONE_DAY,
         ],
     },
-    [ChartType.PNL]: {
-        name: 'PnL',
-        enabled: false,
-        defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
-        allowedIntervals: [
-            ChartIntervalInSeconds.FIVE_MINUTES,
-            ChartIntervalInSeconds.FIFTEEN_MINUTES,
-            ChartIntervalInSeconds.ONE_HOUR,
-            ChartIntervalInSeconds.FOUR_HOURS,
-            ChartIntervalInSeconds.ONE_DAY,
-        ],
-    },
+    // [ChartType.PNL]: {
+    //     name: 'PnL',
+    //     enabled: false,
+    //     defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
+    //     allowedIntervals: [
+    //         ChartIntervalInSeconds.FIVE_MINUTES,
+    //         ChartIntervalInSeconds.FIFTEEN_MINUTES,
+    //         ChartIntervalInSeconds.ONE_HOUR,
+    //         ChartIntervalInSeconds.FOUR_HOURS,
+    //         ChartIntervalInSeconds.ONE_DAY,
+    //     ],
+    // },
     [ChartType.SPREAD]: {
         name: 'Spread',
         enabled: true,
         defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
         allowedIntervals: [], // No intervals needed for real-time view
     },
-    [ChartType.AUM]: {
-        name: 'AUM',
-        enabled: false,
-        defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
-        allowedIntervals: [
-            ChartIntervalInSeconds.FIVE_MINUTES,
-            ChartIntervalInSeconds.FIFTEEN_MINUTES,
-            ChartIntervalInSeconds.ONE_HOUR,
-            ChartIntervalInSeconds.FOUR_HOURS,
-            ChartIntervalInSeconds.ONE_DAY,
-        ],
-    },
+    // [ChartType.AUM]: {
+    //     name: 'AUM',
+    //     enabled: false,
+    //     defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
+    //     allowedIntervals: [
+    //         ChartIntervalInSeconds.FIVE_MINUTES,
+    //         ChartIntervalInSeconds.FIFTEEN_MINUTES,
+    //         ChartIntervalInSeconds.ONE_HOUR,
+    //         ChartIntervalInSeconds.FOUR_HOURS,
+    //         ChartIntervalInSeconds.ONE_DAY,
+    //     ],
+    // },
     [ChartType.INVENTORY]: {
         name: 'Inventory',
-        enabled: false,
+        enabled: true,
         defaultInterval: ChartIntervalInSeconds.FIVE_MINUTES,
         allowedIntervals: [
             ChartIntervalInSeconds.FIVE_MINUTES,

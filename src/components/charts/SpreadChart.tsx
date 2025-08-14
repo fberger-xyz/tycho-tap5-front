@@ -261,8 +261,9 @@ export default function SpreadChart({
                 },
             },
             tooltip: {
+                show: true,
                 borderColor: 'rgba(55, 65, 81, 0.5)', // subtle border
-                triggerOn: 'mousemove',
+                triggerOn: 'mousemove|click',
                 backgroundColor: '#FFF4E005',
                 borderRadius: 12,
                 extraCssText: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding:12px;',
@@ -274,6 +275,10 @@ export default function SpreadChart({
                 transitionDuration: 0,
                 enterable: false,
                 confine: true,
+                axisPointer: {
+                    type: 'cross',
+                    animation: false,
+                },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter: function (params: any) {
                     if (!params || params.length === 0) return ''
@@ -457,7 +462,7 @@ export default function SpreadChart({
             // No graphic overlay when we have actual data
         } as EChartsOption
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [binanceTimeSeries, poolsTimeSeries, referencePrice, targetSpreadBps, colors, maxPoints, refreshInterval])
+    }, [binanceTimeSeries, poolsTimeSeries, targetSpreadBps, colors, isMobile, useFallbackPrice])
 
     // Loading placeholder with animated skeleton
     const loadingOptions = useMemo((): EChartsOption => {

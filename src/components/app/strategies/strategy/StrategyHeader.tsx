@@ -21,7 +21,7 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
         return (
             <>
                 {/* Left side */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-fit">
+                <div className="flex items-center gap-4 w-full md:w-fit">
                     <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
                         <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                     </ButtonDark>
@@ -59,7 +59,7 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
     return (
         <>
             {/* Left side */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 w-full md:w-fit">
+            <div className="flex items-center gap-4 w-full md:w-fit">
                 <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
                     <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                 </ButtonDark>

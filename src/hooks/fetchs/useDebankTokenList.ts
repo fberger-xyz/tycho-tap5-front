@@ -7,6 +7,7 @@ interface UseDebankTokenListParams {
     walletAddress?: string
     chainId?: number
     isAll?: boolean
+    refreshInterval?: number
 }
 
 interface ApiResponse {
@@ -15,7 +16,7 @@ interface ApiResponse {
     data: DebankToken[]
 }
 
-export function useDebankTokenList({ walletAddress, chainId, isAll = true }: UseDebankTokenListParams) {
+export function useDebankTokenList({ walletAddress, chainId, isAll = true, refreshInterval = 60000 }: UseDebankTokenListParams) {
     const queryKey = ['debank-token-list', walletAddress, chainId, isAll]
 
     const { data, isLoading, error } = useQuery<ApiResponse>({
@@ -37,8 +38,8 @@ export function useDebankTokenList({ walletAddress, chainId, isAll = true }: Use
             return result
         },
         enabled: !!walletAddress && !!chainId,
-        refetchInterval: 60000, // Refetch every minute
-        staleTime: 30000, // Consider data stale after 30 seconds
+        refetchInterval: refreshInterval, // Use custom refresh interval
+        staleTime: refreshInterval / 2, // Consider data stale after half the refresh interval
     })
 
     return {

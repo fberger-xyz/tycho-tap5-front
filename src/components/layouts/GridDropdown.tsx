@@ -16,7 +16,7 @@ export default function GridDropdown({ isOpen, onClose, className }: GridDropdow
     return (
         <div
             className={cn(
-                `absolute top-full left-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2 transition-all origin-top-left flex flex-col items-start z-10 gap-1`,
+                `absolute z-50 top-full left-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2 transition-all origin-top-left flex flex-col items-start gap-1`,
                 {
                     'scale-100 opacity-100': isOpen,
                     'scale-95 opacity-0 pointer-events-none': !isOpen,

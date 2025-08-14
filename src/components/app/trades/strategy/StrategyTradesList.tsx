@@ -355,7 +355,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 <StyledTooltip
                     content={
                         <div className="flex flex-col gap-1">
-                            <p>Raw: {JSON.stringify(trade.values, null, 2)}</p>
+                            <pre>{JSON.stringify(trade.values, null, 2)}</pre>
                         </div>
                     }
                 >
