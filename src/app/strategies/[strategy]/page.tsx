@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, lazy } from 'react'
+import { lazy } from 'react'
 import { useParams } from 'next/navigation'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
@@ -32,6 +32,7 @@ import StrategyConfiguration from '@/components/app/strategies/strategy/Strategy
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
+    DEPOSITS_AND_WITHDRAWS = 'Deposits & Withdrawals',
 }
 
 const STRATEGY_UI_CONSTANTS = {
@@ -70,12 +71,26 @@ const STRATEGY_UI_CONSTANTS = {
     },
 } as const
 
-// Constants moved to individual components
-
 // Component for Pools with refresh countdown
-function PoolsCard({ chainId, token0, token1, targetSpreadBps }: { chainId: number; token0: string; token1: string; targetSpreadBps?: number }) {
+function PoolsCard({
+    chainId,
+    token0,
+    token1,
+    targetSpreadBps,
+    isLoading,
+}: {
+    chainId?: number
+    token0?: string
+    token1?: string
+    targetSpreadBps?: number
+    isLoading?: boolean
+}) {
     const [refreshInterval, setRefreshInterval] = React.useState<number>()
     const [lastRefreshTime, setLastRefreshTime] = React.useState<number>()
+
+    if (isLoading || !chainId || !token0 || !token1) {
+        return <div className="skeleton-loading h-[240px] rounded-lg" />
+    }
 
     return (
         <Card className="gap-5 px-0 pb-0">
@@ -105,7 +120,7 @@ export default function StrategyPage() {
     const [tradesTab, setTradesTab] = useQueryState('view', parseAsString.withDefault(TradesView.RECENT_TRADES))
 
     // Get configuration and strategy with price
-    const { configuration, strategy, isLoading: configLoading, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
+    const { configuration, strategy, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
 
     // Get trades data with proper refresh interval
     const strategyIdStr = Array.isArray(strategyId) ? strategyId[0] : strategyId
@@ -129,7 +144,7 @@ export default function StrategyPage() {
     })
 
     // Get ETH balance for threshold checking
-    const { isEthBalanceLoading, isEthBelowThreshold } = useEthBalance({
+    const { isEthBalanceBelowThreshold } = useEthBalance({
         walletAddress,
         chainId,
     })
@@ -166,146 +181,109 @@ export default function StrategyPage() {
     }
 
     // Progressive loading - show skeleton for loading states
-    const isInitialLoading = configLoading && !configuration
+    const isInitialLoading = !configuration
+    // const isInitialLoading = true
 
     // render
     return (
         <HydratedPageWrapper className={STRATEGY_UI_CONSTANTS.MAX_WIDTH}>
             <StrategyTemplate
                 header={
-                    isInitialLoading ? (
-                        <div className="skeleton-loading h-16 w-full rounded" />
-                    ) : parsedConfig ? (
-                        <StrategyHeader
-                            baseSymbol={parsedConfig.base.symbol}
-                            quoteSymbol={parsedConfig.quote.symbol}
-                            chainId={parsedConfig.chain.id}
-                            chainName={parsedConfig.chain.name}
-                            targetSpread={parsedConfig.execution.minWatchSpreadBps}
-                        />
-                    ) : null
+                    <StrategyHeader
+                        baseSymbol={parsedConfig?.base.symbol}
+                        quoteSymbol={parsedConfig?.quote.symbol}
+                        chainId={parsedConfig?.chain.id}
+                        chainName={parsedConfig?.chain.name}
+                        isLoading={isInitialLoading}
+                    />
                 }
                 banner={
-                    !isEthBalanceLoading &&
-                    isEthBelowThreshold && (
+                    !isInitialLoading &&
+                    isEthBalanceBelowThreshold && (
                         <div className="w-full p-5 bg-folly/20 rounded-xl">
                             <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
                         </div>
                     )
                 }
-                kpis={
-                    <ErrorBoundary fallback={<div className="text-red-500">Error loading KPIs</div>}>
-                        <StrategyKPIs aum={aum} priceUsd={priceUsd} priceSourceUrl={priceSourceUrl} isLoading={isInitialLoading} />
-                    </ErrorBoundary>
-                }
+                kpis={<StrategyKPIs aum={aum} priceUsd={priceUsd} priceSourceUrl={priceSourceUrl} isLoading={isInitialLoading} />}
                 chart={
-                    isInitialLoading ? (
-                        <Card className="h-[420px] p-0">
-                            <div className="skeleton-loading h-full w-full rounded" />
-                        </Card>
-                    ) : parsedConfig ? (
-                        <ErrorBoundary
-                            fallback={
-                                <Card className="h-[420px] p-0">
-                                    <div className="flex items-center justify-center h-full text-red-500">Error loading chart</div>
-                                </Card>
-                            }
-                        >
-                            <Suspense
-                                fallback={
-                                    <Card className="h-[420px] p-0">
-                                        <div className="skeleton-loading h-full w-full rounded" />
-                                    </Card>
-                                }
-                            >
-                                <Card className="h-[420px] p-0">
-                                    <ChartForPairOnChain
-                                        baseTokenAddress={parsedConfig.base.address}
-                                        quoteTokenAddress={parsedConfig.quote.address}
-                                        baseTokenSymbol={parsedConfig.base.symbol}
-                                        quoteTokenSymbol={parsedConfig.quote.symbol}
-                                        chainId={parsedConfig.chain.id}
-                                        targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
-                                        className="h-[420px] w-full"
-                                    />
-                                </Card>
-                            </Suspense>
-                        </ErrorBoundary>
-                    ) : null
+                    <Card className="h-[420px] p-0">
+                        {isInitialLoading || !parsedConfig ? (
+                            <div className="skeleton-loading h-full w-full rounded-xl" />
+                        ) : (
+                            <ChartForPairOnChain
+                                baseTokenAddress={parsedConfig?.base.address}
+                                quoteTokenAddress={parsedConfig?.quote.address}
+                                baseTokenSymbol={parsedConfig?.base.symbol}
+                                quoteTokenSymbol={parsedConfig?.quote.symbol}
+                                chainId={parsedConfig?.chain.id}
+                                targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
+                                className="size-full"
+                            />
+                        )}
+                    </Card>
                 }
                 pools={
-                    isInitialLoading ? (
-                        <Card className="gap-5 px-0 pb-0">
-                            <div className="skeleton-loading h-64 w-full rounded" />
-                        </Card>
-                    ) : parsedConfig ? (
-                        <ErrorBoundary
-                            fallback={
-                                <Card className="gap-5 px-0 pb-0">
-                                    <div className="p-5 text-red-500">Error loading pools</div>
-                                </Card>
-                            }
-                        >
-                            <PoolsCard
-                                chainId={parsedConfig.chain.id}
-                                token0={parsedConfig.base.address}
-                                token1={parsedConfig.quote.address}
-                                targetSpreadBps={parsedConfig.execution.minSpreadThresholdBps}
-                            />
-                        </ErrorBoundary>
-                    ) : null
+                    <PoolsCard
+                        chainId={parsedConfig?.chain.id}
+                        token0={parsedConfig?.base.address}
+                        token1={parsedConfig?.quote.address}
+                        targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
+                        isLoading={isInitialLoading}
+                    />
                 }
                 trades={
-                    <ErrorBoundary
-                        fallback={
-                            <Card className="gap-5 px-0 pb-0">
-                                <div className="p-5 text-red-500">Error loading trades</div>
-                            </Card>
-                        }
-                    >
+                    isInitialLoading ? (
+                        <div className="skeleton-loading w-full h-48 rounded-lg" />
+                    ) : (
                         <Card className="gap-5 px-0 pb-0">
                             <div className="flex gap-x-6 gap-y-2 px-5 flex-wrap">
                                 <button className={cn('cursor-pointer')} onClick={() => setTradesTab(TradesView.RECENT_TRADES)}>
                                     <p
-                                        className={cn('text-lg truncate w-max font-inter-tight', {
-                                            'text-milk font-semibold': tradesTab === TradesView.RECENT_TRADES,
+                                        className={cn('text-lg truncate w-max font-semibold font-inter-tight', {
+                                            'text-milk': tradesTab === TradesView.RECENT_TRADES,
                                             'text-milk-400': tradesTab !== TradesView.RECENT_TRADES,
                                         })}
                                     >
                                         {TradesView.RECENT_TRADES}
                                     </p>
                                 </button>
+                                <button className={cn('cursor-pointer')} onClick={() => setTradesTab(TradesView.DEPOSITS_AND_WITHDRAWS)}>
+                                    <p
+                                        className={cn('text-lg truncate w-max font-semibold font-inter-tight', {
+                                            'text-milk': tradesTab === TradesView.DEPOSITS_AND_WITHDRAWS,
+                                            'text-milk-400': tradesTab !== TradesView.DEPOSITS_AND_WITHDRAWS,
+                                        })}
+                                    >
+                                        {TradesView.DEPOSITS_AND_WITHDRAWS}
+                                    </p>
+                                </button>
                             </div>
                             {tradesTab === TradesView.RECENT_TRADES && <StrategyTradesList trades={trades || []} isLoading={tradesLoading} />}
+                            {tradesTab === TradesView.DEPOSITS_AND_WITHDRAWS && (
+                                <div className="rounded-xl w-full">
+                                    <div className="overflow-x-auto w-full">
+                                        <div className="flex flex-col min-w-max max-h-[50vh] w-full p-4">
+                                            <p className="text-milk-200 truncate">To be added</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </Card>
-                    </ErrorBoundary>
+                    )
                 }
                 inventory={
-                    <ErrorBoundary
-                        fallback={
-                            <Card className="gap-5 px-0 pb-0">
-                                <div className="p-5 text-red-500">Error loading inventory</div>
-                            </Card>
-                        }
-                    >
+                    isInitialLoading ? (
+                        <div className="skeleton-loading w-full h-48 rounded-lg" />
+                    ) : (
                         <StrategyInventory tokens={tokens} isLoading={isInitialLoading} />
-                    </ErrorBoundary>
+                    )
                 }
                 configurations={
                     isInitialLoading ? (
-                        <Card className="gap-5">
-                            <div className="skeleton-loading h-96 w-full rounded" />
-                        </Card>
+                        <div className="skeleton-loading size-full rounded-lg" />
                     ) : parsedConfig ? (
-                        <ErrorBoundary
-                            fallback={
-                                <Card className="gap-5">
-                                    <div className="p-5 text-red-500">Error loading configuration</div>
-                                </Card>
-                            }
-                        >
-                            <StrategyConfiguration parsedConfig={parsedConfig} priceSourceUrl={priceSourceUrl} trades={trades} />
-                        </ErrorBoundary>
+                        <StrategyConfiguration parsedConfig={parsedConfig} priceSourceUrl={priceSourceUrl} trades={trades} />
                     ) : null
                 }
             />

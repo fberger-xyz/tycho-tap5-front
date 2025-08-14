@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, memo } from 'react'
-import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
+import { cn, DAYJS_FORMATS, mapProtocolIdToProtocolConfig, shortenValue } from '@/utils'
 import { EmptyPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 import { LiveDate } from '@/components/common/LiveDate'
@@ -11,11 +11,8 @@ import numeral from 'numeral'
 import { RoundedAmount } from '@/components/common/RoundedAmount'
 import { TradeValuesV2, isSuccessfulTrade, isRevertedTrade, isSimulationFailedTrade } from '@/interfaces/database/trade.interface'
 import { LinkToExplorer } from '@/components/common/LinkToExplorer'
-import { CHAINS_CONFIG, getProtocolConfig } from '@/config'
-import FileMapper from '@/components/icons/FileMapper'
-import { jsonConfigParser } from '@/utils/data/parser'
-import LinkWrapper from '@/components/common/LinkWrapper'
 import StyledTooltip from '@/components/common/StyledTooltip'
+import PoolLink from '../../pools/LinkToPool'
 
 /**
  * ------------------------ 1 template
@@ -39,8 +36,8 @@ export const RecentTradeRowTemplate = (props: {
 }) => {
     return (
         <div className={cn('flex w-full items-center text-sm gap-1', props.className)}>
-            <div className="w-[120px]">{props.time}</div>
-            <div className="w-[120px]">{props.pool}</div>
+            <div className="w-[130px]">{props.time}</div>
+            <div className="w-[130px]">{props.pool}</div>
             <div className="w-[70px] flex justify-center">{props.status}</div>
             <div className="w-[70px]">{props.side}</div>
             <div className="w-[70px]">{props.volume}</div>
@@ -118,55 +115,6 @@ export function LoadingRecentTradeRows() {
  * ------------------------ 4 validation utilities
  */
 
-// function isValidTradePattern(tradeValues: unknown): tradeValues is TradeValuesV2 {
-//     try {
-//         // Check basic structure
-//         const values = tradeValues as { data?: unknown; identifier?: unknown }
-//         if (!values?.data || !values?.identifier) return false
-
-//         const data = values.data as {
-//             status?: string
-//             context?: unknown
-//             metadata?: {
-//                 base_token?: string
-//                 quote_token?: string
-//                 profit_delta_bps?: number
-//                 amount_in_normalized?: number
-//                 amount_out_expected?: number
-//             }
-//             inventory?: unknown
-//             simulation?: unknown
-//             broadcast?: unknown
-//         }
-
-//         // Check required fields
-//         if (!data.status || !data.context || !data.metadata || !data.inventory || !data.simulation) return false
-
-//         // Check status is one of expected values
-//         if (!['BroadcastSucceeded', 'SimulationFailed'].includes(data.status)) return false
-
-//         // If BroadcastSucceeded, must have broadcast data
-//         if (data.status === 'BroadcastSucceeded' && !data.broadcast) return false
-
-//         // If SimulationFailed, broadcast should be null
-//         if (data.status === 'SimulationFailed' && data.broadcast !== null) return false
-
-//         // Check metadata has required fields
-//         if (
-//             !data.metadata.base_token ||
-//             !data.metadata.quote_token ||
-//             data.metadata.profit_delta_bps === undefined ||
-//             data.metadata.amount_in_normalized === undefined ||
-//             data.metadata.amount_out_expected === undefined
-//         )
-//             return false
-
-//         return true
-//     } catch {
-//         return false
-//     }
-// }
-
 function getTradeStatusIcon(tradeValues: TradeValuesV2) {
     if (isSuccessfulTrade(tradeValues)) {
         return <div className="size-2 rounded-full bg-aquamarine" title="Transaction successful" />
@@ -206,7 +154,6 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
     if (!isValidTradePattern(tradeValues)) return null
 
     const validTradeValues = tradeValues as TradeValuesV2
-    const parsedConfig = jsonConfigParser(trade.Instance.Configuration.id, trade.Instance.Configuration.values)
     const poolAddress = validTradeValues.data.metadata?.pool ?? 'Unknown'
 
     // Get tx hash based on trade type
@@ -244,25 +191,48 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                                 : 'No status'
                     }
                 >
-                    <div className="w-4 mx-auto cursor-help">{getTradeStatusIcon(validTradeValues)}</div>
+                    <p className="w-4 mx-auto cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
                 </StyledTooltip>
             }
             side={<TradeSide side={validTradeValues.data.metadata.trade_direction === 'Buy' ? 'buy' : 'sell'} />}
             pool={
-                <div className="flex items-center gap-2">
-                    <FileMapper
-                        id={getProtocolConfig(trade.Instance.Configuration.values as string).fileId}
-                        className="size-6 rounded-full bg-milk-100"
-                    />
-                    <LinkWrapper
-                        href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/contract/${poolAddress}`}
-                        className="truncate hover:underline cursor-alias"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        {shortenValue(poolAddress)}
-                    </LinkWrapper>
-                </div>
+                // <div className="flex items-center gap-2">
+                //     <FileMapper
+                //         id={getProtocolConfig(trade.Instance.Configuration.values as string).fileId}
+                //         className="size-6 rounded-full bg-milk-100"
+                //     />
+                //     <LinkWrapper
+                //         href={`${CHAINS_CONFIG[parsedConfig.chain.id].explorerRoot}/contract/${poolAddress}`}
+                //         className="truncate hover:underline cursor-alias"
+                //         target="_blank"
+                //         rel="noopener noreferrer"
+                //     >
+                //         {shortenValue(poolAddress)}
+                //     </LinkWrapper>
+                // </div>
+                <PoolLink
+                    currentChainId={trade.Instance.Configuration?.chainId}
+                    pool={{
+                        address: poolAddress,
+                        id: 'string',
+                        tokens: [
+                            {
+                                address: 'string',
+                                decimals: 18,
+                                symbol: 'string',
+                                gas: 'string',
+                            },
+                        ],
+                        protocol_system: 'string',
+                        contract_ids: ['string'],
+                        static_attributes: [['string']],
+                        creation_tx: 'string',
+                        fee: 30,
+                        last_updated_at: 100,
+                        protocol_type_name: 'string',
+                    }}
+                    config={mapProtocolIdToProtocolConfig('uniswap v3')}
+                />
             }
             volume={
                 <StyledTooltip
@@ -279,7 +249,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 <div className="flex items-center gap-2">
                     <SymbolImage symbol={validTradeValues.data.metadata.base_token} size={20} />
                     <RoundedAmount amount={validTradeValues.data.metadata.amount_in_normalized}>
-                        {numeral(validTradeValues.data.metadata.amount_in_normalized).format('0,0.[00]')}
+                        {numeral(validTradeValues.data.metadata.amount_in_normalized).format('0,0.[000]')}
                     </RoundedAmount>
                 </div>
             }
@@ -287,7 +257,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 <div className="flex items-center gap-2">
                     <SymbolImage symbol={validTradeValues.data.metadata.quote_token} size={20} />
                     <RoundedAmount amount={validTradeValues.data.metadata.amount_out_expected}>
-                        {numeral(validTradeValues.data.metadata.amount_out_expected).format('0,0.[00]')}
+                        {numeral(validTradeValues.data.metadata.amount_out_expected).format('0,0.[000]')}
                     </RoundedAmount>
                 </div>
             }
@@ -317,7 +287,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="text-sm text-milk cursor-help">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={
@@ -332,19 +302,35 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
             }
             idx={
                 hasValidTx && validTradeValues.data.broadcast ? (
-                    <p
-                        className={cn(
-                            'font-medium',
-                            validTradeValues.data.broadcast.receipt.transaction_index <= 5
-                                ? 'text-aquamarine'
-                                : validTradeValues.data.broadcast.receipt.transaction_index <= 10
-                                  ? 'text-milk'
-                                  : 'text-folly',
-                        )}
-                        title={`Transaction index in block: ${validTradeValues.data.broadcast.receipt.transaction_index}`}
+                    <StyledTooltip
+                        content={
+                            <div className="flex flex-col gap-1">
+                                <p>Position in block: {validTradeValues.data.broadcast.receipt.transaction_index}</p>
+                                <div className="text-xs opacity-80 mt-1">
+                                    {validTradeValues.data.broadcast.receipt.transaction_index <= 5 ? (
+                                        <span className="text-aquamarine">Top 5 position</span>
+                                    ) : validTradeValues.data.broadcast.receipt.transaction_index <= 10 ? (
+                                        <span className="text-milk">Top 10 position</span>
+                                    ) : (
+                                        <span className="text-folly">Late</span>
+                                    )}
+                                </div>
+                            </div>
+                        }
                     >
-                        {validTradeValues.data.broadcast.receipt.transaction_index}
-                    </p>
+                        <p
+                            className={cn(
+                                'font-medium cursor-help',
+                                validTradeValues.data.broadcast.receipt.transaction_index <= 5
+                                    ? 'text-aquamarine'
+                                    : validTradeValues.data.broadcast.receipt.transaction_index <= 10
+                                      ? 'text-milk'
+                                      : 'text-folly',
+                            )}
+                        >
+                            {validTradeValues.data.broadcast.receipt.transaction_index}
+                        </p>
+                    </StyledTooltip>
                 ) : (
                     <p className="text-xs text-milk-400">-</p>
                 )

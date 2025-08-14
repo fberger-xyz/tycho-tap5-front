@@ -59,7 +59,7 @@ export function useNativeBalanceQuery({ walletAddress, chainId }: { walletAddres
     return {
         ...query,
         balance,
-        isEthBelowThreshold: balance < threshold,
+        isEthBalanceBelowThreshold: balance < threshold,
         threshold,
     }
 }

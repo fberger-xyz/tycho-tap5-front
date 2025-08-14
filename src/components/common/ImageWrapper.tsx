@@ -21,7 +21,7 @@ export function ImageWrapper({
     return <Image src={src} alt={alt} width={size} height={size} className={cn('object-cover', className)} onError={() => setImgError(true)} />
 }
 
-export function ChainImage({ id, size, className = 'rounded' }: { id?: string | number; size?: number; className?: string }) {
+export function ChainImage({ id, size, className = 'rounded-lg' }: { id?: string | number; size?: number; className?: string }) {
     const src = id ? (CHAINS_CONFIG[Number(id)]?.fileId ? `/figma/chains/${CHAINS_CONFIG[Number(id)]?.fileId}.svg` : '') : ''
     const alt = `Logo of ${id ? (CHAINS_CONFIG[Number(id)]?.name ?? 'unknown') : 'unknown'}`
     return <ImageWrapper src={src} size={size ?? 20} alt={alt} className={className} />

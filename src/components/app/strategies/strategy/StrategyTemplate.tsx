@@ -1,5 +1,7 @@
 'use client'
 
+import Card from '@/components/figma/Card'
+import { ErrorBoundary } from 'react-error-boundary'
 import { ReactNode } from 'react'
 
 export default function StrategyTemplate(props: {
@@ -19,15 +21,58 @@ export default function StrategyTemplate(props: {
             <div className="grid grid-cols-12 gap-6">
                 {/* left */}
                 <div className="md:col-span-8 col-span-12 flex flex-col gap-4">
-                    {props.kpis}
-                    {props.chart}
-                    {props.pools}
+                    <ErrorBoundary
+                        fallback={
+                            <Card className="gap-5 px-0 pb-0">
+                                <div className="p-5 text-red-500">Error loading KPIs</div>
+                            </Card>
+                        }
+                    >
+                        {props.kpis}
+                    </ErrorBoundary>
+
+                    <ErrorBoundary
+                        fallback={
+                            <Card className="gap-5 px-0 pb-0">
+                                <div className="p-5 text-red-500">Error loading chart</div>
+                            </Card>
+                        }
+                    >
+                        {props.chart}
+                    </ErrorBoundary>
+
+                    <ErrorBoundary
+                        fallback={
+                            <Card className="gap-5 px-0 pb-0">
+                                <div className="p-5 text-red-500">Error loading pools</div>
+                            </Card>
+                        }
+                    >
+                        {props.pools}
+                    </ErrorBoundary>
                     {props.trades}
                 </div>
+
                 {/* right */}
                 <div className="md:col-span-4 col-span-12 flex flex-col gap-4">
-                    {props.inventory}
-                    {props.configurations}
+                    <ErrorBoundary
+                        fallback={
+                            <Card className="gap-5 px-0 pb-0">
+                                <div className="p-5 text-red-500">Error loading inventory</div>
+                            </Card>
+                        }
+                    >
+                        {props.inventory}
+                    </ErrorBoundary>
+                    <ErrorBoundary
+                        fallback={
+                            <Card className="gap-5 px-0 pb-0">
+                                <div className="p-5 text-red-500">Error loading configurations</div>
+                            </Card>
+                        }
+                    >
+                        {props.configurations}
+                    </ErrorBoundary>
                 </div>
             </div>
         </div>

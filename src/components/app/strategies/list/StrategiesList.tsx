@@ -193,7 +193,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
     const aum = debankLast24hNetWorth.length ? debankLast24hNetWorth[debankLast24hNetWorth.length - 1].usd_value : networth?.usd_value || 0
 
     // Check ETH balance threshold
-    const { isEthBalanceLoading, isEthBelowThreshold } = useEthBalance({
+    const { isEthBalanceLoading, isEthBalanceBelowThreshold } = useEthBalance({
         walletAddress,
         chainId: data.chainId,
     })
@@ -246,7 +246,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             }
             banner={
                 !isEthBalanceLoading &&
-                isEthBelowThreshold && (
+                isEthBalanceBelowThreshold && (
                     <div className="w-full p-5 bg-folly/20">
                         <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
                     </div>

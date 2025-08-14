@@ -2,7 +2,7 @@
 
 import React, { ReactNode, memo, useMemo } from 'react'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
-import { cn, mapProtocolIdToProtocolConfig } from '@/utils'
+import { cn, DAYJS_FORMATS, mapProtocolIdToProtocolConfig } from '@/utils'
 import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
 import numeral from 'numeral'
 import { AmmPool } from '@/interfaces'
@@ -12,6 +12,7 @@ import StyledTooltip from '@/components/common/StyledTooltip'
 import { LiveDate } from '@/components/common/LiveDate'
 import PoolLink from './LinkToPool'
 import { AppSupportedChainIds } from '@/enums'
+import { SymbolImage } from '@/components/common/ImageWrapper'
 
 // todo simulation failed pas de broadcast data
 
@@ -38,7 +39,7 @@ export const PoolRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('grid grid-cols-12 w-full items-center text-sm gap-3 px-4', props.className)}>
+        <div className={cn('grid grid-cols-12 w-full items-center text-sm gap-4 px-4', props.className)}>
             <div className="col-span-2">{props.protocol}</div>
             <div className="col-span-1">{props.poolPrice}</div>
             <div className="col-span-1">{props.lastUpdate}</div>
@@ -46,7 +47,7 @@ export const PoolRowTemplate = (props: {
             {/* Base token columns */}
             <div className="col-span-3 grid grid-cols-3 w-full">
                 <div className="col-span-1 text-right">{props.base.balance}</div>
-                <div className="col-span-1 text-center">{props.base.usd}</div>
+                <div className="col-span-1 text-right">{props.base.usd}</div>
                 <div className="col-span-1 text-right">{props.base.percent}</div>
             </div>
 
@@ -77,17 +78,23 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
 
             {/* Base token columns */}
             <div className="flex flex-col gap-2 col-span-3">
-                <div className="font-semibold text-milk text-center pb-1 border-b border-milk-100">{baseSymbol}</div>
+                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+                    <SymbolImage symbol={baseSymbol} size={20} />
+                    <p className="truncate">{baseSymbol}</p>
+                </div>
                 <div className="col-span-3 grid grid-cols-3 w-full">
                     <div className="col-span-1 text-right">Balance</div>
-                    <div className="col-span-1 text-center">k$</div>
+                    <div className="col-span-1 text-right">k$</div>
                     <div className="col-span-1 text-right">%</div>
                 </div>
             </div>
 
             {/* Quote token columns */}
             <div className="flex flex-col gap-2 col-span-3">
-                <div className="font-semibold text-milk text-center pb-1 border-b border-milk-100">{quoteSymbol}</div>
+                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+                    <SymbolImage symbol={quoteSymbol} size={20} />
+                    <p className="truncate">{quoteSymbol}</p>
+                </div>
                 <div className="grid grid-cols-3 w-full">
                     <div className="col-span-1 text-right">Balance</div>
                     <div className="col-span-1 text-right">k$</div>
@@ -197,7 +204,7 @@ export const PoolRow = memo(function PoolRow({
     className,
 }: PoolRowProps) {
     // Calculate time since last update (last_updated_at is in seconds, not milliseconds)
-    const minutesAgo = pool.last_updated_at ? Math.floor((Date.now() / 1000 - pool.last_updated_at) / 60) : 0
+    // const minutesAgo = pool.last_updated_at ? Math.floor((Date.now() / 1000 - pool.last_updated_at) / 60) : 0
 
     // Calculate USD values
     const baseUsd = (baseLiquidity || 0) * (baseWorthEth || 0) * (ethUsd || 0)
@@ -240,7 +247,7 @@ export const PoolRow = memo(function PoolRow({
                     <p className="truncate cursor-help text-milk">{poolPrice ? numeral(poolPrice).format('0,0.[00]') : '-'}</p>
                 </StyledTooltip>
             }
-            lastUpdate={<LiveDate date={pool.last_updated_at * 1000}>{minutesAgo > 0 ? `${minutesAgo} min ago` : 'Just now'}</LiveDate>}
+            lastUpdate={<LiveDate date={pool.last_updated_at * 1000}>{DAYJS_FORMATS.timeAgo(pool.last_updated_at * 1000)}</LiveDate>}
             base={{
                 balance: <p className="text-milk">{baseLiquidity ? numeral(baseLiquidity).format('0,0a') : '-'}</p>,
                 usd: <p className="text-milk">{baseUsd > 0 ? `$${numeral(baseUsd).format('0,0a')}` : '-'}</p>,
@@ -371,22 +378,22 @@ export function PoolsList({ chainId, token0, token1, onRefreshData }: PoolsListP
                             {/* Totals row */}
                             {pools.length > 0 && (
                                 <PoolRowTemplate
-                                    protocol={<span>Total</span>}
+                                    protocol={<span className="text-milk-400">Total</span>}
                                     poolPrice={<span></span>}
                                     lastUpdate={<span></span>}
                                     base={{
-                                        balance: <span className="text-milk">{numeral(totalBaseLiquidity).format('0,0a')}</span>,
-                                        usd: <span className="text-milk">${numeral(totalBaseUsd).format('0,0a')}</span>,
-                                        percent: <span className="text-milk">100%</span>,
+                                        balance: <span className="text-milk-400">{numeral(totalBaseLiquidity).format('0,0a')}</span>,
+                                        usd: <span className="text-milk-400">${numeral(totalBaseUsd).format('0,0a')}</span>,
+                                        percent: <span className="text-milk-400">100%</span>,
                                     }}
                                     quote={{
-                                        balance: <span className="text-milk">{numeral(totalQuoteLiquidity).format('0,0a')}</span>,
-                                        usd: <span className="text-milk">${numeral(totalQuoteUsd).format('0,0a')}</span>,
-                                        percent: <span className="text-milk">100%</span>,
+                                        balance: <span className="text-milk-400">{numeral(totalQuoteLiquidity).format('0,0a')}</span>,
+                                        usd: <span className="text-milk-400">${numeral(totalQuoteUsd).format('0,0a')}</span>,
+                                        percent: <span className="text-milk-400">100%</span>,
                                     }}
-                                    tvlUsd={<span className="text-milk">${numeral(totalTvlUsd).format('0,0a')}</span>}
-                                    tvlPercent={<span className="text-milk">100%</span>}
-                                    className="py-3 border-t border-milk-100"
+                                    tvlUsd={<span className="text-milk-400">${numeral(totalTvlUsd).format('0,0a')}</span>}
+                                    tvlPercent={<span className="text-milk-400">100%</span>}
+                                    className="py-3 border-t text-sm border-milk-100"
                                 />
                             )}
                         </div>

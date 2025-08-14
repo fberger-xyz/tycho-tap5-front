@@ -333,7 +333,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk cursor-pointer">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="text-sm text-milk cursor-help">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={

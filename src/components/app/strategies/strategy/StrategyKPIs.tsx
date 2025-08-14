@@ -13,9 +13,13 @@ interface StrategyKPIsProps {
 
 export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading }: StrategyKPIsProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Card>
-                <p className="text-xs text-milk-600">AUM (Assets Under Management)</p>
+                <p className="text-xs text-milk-600">PnL</p>
+                {isLoading ? <Skeleton variant="text" /> : <p className="text-milk-200 truncate text-lg">To be computed</p>}
+            </Card>
+            <Card>
+                <p className="text-xs text-milk-600">AUM</p>
                 {isLoading ? (
                     <Skeleton variant="text" />
                 ) : aum ? (
@@ -24,9 +28,8 @@ export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading 
                     <p className="text-milk-200 truncate text-lg">$0.00</p>
                 )}
             </Card>
-
             <Card>
-                <p className="text-xs text-milk-600">Current Price</p>
+                <p className="text-xs text-milk-600">Price</p>
                 {isLoading ? (
                     <Skeleton variant="text" />
                 ) : priceSourceUrl ? (

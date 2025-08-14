@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { CHAINS_CONFIG } from '@/config/chains.config'
+import { fetchWithTimeout } from '@/utils/requests.util'
 
 interface UseEthBalanceParams {
     walletAddress?: string
@@ -10,16 +11,16 @@ interface UseEthBalanceParams {
 
 export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
     const [balance, setBalance] = useState<number>(0)
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(!!walletAddress && !!chainId)
     const [error, setError] = useState<Error | null>(null)
     const abortControllerRef = useRef<AbortController | null>(null)
     const isMountedRef = useRef(true)
 
     useEffect(() => {
-        // Track mounted state
+        // Track mounted state to prevent memory leaks from state updates after unmount
         isMountedRef.current = true
 
-        // Cleanup function
+        // Cleanup function to prevent React warnings and memory leaks
         return () => {
             isMountedRef.current = false
             // Abort any pending requests
@@ -50,7 +51,7 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
             setError(null)
 
             try {
-                const response = await fetch('/api/balances', {
+                const response = await fetchWithTimeout('/api/balances', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -62,11 +63,9 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
                         includeNative: true,
                     }),
                     signal: abortControllerRef.current.signal,
+                    timeout: 15000,
+                    retries: 1,
                 })
-
-                if (!response.ok) {
-                    throw new Error('Failed to fetch balance')
-                }
 
                 const data = await response.json()
                 const nativeBalance = data.balances?.find(
@@ -74,7 +73,7 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
                         b.address === '0x0000000000000000000000000000000000000000',
                 )
 
-                // Only update state if component is still mounted
+                // Only update state if component is still mounted to prevent memory leaks and React warnings
                 if (isMountedRef.current) {
                     if (nativeBalance) {
                         // Convert from wei to ETH
@@ -90,14 +89,14 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
                     return
                 }
 
-                // Only update state if component is still mounted
+                // Only update state if component is still mounted to prevent memory leaks and React warnings
                 if (isMountedRef.current) {
                     console.error('Error fetching ETH balance:', err)
                     setError(err instanceof Error ? err : new Error('Unknown error'))
                     setBalance(0)
                 }
             } finally {
-                // Only update state if component is still mounted
+                // Only update state if component is still mounted to prevent memory leaks and React warnings
                 if (isMountedRef.current) {
                     setIsLoading(false)
                 }
@@ -106,9 +105,9 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
 
         fetchBalance()
 
-        // Cleanup function for this effect
+        // Cleanup function for this effect to handle race conditions
         return () => {
-            // Abort the request if component unmounts or dependencies change
+            // Abort the request if component unmounts or dependencies change to prevent stale updates
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort()
             }
@@ -122,8 +121,8 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
     return {
         balance,
         isEthBalanceLoading: isLoading,
+        isEthBalanceBelowThreshold: !isLoading && balance < threshold,
         error,
-        isEthBelowThreshold: balance < threshold,
         threshold,
     }
 }
