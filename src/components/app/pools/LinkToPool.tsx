@@ -22,8 +22,8 @@ export default function PoolLink({
 }) {
     if (!pool)
         return (
-            <div className={cn('flex gap-2 items-center group cursor-alias', className)}>
-                <p className="text-milk-600 truncate">{config?.id}</p>
+            <div className={cn('group flex cursor-alias items-center gap-2', className)}>
+                <p className="truncate text-milk-600">{config?.id}</p>
             </div>
         )
 
@@ -35,11 +35,11 @@ export default function PoolLink({
                     ? `https://app.uniswap.org/explore/pools/${CHAINS_CONFIG[currentChainId].name.toLowerCase()}/${pool.address}`
                     : `${CHAINS_CONFIG[currentChainId].explorerRoot}/address/${pool.address}`
             }
-            className={cn('flex gap-2 items-center group cursor-alias transition-all duration-300 ease-in-out pl-1', className)}
+            className={cn('group flex cursor-alias items-center gap-2 pl-1 transition-all duration-300 ease-in-out', className)}
         >
             <div className="relative pl-1">
                 <FileMapper id={config?.fileId} className="size-7 rounded-full" />
-                <ChainImage id={currentChainId} className="size-3 absolute -bottom-0 -left-1.5" />
+                <ChainImage id={currentChainId} className="absolute -bottom-0 -left-1.5 size-3" />
             </div>
             <p className="truncate group-hover:underline">
                 {config?.version ? `${config?.version.toLowerCase()} - ` : ''}

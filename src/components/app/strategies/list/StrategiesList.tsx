@@ -31,17 +31,17 @@ const StrategyHeaderTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex flex-row gap-4 center items-center', props.className)}>
+        <div className={cn('center flex flex-row items-center gap-4', props.className)}>
             {props.pairImages}
-            <div className="flex flex-col gap-2 grow">
+            <div className="flex grow flex-col gap-2">
                 {/* sub row 1 */}
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                     {props.pairSymbols}
                     {props.spread}
                 </div>
 
                 {/* sub row 2 */}
-                <div className="flex gap-2 items-center">{props.chains}</div>
+                <div className="flex items-center gap-2">{props.chains}</div>
             </div>
         </div>
     )
@@ -63,16 +63,16 @@ const StrategyRowTemplate = (props: {
     )
 
     return (
-        <div className={cn('w-full flex flex-col', props.className)}>
+        <div className={cn('flex w-full flex-col', props.className)}>
             {/* row 1 */}
             {props.headerLink ? (
                 <LinkWrapper href={props.headerLink} className="block">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full px-4 py-5 bg-milk-50 rounded-t-2xl hover:bg-milk-100 transition-colors duration-200 cursor-pointer overflow-hidden">
+                    <div className="grid w-full cursor-pointer grid-cols-1 gap-y-4 overflow-hidden rounded-t-2xl bg-milk-50 px-4 py-5 transition-colors duration-200 hover:bg-milk-100 md:grid-cols-2">
                         {headerContent}
                     </div>
                 </LinkWrapper>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 w-full p-4 bg-milk-50 rounded-t-2xl hover:bg-milk-100 transition-colors duration-200 cursor-pointer overflow-hidden">
+                <div className="grid w-full cursor-pointer grid-cols-1 gap-y-4 overflow-hidden rounded-t-2xl bg-milk-50 p-4 transition-colors duration-200 hover:bg-milk-100 md:grid-cols-2">
                     {headerContent}
                 </div>
             )}
@@ -82,13 +82,13 @@ const StrategyRowTemplate = (props: {
 
             {/* row 2 */}
             <div
-                className={cn('grid grid-cols-2 md:grid-cols-4 gap-6 justify-between items-center bg-milk-50 p-5', !props.banner && 'rounded-b-2xl')}
+                className={cn('grid grid-cols-2 items-center justify-between gap-6 bg-milk-50 p-5 md:grid-cols-4', !props.banner && 'rounded-b-2xl')}
             >
                 {props.kpis}
             </div>
 
             {/* row 3 : banner */}
-            {props.banner && <div className="w-full rounded-b-2xl overflow-hidden text-xs">{props.banner}</div>}
+            {props.banner && <div className="w-full overflow-hidden rounded-b-2xl text-xs">{props.banner}</div>}
         </div>
     )
 }
@@ -126,15 +126,15 @@ export function LoadingStrategiesList() {
                     kpis={
                         <>
                             {Array.from({ length: 4 }, (_, i) => (
-                                <div key={i} className="flex flex-col gap-1 items-start">
-                                    <Skeleton className="w-1/2 mb-1" />
+                                <div key={i} className="flex flex-col items-start gap-1">
+                                    <Skeleton className="mb-1 w-1/2" />
                                     <Skeleton className="w-3/4" />
                                 </div>
                             ))}
                         </>
                     }
-                    chart={<div className="w-full md:w-48 h-14 md:ml-auto skeleton-loading rounded-lg" />}
-                    className="text-transparent cursor-wait"
+                    chart={<div className="skeleton-loading h-14 w-full rounded-lg md:ml-auto md:w-48" />}
+                    className="cursor-wait text-transparent"
                 />
             ))}
         </>
@@ -147,9 +147,9 @@ export function LoadingStrategiesList() {
 
 export const StrategyId = ({ strategy, className }: { strategy: Strategy; className?: string }) => {
     return (
-        <div className={cn('flex flex-row gap-4 center p-4 items-center', className)}>
+        <div className={cn('center flex flex-row items-center gap-4 p-4', className)}>
             <DoubleSymbol symbolLeft={strategy.base.symbol} symbolRight={strategy.quote.symbol} size={40} gap={2} />
-            <p className="truncate font-light text-2xl">
+            <p className="truncate text-2xl font-light">
                 {strategy.base.symbol} / {strategy.quote.symbol}
             </p>
         </div>
@@ -161,7 +161,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
         <StrategyHeaderTemplate
             pairImages={<DoubleSymbol symbolLeft={data.base.symbol} symbolRight={data.quote.symbol} size={48} gap={2} />}
             pairSymbols={
-                <p className="truncate font-semibold text-base">
+                <p className="truncate text-base font-semibold">
                     {data.base.symbol} / {data.quote.symbol}
                 </p>
             }
@@ -172,9 +172,9 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
                 </div>
             }
             chains={
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                     <ChainImage id={data.config.chain.id} size={18} />
-                    <p className="truncate text-milk-600 text-sm">{CHAINS_CONFIG[data.config.chain.id]?.name ?? 'unknown'}</p>
+                    <p className="truncate text-sm text-milk-600">{CHAINS_CONFIG[data.config.chain.id]?.name ?? 'unknown'}</p>
                 </div>
             }
             className={className}
@@ -211,33 +211,33 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             headerLink={`/strategies/${data.config.id}`}
             header={<StrategyHeader data={data} />}
             chart={
-                <div className="md:w-48 h-14 md:ml-auto">
+                <div className="h-14 md:ml-auto md:w-48">
                     {chartData.length > 0 ? <DebankAumChart data={chartData} className="size-full" /> : <Skeleton variant="debanAumChart" />}
                 </div>
             }
             kpis={
                 <>
-                    <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-600 text-xs">PnL</p>
-                        <p className="text-milk-200 truncate">To be computed</p>
+                    <div className="flex flex-col items-start gap-1">
+                        <p className="truncate text-xs text-milk-600">PnL</p>
+                        <p className="truncate text-milk-200">To be computed</p>
                     </div>
-                    <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-600 text-xs">AUM</p>
-                        {aum ? <UsdAmount amountUsd={aum} className="hover:underline cursor-alias" /> : <Skeleton variant="text" />}
+                    <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col items-start gap-1">
+                        <p className="truncate text-xs text-milk-600">AUM</p>
+                        {aum ? <UsdAmount amountUsd={aum} className="cursor-alias hover:underline" /> : <Skeleton variant="text" />}
                     </LinkWrapper>
-                    <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-600 text-xs">Price</p>
+                    <div className="flex flex-col items-start gap-1">
+                        <p className="truncate text-xs text-milk-600">Price</p>
                         {priceSourceUrl ? (
                             <LinkWrapper href={priceSourceUrl} target="_blank">
-                                <UsdAmount amountUsd={data.priceUsd} className="hover:underline cursor-alias" />
+                                <UsdAmount amountUsd={data.priceUsd} className="cursor-alias hover:underline" />
                             </LinkWrapper>
                         ) : (
                             <UsdAmount amountUsd={data.priceUsd} />
                         )}
                     </div>
 
-                    <div className="flex flex-col gap-1 items-start">
-                        <p className="truncate text-milk-600 text-xs">Trades</p>
+                    <div className="flex flex-col items-start gap-1">
+                        <p className="truncate text-xs text-milk-600">Trades</p>
                         <p className="truncate">
                             {numeral(data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)).format('0,0')}
                         </p>
@@ -247,7 +247,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             banner={
                 !isEthBalanceLoading &&
                 isEthBalanceBelowThreshold && (
-                    <div className="w-full p-5 bg-folly/20">
+                    <div className="w-full bg-folly/20 p-5">
                         <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
                     </div>
                 )
@@ -267,12 +267,12 @@ export default function StrategiesList() {
     if (hasError && error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load strategies'
         return (
-            <div className={cn('flex flex-col gap-5 mx-auto w-full mt-10', DEFAULT_PADDING_X)}>
+            <div className={cn('mx-auto mt-10 flex w-full flex-col gap-5', DEFAULT_PADDING_X)}>
                 <ErrorPlaceholder entryName="strategies" errorMessage={errorMessage} />
                 <button
                     onClick={() => refetch()}
                     disabled={isRefetching}
-                    className="mt-2 px-4 py-2 bg-folly/20 text-folly rounded-lg disabled:cursor-not-allowed text-sm font-medium"
+                    className="mt-2 rounded-lg bg-folly/20 px-4 py-2 text-sm font-medium text-folly disabled:cursor-not-allowed"
                 >
                     {isRefetching ? 'Retrying...' : 'Try Again'}
                 </button>
@@ -285,7 +285,7 @@ export default function StrategiesList() {
     const noData = !isLoading && strategies?.length === 0
 
     return (
-        <div className={cn('flex flex-col gap-5 mx-auto w-full', DEFAULT_PADDING_X)}>
+        <div className={cn('mx-auto flex w-full flex-col gap-5', DEFAULT_PADDING_X)}>
             {showLoading ? (
                 <LoadingStrategiesList />
             ) : noData ? (

@@ -36,7 +36,7 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
             {/* Pull indicator - Fixed positioned to avoid clipping */}
             {(isPulling || isRefreshing) && (
                 <div
-                    className="fixed left-0 right-0 top-0 z-50 flex items-end justify-center pointer-events-none"
+                    className="pointer-events-none fixed left-0 right-0 top-0 z-50 flex items-end justify-center"
                     style={{
                         height: `${Math.max(pullDistance, 60)}px`,
                         transform: `translateY(-${Math.max(60 - pullDistance, 0)}px)`,
@@ -46,7 +46,7 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
                     <div className="mb-3">
                         <div
                             className={cn(
-                                'size-10 rounded-full border-2 transition-all duration-200 flex items-center justify-center',
+                                'flex size-10 items-center justify-center rounded-full border-2 transition-all duration-200',
                                 isRefreshing || isReady ? 'border-aquamarine bg-aquamarine/20' : 'border-milk-300 bg-milk-100',
                             )}
                             style={{
@@ -63,14 +63,14 @@ export default function PullToRefresh({ children, onRefresh, className }: PullTo
                                 }}
                             />
                         </div>
-                        <p className="text-xs text-aquamarine mt-2">Reload</p>
+                        <p className="mt-2 text-xs text-aquamarine">Reload</p>
                     </div>
                 </div>
             )}
 
             {/* Content wrapper */}
             <div
-                className={cn('relative flex flex-col min-h-screen', className)}
+                className={cn('relative flex min-h-screen flex-col', className)}
                 style={{
                     transform: isPulling || isRefreshing ? `translateY(${pullDistance}px)` : 'translateY(0)',
                     transition: isPulling ? 'none' : 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',

@@ -30,7 +30,7 @@ module.exports = {
                 // Tailwind CSS rules
                 'tailwindcss/no-custom-classname': 'warn',
                 'tailwindcss/no-contradicting-classname': 'error',
-                'tailwindcss/classnames-order': 'warn',
+                'tailwindcss/classnames-order': 'error',
             },
             files: ['src/**/*.ts', 'src/**/*.tsx', './tailwind.config.ts', './src/app/global.css'],
         },

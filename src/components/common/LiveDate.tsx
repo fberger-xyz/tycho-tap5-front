@@ -35,7 +35,7 @@ export function LiveDate(props: { date: string | number | Date; className?: stri
                 </div>
             }
         >
-            <p className={cn('truncate hover:underline cursor-help', props.className)}>{props.children}</p>
+            <p className={cn('cursor-help truncate hover:underline', props.className)}>{props.children}</p>
         </StyledTooltip>
     )
 }

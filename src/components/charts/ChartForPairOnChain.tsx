@@ -160,8 +160,8 @@ export default function ChartForPairOnChain({
     }
 
     return (
-        <div className={cn('w-full flex flex-col', className)}>
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center text-xs p-5 gap-y-4">
+        <div className={cn('flex w-full flex-col', className)}>
+            <div className="flex flex-col gap-y-4 p-5 text-xs md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-6 font-inter-tight">
                     {Object.values(CHART_CONFIG).map((config) => (
                         <button
@@ -180,7 +180,7 @@ export default function ChartForPairOnChain({
                             <ButtonDark
                                 key={interval}
                                 selected={interval === selectedInterval}
-                                className={cn('py-[3px] px-2.5 rounded-xl text-xs')}
+                                className={cn('rounded-xl px-2.5 py-[3px] text-xs')}
                                 onClick={() => selectInterval(interval)}
                             >
                                 {INTERVAL_LABELS(interval)}
@@ -189,7 +189,7 @@ export default function ChartForPairOnChain({
                     </div>
                 )}
             </div>
-            <div className="flex-1 h-full">
+            <div className="h-full flex-1">
                 {chartType === CHART_CONFIG[ChartType.SPREAD].name && (
                     <SpreadChart
                         referencePrice={liveReferencePrice || poolsData?.mpd_base_to_quote?.mid}

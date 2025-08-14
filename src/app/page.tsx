@@ -21,17 +21,17 @@ export default function Page() {
     return (
         <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-3 mb-14 w-full px-6 md:px-8 lg:px-10">
+            <div className="mb-14 grid w-full grid-cols-1 gap-4 px-6 sm:grid-cols-3 md:px-8 lg:px-10">
                 <Card>
                     <p className="text-xs text-milk-600">Total PnL</p>
-                    <p className="text-milk-200 text-lg truncate">To be computed</p>
+                    <p className="truncate text-lg text-milk-200">To be computed</p>
                 </Card>
                 <Card>
                     <p className="text-xs text-milk-600">Total AUM</p>
                     {totalAUMIsLoading ? (
                         <Skeleton variant="text" />
                     ) : aumError ? (
-                        <p className="text-milk-200 text-lg truncate">Failed to load</p>
+                        <p className="truncate text-lg text-milk-200">Failed to load</p>
                     ) : (
                         <UsdAmount amountUsd={totalAUM} variationPercentage={0} textClassName="text-lg" />
                     )}
@@ -54,10 +54,10 @@ export default function Page() {
             </div>
 
             {/* list to show */}
-            <div className={cn('flex gap-6 mb-8', DEFAULT_PADDING_X)}>
+            <div className={cn('mb-8 flex gap-6', DEFAULT_PADDING_X)}>
                 {Object.values(ListToShow).map((list) => (
                     <button key={list} className="cursor-pointer" onClick={() => setTab(list)}>
-                        <p className={cn('text-lg font-inter-tight', { 'text-milk': list === tab, 'text-milk-400': list !== tab })}>{list}</p>
+                        <p className={cn('font-inter-tight text-lg', { 'text-milk': list === tab, 'text-milk-400': list !== tab })}>{list}</p>
                     </button>
                 ))}
             </div>

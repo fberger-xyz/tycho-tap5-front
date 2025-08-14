@@ -40,10 +40,10 @@ export const TradeRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex w-full items-center text-sm gap-1', props.className)}>
+        <div className={cn('flex w-full items-center gap-1 text-sm', props.className)}>
             <div className="w-[170px]">{props.strategy}</div>
             <div className="w-[120px]">{props.time}</div>
-            <div className="w-[70px] flex justify-center">{props.status}</div>
+            <div className="flex w-[70px] justify-center">{props.status}</div>
             <div className="w-[70px]">{props.side}</div>
             <div className="w-[110px]">{props.chain}</div>
             <div className="w-[70px]">{props.volume}</div>
@@ -80,7 +80,7 @@ export function TradesTableHeaders() {
             sim={<p className="truncate">Simulation (ms)</p>}
             idx={<p className="truncate">Index</p>}
             tx={<p className="truncate">Tx</p>}
-            className="px-4 py-3 text-milk-600 text-xs"
+            className="px-4 py-3 text-xs text-milk-600"
         />
     )
 }
@@ -90,7 +90,7 @@ export function TradesTableHeaders() {
  */
 
 export function LoadingTradeRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-8 rounded-lg mr-auto">Loading...</p>
+    const loadingParagraph = <p className="skeleton-loading mr-auto h-8 w-3/4 rounded-lg">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">
@@ -111,7 +111,7 @@ export function LoadingTradeRows() {
                         sim={loadingParagraph}
                         idx={loadingParagraph}
                         tx={loadingParagraph}
-                        className="py-2 rounded-lg text-transparent border-b border-milk-50"
+                        className="rounded-lg border-b border-milk-50 py-2 text-transparent"
                     />
                 ))}
             </div>
@@ -247,12 +247,12 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                 <LinkWrapper
                     href={`/strategies/${parsedConfig.id}`}
                     target="_blank"
-                    className="flex gap-2 items-center group w-fit rounded-lg group cursor-alias"
+                    className="group flex w-fit cursor-alias items-center gap-2 rounded-lg"
                 >
-                    <p className="font-medium truncate group-hover:underline">
+                    <p className="truncate font-medium group-hover:underline">
                         {trade.Instance.Configuration?.baseTokenSymbol.toUpperCase()} / {trade.Instance.Configuration?.quoteTokenSymbol.toUpperCase()}
                     </p>
-                    <Tag variant="default" className="rounded pl-2 pr-1.5 py-0.5 text-xs">
+                    <Tag variant="default" className="rounded py-0.5 pl-2 pr-1.5 text-xs">
                         <p className="text-milk">{numeral(spread).format('0,0.[0000]')} bps</p>
                     </Tag>
                 </LinkWrapper>
@@ -270,12 +270,12 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                                 : 'No status'
                     }
                 >
-                    <p className="w-4 mx-auto cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
+                    <p className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
                 </StyledTooltip>
             }
             side={<TradeSide side={validTradeValues.data.metadata.trade_direction === 'Buy' ? 'buy' : 'sell'} />}
             chain={
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                     <ChainImage id={trade.Instance.Configuration?.chainId} size={20} />
                     <p className="truncate">{CHAINS_CONFIG[trade.Instance.Configuration?.chainId]?.name || 'Unknown'}</p>
                 </div>
@@ -333,7 +333,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk cursor-help">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="cursor-help text-sm text-milk">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={
@@ -374,7 +374,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                     <p className="text-xs text-milk-400">-</p>
                 )
             }
-            className={cn('px-4 py-3 hover:bg-milk-100 transition-colors duration-200', className)}
+            className={cn('px-4 py-3 transition-colors duration-200 hover:bg-milk-100', className)}
         />
     )
 })
@@ -424,8 +424,8 @@ export function TradesList() {
     // render table
     return (
         <div className={cn('rounded-xl', DEFAULT_PADDING_X)}>
-            <div className={cn('overflow-x-auto w-full')}>
-                <div className={cn('flex flex-col min-w-max max-h-[50vh] rounded-2xl bg-milk-50 w-full')}>
+            <div className={cn('w-full overflow-x-auto')}>
+                <div className={cn('flex max-h-[50vh] w-full min-w-max flex-col rounded-2xl bg-milk-50')}>
                     <TradesTableHeaders />
                     {showLoading ? (
                         <LoadingTradeRows />

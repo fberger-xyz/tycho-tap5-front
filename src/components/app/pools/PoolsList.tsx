@@ -62,28 +62,28 @@ export const PoolRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('grid grid-cols-9 w-full items-center text-sm gap-4 px-4', props.className)}>
+        <div className={cn('grid w-full grid-cols-9 items-center gap-4 px-4 text-sm', props.className)}>
             <div className="col-span-1">{props.protocol}</div>
             <div className="col-span-1">{props.range}</div>
             <div className="col-span-1">{props.poolPrice}</div>
             <div className="col-span-1">{props.lastUpdate}</div>
 
             {/* Base token columns */}
-            <div className="col-span-2 grid grid-cols-3 w-full">
+            <div className="col-span-2 grid w-full grid-cols-3">
                 <div className="col-span-1 text-right">{props.base.balance}</div>
                 <div className="col-span-1 text-right">{props.base.usd}</div>
                 <div className="col-span-1 text-right">{props.base.percent}</div>
             </div>
 
             {/* Quote token columns */}
-            <div className="col-span-2 grid grid-cols-3 w-full">
+            <div className="col-span-2 grid w-full grid-cols-3">
                 <div className="col-span-1 text-right">{props.quote.balance}</div>
                 <div className="col-span-1 text-right">{props.quote.usd}</div>
                 <div className="col-span-1 text-right">{props.quote.percent}</div>
             </div>
 
             {/* TVL columns */}
-            <div className="col-span-1 grid grid-cols-2 w-full">
+            <div className="col-span-1 grid w-full grid-cols-2">
                 <div className="col-span-1 text-right">{props.tvlUsd}</div>
                 <div className="col-span-1 text-right">{props.tvlPercent}</div>
             </div>
@@ -97,19 +97,19 @@ export const PoolRowTemplate = (props: {
 
 export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }: { baseSymbol?: string; quoteSymbol?: string }) {
     return (
-        <div className="grid grid-cols-9 w-full items-end gap-3 px-4 text-milk-400 text-xs pb-2">
+        <div className="grid w-full grid-cols-9 items-end gap-3 px-4 pb-2 text-xs text-milk-400">
             <div className="col-span-1">Protocol</div>
             <div className="col-span-1">Range</div>
             <div className="col-span-1">Pool price</div>
             <div className="col-span-1">Last trade</div>
 
             {/* Base token columns */}
-            <div className="flex flex-col gap-2 col-span-2">
-                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+            <div className="col-span-2 flex flex-col gap-2">
+                <div className="flex items-center justify-center gap-2 border-b border-milk-100 pb-1 text-center font-semibold text-milk">
                     <SymbolImage symbol={baseSymbol} size={20} />
                     <p className="truncate">{baseSymbol}</p>
                 </div>
-                <div className="col-span-3 grid grid-cols-3 w-full">
+                <div className="col-span-3 grid w-full grid-cols-3">
                     <div className="col-span-1 text-right">Balance</div>
                     <div className="col-span-1 text-right">k$</div>
                     <div className="col-span-1 text-right">%</div>
@@ -117,12 +117,12 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
             </div>
 
             {/* Quote token columns */}
-            <div className="flex flex-col gap-2 col-span-2">
-                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+            <div className="col-span-2 flex flex-col gap-2">
+                <div className="flex items-center justify-center gap-2 border-b border-milk-100 pb-1 text-center font-semibold text-milk">
                     <SymbolImage symbol={quoteSymbol} size={20} />
                     <p className="truncate">{quoteSymbol}</p>
                 </div>
-                <div className="grid grid-cols-3 w-full">
+                <div className="grid w-full grid-cols-3">
                     <div className="col-span-1 text-right">Balance</div>
                     <div className="col-span-1 text-right">k$</div>
                     <div className="col-span-1 text-right">%</div>
@@ -130,12 +130,12 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
             </div>
 
             {/* TVL columns */}
-            <div className="flex flex-col gap-2 col-span-1">
-                <div className="flex gap-2 items-center font-semibold text-milk text-center pb-1 border-b border-milk-100 justify-center">
+            <div className="col-span-1 flex flex-col gap-2">
+                <div className="flex items-center justify-center gap-2 border-b border-milk-100 pb-1 text-center font-semibold text-milk">
                     <DoubleSymbol symbolLeft={baseSymbol} symbolRight={quoteSymbol} size={20} gap={1} />
                     <p className="truncate">TVL</p>
                 </div>
-                <div className="grid grid-cols-2 w-full">
+                <div className="grid w-full grid-cols-2">
                     <div className="col-span-1 text-right">k$</div>
                     <div className="col-span-1 text-right">%</div>
                 </div>
@@ -149,7 +149,7 @@ export function PoolsTableHeaders({ baseSymbol = 'Base', quoteSymbol = 'Quote' }
  */
 
 export function LoadingPoolsRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg mr-auto">Loading...</p>
+    const loadingParagraph = <p className="skeleton-loading mr-auto h-6 w-3/4 rounded-lg">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 pb-2">
@@ -172,7 +172,7 @@ export function LoadingPoolsRows() {
                         }}
                         tvlUsd={loadingParagraph}
                         tvlPercent={loadingParagraph}
-                        className="py-2 rounded-lg text-transparent border-b border-milk-50"
+                        className="rounded-lg border-b border-milk-50 py-2 text-transparent"
                     />
                 ))}
             </div>
@@ -255,19 +255,19 @@ export const PoolRow = function PoolRow({
                             <div className="flex flex-col">
                                 {/* <p className="font-semibold">Pool spot price (mid-price)</p> */}
                                 {/* <p className="text-xs">Pool index: {poolIndex}</p> */}
-                                <p className="text-xs mt-1">
+                                <p className="mt-1 text-xs">
                                     {numeral(poolPrice).format('0,0.[0000000]')} {quoteSymbol} / {baseSymbol}
                                 </p>
-                                <p className="text-xs mt-1">
+                                <p className="mt-1 text-xs">
                                     {numeral(1 / poolPrice).format('0,0.[0000000]')} {baseSymbol} / {quoteSymbol}
                                 </p>
                             </div>
                         ) : (
-                            <p className="text-xs mt-1">No price</p>
+                            <p className="mt-1 text-xs">No price</p>
                         )
                     }
                 >
-                    <p className="truncate cursor-help text-milk">{poolPrice ? numeral(poolPrice).format('0,0.[00]') : '-'}</p>
+                    <p className="cursor-help truncate text-milk">{poolPrice ? numeral(poolPrice).format('0,0.[00]') : '-'}</p>
                 </StyledTooltip>
             }
             lastUpdate={<LiveDate date={pool.last_updated_at * 1000}>{DAYJS_FORMATS.timeAgo(pool.last_updated_at * 1000)}</LiveDate>}
@@ -283,7 +283,7 @@ export const PoolRow = function PoolRow({
             }}
             tvlUsd={<p className="text-milk">{poolTvlUsd > 0 ? `$${numeral(poolTvlUsd).format('0,0a')}` : '-'}</p>}
             tvlPercent={<p className="text-milk">{tvlPercent > 0 ? numeral(tvlPercent / 100).format('0,0%') : '-'}</p>}
-            className={cn('py-3 hover:bg-milk-100 transition-colors duration-200', className)}
+            className={cn('py-3 transition-colors duration-200 hover:bg-milk-100', className)}
         />
     )
 }
@@ -357,9 +357,9 @@ export function PoolsList({ chainId, token0, token1, isInRange, targetSpreadBps,
 
     // render table
     return (
-        <div className="rounded-xl w-full">
-            <div className="overflow-x-auto w-full">
-                <div className={cn('flex flex-col min-w-[1200px] max-h-[60vh] w-full')}>
+        <div className="w-full rounded-xl">
+            <div className="w-full overflow-x-auto">
+                <div className={cn('flex max-h-[60vh] w-full min-w-[1200px] flex-col')}>
                     <PoolsTableHeaders baseSymbol={baseSymbol} quoteSymbol={quoteSymbol} />
                     {showLoading ? (
                         <LoadingPoolsRows />
@@ -416,7 +416,7 @@ export function PoolsList({ chainId, token0, token1, isInRange, targetSpreadBps,
                                     }}
                                     tvlUsd={<span className="text-milk-400">${numeral(totalTvlUsd).format('0,0a')}</span>}
                                     tvlPercent={<span className="text-milk-400">100%</span>}
-                                    className="py-3 border-t text-sm border-milk-100"
+                                    className="border-t border-milk-100 py-3 text-sm"
                                 />
                             )}
                         </div>

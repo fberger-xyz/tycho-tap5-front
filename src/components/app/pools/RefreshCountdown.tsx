@@ -59,7 +59,7 @@ export default function RefreshCountdown({ chainId, refreshIntervalMs, lastRefre
                     return { shouldRepeat: false }
                 }}
             >
-                {({ remainingTime }) => <span className="text-[8px] text-milk-200 font-mono">{Math.ceil(remainingTime || 0)}</span>}
+                {({ remainingTime }) => <span className="font-mono text-[8px] text-milk-200">{Math.ceil(remainingTime || 0)}</span>}
             </CountdownCircleTimer>
         </div>
     )

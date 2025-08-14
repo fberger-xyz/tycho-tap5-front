@@ -877,7 +877,7 @@ export default function CandlestickChart({
         })
 
         return (
-            <div className={cn('relative bg-transparent overflow-hidden', className || 'h-[400px]')}>
+            <div className={cn('relative overflow-hidden bg-transparent', className || 'h-[400px]')}>
                 {/* Subtle grid lines */}
                 <div className="absolute inset-0" style={{ opacity: 0.03 }}>
                     {/* Horizontal lines */}
@@ -896,7 +896,7 @@ export default function CandlestickChart({
                         <div key={i} className="relative" style={{ width: '3%', height: '100%' }}>
                             {/* Wick */}
                             <div
-                                className="absolute left-1/2 transform -translate-x-1/2 bg-milk/5"
+                                className="absolute left-1/2 -translate-x-1/2 transform bg-milk/5"
                                 style={{
                                     width: '1px',
                                     height: `${bar.height + 8}%`,
@@ -920,8 +920,8 @@ export default function CandlestickChart({
                 {/* Very subtle loading indicator */}
                 {isLoading && (
                     <div className="absolute bottom-4 right-4">
-                        <div className="text-milk/30 text-xs flex items-center gap-2">
-                            <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24">
+                        <div className="flex items-center gap-2 text-xs text-milk/30">
+                            <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24">
                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>

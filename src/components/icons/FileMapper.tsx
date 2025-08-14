@@ -7,7 +7,7 @@ import Image from 'next/image'
 import IconWrapper from './IconWrapper'
 
 export function FileWrapper(props: { children: ReactNode; className?: string }) {
-    return <div className={cn('flex items-center justify-center relative', props.className)}>{props.children}</div>
+    return <div className={cn('relative flex items-center justify-center', props.className)}>{props.children}</div>
 }
 
 export default function FileMapper({
@@ -64,7 +64,7 @@ export default function FileMapper({
         )
     if (props.id === FileIds.PROTOCOL_UNISWAP)
         return (
-            <div className={cn(className, 'bg-white p-0.5 rounded-full')}>
+            <div className={cn(className, 'rounded-full bg-white p-0.5')}>
                 <Image src={`/protocols/Uniswap.svg`} alt={`${props.id} logo`} width={size} height={size} className="size-full" />
             </div>
         )
@@ -73,5 +73,5 @@ export default function FileMapper({
     if (props.id && props.id in IconIds) return <IconWrapper id={props.id as IconIds} className={className} />
 
     // fallback
-    return <div className={cn('bg-milk rounded-full', className)} />
+    return <div className={cn('rounded-full bg-milk', className)} />
 }

@@ -70,7 +70,7 @@ function PoolsCard({
     return (
         <Card className="gap-5 px-0 pb-0">
             <div className="flex items-center justify-between px-5">
-                <h1 className="text-lg font-semibold text-milk font-inter-tight">Pools Status</h1>
+                <h1 className="font-inter-tight text-lg font-semibold text-milk">Pools Status</h1>
                 <RefreshCountdown chainId={chainId} refreshIntervalMs={refreshInterval} lastRefreshTime={lastRefreshTime} />
             </div>
             <PoolsList
@@ -137,7 +137,7 @@ export default function StrategyPage() {
     if (!strategyId) {
         return (
             <HydratedPageWrapper className={MAX_WIDTH}>
-                <div className="flex items-center justify-center h-64">
+                <div className="flex h-64 items-center justify-center">
                     <p className="text-milk-600">Invalid strategy ID</p>
                 </div>
             </HydratedPageWrapper>
@@ -180,7 +180,7 @@ export default function StrategyPage() {
                 banner={
                     !isInitialLoading &&
                     isEthBalanceBelowThreshold && (
-                        <div className="w-full p-5 bg-folly/20 rounded-xl">
+                        <div className="w-full rounded-xl bg-folly/20 p-5">
                             <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
                         </div>
                     )
@@ -221,10 +221,10 @@ export default function StrategyPage() {
                         <div className={`skeleton-loading w-full ${SKELETON_HEIGHTS.TRADES} rounded-lg`} />
                     ) : (
                         <Card className="gap-5 px-0 pb-0">
-                            <div className="flex gap-x-6 gap-y-2 px-5 flex-wrap">
+                            <div className="flex flex-wrap gap-x-6 gap-y-2 px-5">
                                 <button className={cn('cursor-pointer')} onClick={() => setTradesTab(TradesView.RECENT_TRADES)}>
                                     <p
-                                        className={cn('text-lg truncate w-max font-semibold font-inter-tight', {
+                                        className={cn('w-max truncate font-inter-tight text-lg font-semibold', {
                                             'text-milk': tradesTab === TradesView.RECENT_TRADES,
                                             'text-milk-400': tradesTab !== TradesView.RECENT_TRADES,
                                         })}
@@ -234,7 +234,7 @@ export default function StrategyPage() {
                                 </button>
                                 <button className={cn('cursor-pointer')} onClick={() => setTradesTab(TradesView.DEPOSITS_AND_WITHDRAWS)}>
                                     <p
-                                        className={cn('text-lg truncate w-max font-semibold font-inter-tight', {
+                                        className={cn('w-max truncate font-inter-tight text-lg font-semibold', {
                                             'text-milk': tradesTab === TradesView.DEPOSITS_AND_WITHDRAWS,
                                             'text-milk-400': tradesTab !== TradesView.DEPOSITS_AND_WITHDRAWS,
                                         })}
@@ -245,10 +245,10 @@ export default function StrategyPage() {
                             </div>
                             {tradesTab === TradesView.RECENT_TRADES && <StrategyTradesList trades={trades || []} isLoading={tradesLoading} />}
                             {tradesTab === TradesView.DEPOSITS_AND_WITHDRAWS && (
-                                <div className="rounded-xl w-full">
-                                    <div className="overflow-x-auto w-full">
-                                        <div className="flex flex-col min-w-max max-h-[50vh] w-full p-4">
-                                            <p className="text-milk-200 truncate">To be added</p>
+                                <div className="w-full rounded-xl">
+                                    <div className="w-full overflow-x-auto">
+                                        <div className="flex max-h-[50vh] w-full min-w-max flex-col p-4">
+                                            <p className="truncate text-milk-200">To be added</p>
                                         </div>
                                     </div>
                                 </div>

@@ -12,10 +12,10 @@ interface StrategyKPIsProps {
 
 export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading }: StrategyKPIsProps) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <Card>
                 <p className="text-xs text-milk-600">PnL</p>
-                {isLoading ? <Skeleton variant="text" /> : <p className="text-milk-200 truncate text-lg">To be computed</p>}
+                {isLoading ? <Skeleton variant="text" /> : <p className="truncate text-lg text-milk-200">To be computed</p>}
             </Card>
             <Card>
                 <p className="text-xs text-milk-600">AUM</p>
@@ -24,7 +24,7 @@ export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading 
                 ) : aum ? (
                     <UsdAmount amountUsd={aum} className="hover:underline" textClassName="text-lg" />
                 ) : (
-                    <p className="text-milk-200 truncate text-lg">$0.00</p>
+                    <p className="truncate text-lg text-milk-200">$0.00</p>
                 )}
             </Card>
             <Card>
@@ -33,7 +33,7 @@ export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading 
                     <Skeleton variant="text" />
                 ) : priceSourceUrl ? (
                     <LinkWrapper href={priceSourceUrl} target="_blank">
-                        <UsdAmount amountUsd={priceUsd || 0} className="hover:underline cursor-alias" textClassName="text-lg" />
+                        <UsdAmount amountUsd={priceUsd || 0} className="cursor-alias hover:underline" textClassName="text-lg" />
                     </LinkWrapper>
                 ) : (
                     <UsdAmount amountUsd={priceUsd || 0} textClassName="text-lg" />

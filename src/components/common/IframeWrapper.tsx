@@ -22,7 +22,7 @@ const IframeWrapper: React.FC<{
             <LinkWrapper
                 href={src}
                 target="_blank"
-                className="flex justify-center px-2 py-1.5 text-milk-400 hover:text-milk absolute right-4 bottom-4 z-50 bg-milk-100 hover:bg-milk-100 rounded-lg items-center gap-2 transition-all duration-300 ease-in-out"
+                className="absolute bottom-4 right-4 z-50 flex items-center justify-center gap-2 rounded-lg bg-milk-100 px-2 py-1.5 text-milk-400 transition-all duration-300 ease-in-out hover:bg-milk-100 hover:text-milk"
             >
                 <p className="font-light">Open in a new tab</p>
                 <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />

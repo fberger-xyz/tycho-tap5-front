@@ -39,10 +39,10 @@ export default function HeaderMobile() {
     }, [showMobileMenu])
 
     return (
-        <div className="flex justify-center z-50 w-full">
-            <div className="w-full md:hidden flex justify-between px-5 py-4">
+        <div className="z-50 flex w-full justify-center">
+            <div className="flex w-full justify-between px-5 py-4 md:hidden">
                 {/* left */}
-                <div className="flex gap-4 items-center z-30">
+                <div className="z-30 flex items-center gap-4">
                     <GridDropdownButton />
 
                     {/* logo */}
@@ -57,7 +57,7 @@ export default function HeaderMobile() {
                     <ButtonDark
                         ref={menuDropdown}
                         onClick={() => setShowMobileMenu(!showMobileMenu)}
-                        className="flex items-center gap-1 bg-milk-100 transition-colors duration-300 hover:bg-milk-100 rounded-xl px-[7px] py-1"
+                        className="flex items-center gap-1 rounded-xl bg-milk-100 px-[7px] py-1 transition-colors duration-300 hover:bg-milk-100"
                     >
                         <IconWrapper id={showMobileMenu ? IconIds.CLOSE : IconIds.MENU} className="size-5" />
                     </ButtonDark>
@@ -71,7 +71,7 @@ export default function HeaderMobile() {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="fixed md:hidden z-20 inset-0 flex w-full items-center justify-center px-4 backdrop-blur-xl bg-background/40 h-[calc(100vh-0px)]"
+                        className="fixed inset-0 z-20 flex h-[calc(100vh-0px)] w-full items-center justify-center bg-background/40 px-4 backdrop-blur-xl md:hidden"
                         onClick={(e) => {
                             if (e.target === e.currentTarget) {
                                 setShowMobileMenu(false)
@@ -83,7 +83,7 @@ export default function HeaderMobile() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
                             transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
-                            className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-4 pt-28"
+                            className="absolute inset-2 z-30 flex h-fit flex-col items-center justify-center gap-4 pt-28"
                         >
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
@@ -94,7 +94,7 @@ export default function HeaderMobile() {
                                 <LinkWrapper
                                     href={AppUrls.DOCUMENTATION}
                                     target="_blank"
-                                    className="flex items-center gap-1 cursor-alias p-2.5 group"
+                                    className="group flex cursor-alias items-center gap-1 p-2.5"
                                 >
                                     <p className="text-base group-hover:underline">Docs (Run locally)</p>
                                     <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
@@ -108,9 +108,9 @@ export default function HeaderMobile() {
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}
                             transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 * (APP_PAGES.length + 1) }}
-                            className="absolute bottom-32 text-center max-w-[300px]"
+                            className="absolute bottom-32 max-w-[300px] text-center"
                         >
-                            <Authors className="text-sm text-milk-200 mx-auto justify-center" />
+                            <Authors className="mx-auto justify-center text-sm text-milk-200" />
                         </motion.div>
                     </motion.div>
                 )}

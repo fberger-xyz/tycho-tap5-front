@@ -39,10 +39,10 @@ export const RecentTradeRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('flex w-full items-center text-sm gap-1', props.className)}>
+        <div className={cn('flex w-full items-center gap-1 text-sm', props.className)}>
             <div className="w-[130px]">{props.time}</div>
             <div className="w-[130px]">{props.pool}</div>
-            <div className="w-[70px] flex justify-center">{props.status}</div>
+            <div className="flex w-[70px] justify-center">{props.status}</div>
             <div className="w-[70px]">{props.side}</div>
             <div className="w-[70px]">{props.volume}</div>
             <div className="w-[105px]">{props.in}</div>
@@ -79,7 +79,7 @@ export function RecentTradesTableHeaders() {
             idx={<p className="truncate">Index</p>}
             tx={<p className="truncate">Tx</p>}
             raw={<p className="truncate">Raw</p>}
-            className="px-4 py-3 text-milk-600 text-xs"
+            className="px-4 py-3 text-xs text-milk-600"
         />
     )
 }
@@ -89,7 +89,7 @@ export function RecentTradesTableHeaders() {
  */
 
 export function LoadingRecentTradeRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-8 rounded-lg mr-auto">Loading...</p>
+    const loadingParagraph = <p className="skeleton-loading mr-auto h-8 w-3/4 rounded-lg">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">
@@ -110,7 +110,7 @@ export function LoadingRecentTradeRows() {
                         idx={loadingParagraph}
                         tx={loadingParagraph}
                         raw={loadingParagraph}
-                        className="py-2 rounded-lg text-transparent border-b border-milk-50"
+                        className="rounded-lg border-b border-milk-50 py-2 text-transparent"
                     />
                 ))}
             </div>
@@ -198,7 +198,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                                 : 'No status'
                     }
                 >
-                    <p className="w-4 mx-auto cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
+                    <p className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
                 </StyledTooltip>
             }
             side={<TradeSide side={validTradeValues.data.metadata.trade_direction === 'Buy' ? 'buy' : 'sell'} />}
@@ -294,7 +294,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                         </div>
                     }
                 >
-                    <p className="text-sm text-milk cursor-help">${numeral(gasCostUsd).format('0,0.[00]')}</p>
+                    <p className="cursor-help text-sm text-milk">${numeral(gasCostUsd).format('0,0.[00]')}</p>
                 </StyledTooltip>
             }
             nonce={
@@ -313,7 +313,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                         content={
                             <div className="flex flex-col gap-1">
                                 <p>Position in block: {validTradeValues.data.broadcast.receipt.transaction_index}</p>
-                                <div className="text-xs opacity-80 mt-1">
+                                <div className="mt-1 text-xs opacity-80">
                                     {validTradeValues.data.broadcast.receipt.transaction_index <= 5 ? (
                                         <span className="text-aquamarine">Top 5 position</span>
                                     ) : validTradeValues.data.broadcast.receipt.transaction_index <= 10 ? (
@@ -327,7 +327,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                     >
                         <p
                             className={cn(
-                                'font-medium cursor-help',
+                                'cursor-help font-medium',
                                 validTradeValues.data.broadcast.receipt.transaction_index <= 5
                                     ? 'text-aquamarine'
                                     : validTradeValues.data.broadcast.receipt.transaction_index <= 10
@@ -364,13 +364,13 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                             navigator.clipboard.writeText(JSON.stringify(trade.values, null, 2))
                             toast.success('Copied to clipboard')
                         }}
-                        className="flex items-center gap-1 cursor-pointer"
+                        className="flex cursor-pointer items-center gap-1"
                     >
                         <IconWrapper id={IconIds.COPY} className="size-4 text-milk group-hover:text-milk" />
                     </button>
                 </StyledTooltip>
             }
-            className={cn('px-4 py-3 hover:bg-milk-100 transition-colors duration-200', className)}
+            className={cn('px-4 py-3 transition-colors duration-200 hover:bg-milk-100', className)}
         />
     )
 })
@@ -434,9 +434,9 @@ export function StrategyTradesList(props: { trades: TradeWithInstanceAndConfigur
 
     // render table
     return (
-        <div className="rounded-xl w-full">
-            <div className="overflow-x-auto w-full">
-                <div className={cn('flex flex-col min-w-max max-h-[50vh] w-full')}>
+        <div className="w-full rounded-xl">
+            <div className="w-full overflow-x-auto">
+                <div className={cn('flex max-h-[50vh] w-full min-w-max flex-col')}>
                     <RecentTradesTableHeaders />
                     {showLoading ? (
                         <LoadingRecentTradeRows />

@@ -16,28 +16,28 @@ export default function GridDropdown({ isOpen, onClose, className }: GridDropdow
     return (
         <div
             className={cn(
-                `absolute z-50 top-full left-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2 transition-all origin-top-left flex flex-col items-start gap-1`,
+                `bg-milk-200/4 absolute left-0 top-full z-50 mt-2 flex w-52 origin-top-left flex-col items-start gap-1 rounded-2xl border-2 border-milk-150 p-2 shadow-lg backdrop-blur-lg transition-all`,
                 {
                     'scale-100 opacity-100': isOpen,
-                    'scale-95 opacity-0 pointer-events-none': !isOpen,
+                    'pointer-events-none scale-95 opacity-0': !isOpen,
                 },
                 className,
             )}
         >
-            <div className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center">
-                <p className="text-sm text-gray-500 text-left">Explorer</p>
-                <p className="bg-milk-100 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
+            <div className="flex w-full cursor-not-allowed items-center justify-between rounded-xl p-2.5">
+                <p className="text-left text-sm text-gray-500">Explorer</p>
+                <p className="rounded-sm bg-milk-100 px-1 text-xs font-semibold text-background">SOON</p>
             </div>
             <LinkWrapper
                 href={AppUrls.ORDERBOOK}
                 target="_blank"
-                className="hover:bg-milk-100 p-2.5 w-full rounded-xl flex justify-between items-center group"
+                className="group flex w-full items-center justify-between rounded-xl p-2.5 hover:bg-milk-100"
             >
-                <p className="text-sm text-milk text-left">Orderbook</p>
-                <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 hidden group-hover:flex text-milk" />
+                <p className="text-left text-sm text-milk">Orderbook</p>
+                <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="hidden size-4 text-milk group-hover:flex" />
             </LinkWrapper>
-            <div onClick={onClose} className="bg-milk-100 p-2.5 w-full rounded-xl">
-                <p className="text-sm text-milk text-left">{SITE_NAME.replace('Tycho ', '')}</p>
+            <div onClick={onClose} className="w-full rounded-xl bg-milk-100 p-2.5">
+                <p className="text-left text-sm text-milk">{SITE_NAME.replace('Tycho ', '')}</p>
             </div>
         </div>
     )

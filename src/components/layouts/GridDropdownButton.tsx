@@ -13,7 +13,7 @@ export default function GridDropdownButton() {
     useClickOutside(gridDropdown, () => setOpenGridDropdown(false))
 
     return (
-        <ButtonDark ref={gridDropdown} onClick={() => setOpenGridDropdown(!openGridDropdown)} className="px-[9px] py-[9px] rounded-xl relative z-50">
+        <ButtonDark ref={gridDropdown} onClick={() => setOpenGridDropdown(!openGridDropdown)} className="relative z-50 rounded-xl px-[9px] py-[9px]">
             <Image src={FileIds.GRID_DROPDOWN} alt={FileIds.GRID_DROPDOWN} width={16} height={16} className="min-w-4" />
             <GridDropdown isOpen={openGridDropdown} onClose={() => setOpenGridDropdown(false)} />
         </ButtonDark>

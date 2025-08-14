@@ -1,6 +1,6 @@
 export function LoadingPlaceholder(props: { entryName: string }) {
     return (
-        <div className="flex items-center justify-center h-40">
+        <div className="flex h-40 items-center justify-center">
             <div className="text-milk">Loading {props.entryName}...</div>
         </div>
     )
@@ -8,16 +8,16 @@ export function LoadingPlaceholder(props: { entryName: string }) {
 
 export function ErrorPlaceholder(props: { entryName: string; errorMessage: string }) {
     return (
-        <div className="w-full border border-red-200 p-4 rounded-xl">
-            <p className="text-folly text-sm font-medium">Failed to load {props.entryName}</p>
-            <p className="text-milk-400 text-xs">{props.errorMessage}</p>
+        <div className="w-full rounded-xl border border-red-200 p-4">
+            <p className="text-sm font-medium text-folly">Failed to load {props.entryName}</p>
+            <p className="text-xs text-milk-400">{props.errorMessage}</p>
         </div>
     )
 }
 
 export function NotFoundPlaceholder(props: { entryName: string }) {
     return (
-        <div className="flex items-center justify-center h-20">
+        <div className="flex h-20 items-center justify-center">
             <div className="text-milk-200">{props.entryName} not found</div>
         </div>
     )
@@ -25,7 +25,7 @@ export function NotFoundPlaceholder(props: { entryName: string }) {
 
 export function EmptyPlaceholder(props: { entryName: string }) {
     return (
-        <div className="flex items-center justify-center h-20">
+        <div className="flex h-20 items-center justify-center">
             <div className="text-milk-200">No {props.entryName}</div>
         </div>
     )

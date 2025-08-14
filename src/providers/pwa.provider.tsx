@@ -40,12 +40,12 @@ export default function PWAProvider({ children }: { children: React.ReactNode })
 
     const CONTENT = (
         <div className="fixed bottom-0 left-0 right-0 p-4 text-center">
-            <p className="text-xs max-w-[300px] mx-auto text-aquamarine flex items-center justify-center gap-1 flex-wrap">
+            <p className="mx-auto flex max-w-[300px] flex-wrap items-center justify-center gap-1 text-xs text-aquamarine">
                 Get the full app experience: tap
-                <span className="font-semibold flex items-center gap-1">
+                <span className="flex items-center gap-1 font-semibold">
                     Share
                     <span className="inline-flex align-middle">
-                        <IconWrapper id={IconIds.SHARE} className="w-4 h-4" />
+                        <IconWrapper id={IconIds.SHARE} className="h-4 w-4" />
                     </span>
                 </span>
                 and choose <span className="font-semibold">&quot;Add to Home Screen&quot;</span>

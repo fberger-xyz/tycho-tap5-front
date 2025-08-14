@@ -15,7 +15,7 @@ export default function Authors(props: { className?: string }) {
                     <LinkWrapper
                         href={AppUrls.PROPELLERHEADS_WEBSITE}
                         target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pl-1"
+                        className="cursor-alias pl-1 underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
                     >
                         PropellerHeads,
                     </LinkWrapper>
@@ -26,7 +26,7 @@ export default function Authors(props: { className?: string }) {
                     <LinkWrapper
                         href={AppUrls.MERSO_WEBSITE}
                         target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                        className="cursor-alias underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
                     >
                         xMerso,
                     </LinkWrapper>
@@ -36,7 +36,7 @@ export default function Authors(props: { className?: string }) {
                 <LinkWrapper
                     href={AppUrls.QUANT_TELEGRAM}
                     target="_blank"
-                    className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine pr-1"
+                    className="cursor-alias pr-1 underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
                 >
                     @hugoschrng
                 </LinkWrapper>
@@ -47,7 +47,7 @@ export default function Authors(props: { className?: string }) {
                     <LinkWrapper
                         href={AppUrls.FBERGER_WEBSITE}
                         target="_blank"
-                        className="underline decoration-milk-200 underline-offset-2 cursor-alias hover:underline hover:text-aquamarine"
+                        className="cursor-alias underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
                     >
                         fberger
                     </LinkWrapper>

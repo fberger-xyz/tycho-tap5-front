@@ -22,14 +22,14 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
         return (
             <>
                 {/* Left side */}
-                <div className="flex items-center gap-4 w-full md:w-fit">
-                    <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
+                <div className="flex w-full items-center gap-4 md:w-fit">
+                    <ButtonDark onClick={() => router.back()} className="rounded-xl px-[9px] py-[9px]">
                         <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                     </ButtonDark>
-                    <div className="flex gap-4 items-center">
+                    <div className="flex items-center gap-4">
                         <DoubleSymbol symbolLeft={''} symbolRight={''} size={48} gap={2} />
-                        <div className="flex flex-col gap-1 grow items-start md:w-1/3">
-                            <div className="flex gap-2 items-center">
+                        <div className="flex grow flex-col items-start gap-1 md:w-1/3">
+                            <div className="flex items-center gap-2">
                                 <div className="skeleton-loading h-6 w-24 rounded-lg" />
                                 <div className="skeleton-loading h-6 w-24 rounded-lg" />
                             </div>
@@ -46,10 +46,10 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
                     <StyledTooltip content="Coming soon: Control the market maker directly from your wallet">
                         <ButtonDanger className="w-max rounded-xl">
                             <IconWrapper id={IconIds.STOP_TRADING} className="size-4" />
-                            <p className="text-sm truncate">Stop strategy</p>
+                            <p className="truncate text-sm">Stop strategy</p>
                         </ButtonDanger>
                     </StyledTooltip>
-                    <ButtonDark onClick={() => alert('To be implemented')} className="px-[10px] py-[7px] rounded-xl">
+                    <ButtonDark onClick={() => alert('To be implemented')} className="rounded-xl px-[10px] py-[7px]">
                         <IconWrapper id={IconIds.DOTS_HORIZONTAL} />
                     </ButtonDark>
                 </div>
@@ -60,22 +60,22 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
     return (
         <>
             {/* Left side */}
-            <div className="flex items-center gap-4 w-full md:w-fit">
-                <ButtonDark onClick={() => router.back()} className="px-[9px] py-[9px] rounded-xl">
+            <div className="flex w-full items-center gap-4 md:w-fit">
+                <ButtonDark onClick={() => router.back()} className="rounded-xl px-[9px] py-[9px]">
                     <IconWrapper id={IconIds.ARROW_LEFT} className="size-4" />
                 </ButtonDark>
-                <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-4">
                     <DoubleSymbol symbolLeft={baseSymbol} symbolRight={quoteSymbol} size={48} gap={2} />
-                    <div className="flex flex-col gap-1 grow items-start md:w-1/3">
-                        <div className="flex gap-2 items-center">
-                            <p className="text-lg font-semibold truncate text-milk">
+                    <div className="flex grow flex-col items-start gap-1 md:w-1/3">
+                        <div className="flex items-center gap-2">
+                            <p className="truncate text-lg font-semibold text-milk">
                                 {baseSymbol} / {quoteSymbol}
                             </p>
                             {targetSpreadBps && <TargetSpread bpsAmount={targetSpreadBps} />}
                         </div>
                         <div className="flex gap-2">
                             <ChainImage id={chainId} size={20} />
-                            <p className="truncate text-milk-600 text-sm capitalize">{chainName}</p>
+                            <p className="truncate text-sm capitalize text-milk-600">{chainName}</p>
                         </div>
                     </div>
                 </div>
@@ -86,10 +86,10 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
                 <StyledTooltip content="Coming soon: Control the market maker directly from your wallet">
                     <ButtonDanger className="w-max rounded-xl">
                         <IconWrapper id={IconIds.STOP_TRADING} className="size-4" />
-                        <p className="text-sm truncate">Stop strategy</p>
+                        <p className="truncate text-sm">Stop strategy</p>
                     </ButtonDanger>
                 </StyledTooltip>
-                <ButtonDark onClick={() => alert('To be implemented')} className="px-[10px] py-[7px] rounded-xl">
+                <ButtonDark onClick={() => alert('To be implemented')} className="rounded-xl px-[10px] py-[7px]">
                     <IconWrapper id={IconIds.DOTS_HORIZONTAL} />
                 </ButtonDark>
             </div>

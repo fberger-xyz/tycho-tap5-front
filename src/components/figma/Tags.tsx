@@ -14,7 +14,7 @@ const variantStyles: Record<TagVariant, { bg: string; text: string }> = {
 
 export function Tag({ variant, children, className }: { variant: TagVariant; children: ReactNode; className?: string }) {
     const { bg } = variantStyles[variant]
-    return <div className={cn('w-fit flex gap-0.5 items-center', bg, className)}>{children}</div>
+    return <div className={cn('flex w-fit items-center gap-0.5', bg, className)}>{children}</div>
 }
 
 /**
@@ -24,7 +24,7 @@ export function Tag({ variant, children, className }: { variant: TagVariant; chi
 export function TargetSpread({ bpsAmount, rounded = 'rounded' }: { bpsAmount: number; rounded?: string }) {
     const variant = 'default'
     return (
-        <Tag variant={variant} className={cn('pl-2 pr-1.5 py-0.5 text-xs h-fit', rounded)}>
+        <Tag variant={variant} className={cn('h-fit py-0.5 pl-2 pr-1.5 text-xs', rounded)}>
             <p className={variantStyles[variant].text}>{numeral(bpsAmount).format('0,0.[0000]')} bps</p>
         </Tag>
     )
@@ -33,7 +33,7 @@ export function TargetSpread({ bpsAmount, rounded = 'rounded' }: { bpsAmount: nu
 export function Range({ inRange, className = 'rounded' }: { inRange: boolean; className?: string }) {
     const variant = inRange ? 'success' : 'error'
     return (
-        <Tag variant={variant} className={cn('pl-1.5 pr-2 py-0.5 text-xs h-fit', className)}>
+        <Tag variant={variant} className={cn('h-fit py-0.5 pl-1.5 pr-2 text-xs', className)}>
             <p className={variantStyles[variant].text}>{inRange ? 'In range' : 'Out of range'}</p>
         </Tag>
     )
@@ -46,7 +46,7 @@ export function Range({ inRange, className = 'rounded' }: { inRange: boolean; cl
 export function TradeSide({ side }: { side: 'buy' | 'sell' }) {
     const variant = side === 'buy' ? 'success' : 'error'
     return (
-        <Tag variant={variant} className="rounded-xl px-2 py-0.5 text-xs h-fit">
+        <Tag variant={variant} className="h-fit rounded-xl px-2 py-0.5 text-xs">
             <p className={variantStyles[variant].text}>{side === 'buy' ? 'Buy' : 'Sell'}</p>
         </Tag>
     )
@@ -55,7 +55,7 @@ export function TradeSide({ side }: { side: 'buy' | 'sell' }) {
 export function PercentEvolution({ percentage, className }: { percentage: number; className?: string }) {
     const variant = percentage > 0 ? 'success' : percentage < 0 ? 'error' : 'default'
     return (
-        <Tag variant={variant} className={cn('rounded-xl px-1 py-0.5 text-xs h-fit', className)}>
+        <Tag variant={variant} className={cn('h-fit rounded-xl px-1 py-0.5 text-xs', className)}>
             <IconWrapper
                 id={percentage > 0 ? IconIds.ARROW_UP_RIGHT : percentage < 0 ? IconIds.ARROW_DOWN_LEFT : IconIds.ARROW_WAVE_RIGHT_UP}
                 className={cn('size-4', variantStyles[variant].text)}

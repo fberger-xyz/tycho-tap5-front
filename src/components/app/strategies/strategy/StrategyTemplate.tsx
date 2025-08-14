@@ -16,11 +16,11 @@ export default function StrategyTemplate(props: {
 }) {
     return (
         <div className="flex flex-col gap-4">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">{props.header}</div>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">{props.header}</div>
             {props.banner && <div className="w-full text-xs">{props.banner}</div>}
             <div className="grid grid-cols-12 gap-6">
                 {/* left */}
-                <div className="md:col-span-8 col-span-12 flex flex-col gap-4">
+                <div className="col-span-12 flex flex-col gap-4 md:col-span-8">
                     <ErrorBoundary
                         fallback={
                             <Card className="gap-5 px-0 pb-0">
@@ -54,7 +54,7 @@ export default function StrategyTemplate(props: {
                 </div>
 
                 {/* right */}
-                <div className="md:col-span-4 col-span-12 flex flex-col gap-4">
+                <div className="col-span-12 flex flex-col gap-4 md:col-span-4">
                     <ErrorBoundary
                         fallback={
                             <Card className="gap-5 px-0 pb-0">

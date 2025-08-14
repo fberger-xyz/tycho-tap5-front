@@ -126,9 +126,9 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
         <button
             ref={ref}
             className={cn(
-                'w-fit flex flex-row items-center justify-center',
+                'flex w-fit flex-row items-center justify-center',
                 'border-[3px] border-black',
-                'text-milk font-medium text-sm leading-5',
+                'text-sm font-medium leading-5 text-milk',
                 'rounded-[12px]',
                 'transition-all duration-200 ease-in-out',
                 'relative', // Add relative positioning for pseudo-element
@@ -164,7 +164,7 @@ export const ButtonDark = forwardRef<HTMLButtonElement, ButtonDarkProps>(({ chil
             {/* Add a subtle flashy background effect for selected state */}
             {selected && (
                 <div
-                    className="absolute inset-0 rounded-[9px] pointer-events-none animate-pulse z-0"
+                    className="pointer-events-none absolute inset-0 z-0 animate-pulse rounded-[9px]"
                     style={{
                         background: 'radial-gradient(ellipse at center, rgba(255, 244, 224, 0.08) 0%, transparent 70%)',
                     }}

@@ -142,7 +142,7 @@ export default async function RootLayout({
             >
                 <PWAProvider>
                     <Providers>
-                        <main className="flex flex-col min-h-screen">
+                        <main className="flex min-h-screen flex-col">
                             <Suspense fallback={null}>
                                 <HeaderDesktop />
                                 <HeaderMobile />

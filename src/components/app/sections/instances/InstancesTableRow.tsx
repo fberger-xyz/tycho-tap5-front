@@ -34,30 +34,30 @@ export const InstanceRowTemplate = (props: {
     className?: string
 }) => {
     return (
-        <div className={cn('w-full grid grid-cols-12 items-center text-sm gap-3', props.className)}>
+        <div className={cn('grid w-full grid-cols-12 items-center gap-3 text-sm', props.className)}>
             {/* A */}
-            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-3">
-                <div className="w-full col-span-2">{props.index}</div>
-                <div className="w-full col-span-3">{props.instance}</div>
-                <div className="w-full col-span-2">{props.chain}</div>
-                <div className="w-full col-span-5">{props.pair}</div>
+            <div className="col-span-3 grid grid-cols-12 items-center justify-center gap-3">
+                <div className="col-span-2 w-full">{props.index}</div>
+                <div className="col-span-3 w-full">{props.instance}</div>
+                <div className="col-span-2 w-full">{props.chain}</div>
+                <div className="col-span-5 w-full">{props.pair}</div>
             </div>
 
             {/* B */}
-            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-4">
-                <div className="w-full col-span-3">{props.configurationId}</div>
-                <div className="w-full col-span-3 capitalize">{props.broadcast}</div>
-                <div className="w-full col-span-3 capitalize">{props.reference}</div>
-                <div className="w-full col-span-3">{props.targetSpread}</div>
+            <div className="col-span-4 grid grid-cols-12 items-center justify-center gap-3">
+                <div className="col-span-3 w-full">{props.configurationId}</div>
+                <div className="col-span-3 w-full capitalize">{props.broadcast}</div>
+                <div className="col-span-3 w-full capitalize">{props.reference}</div>
+                <div className="col-span-3 w-full">{props.targetSpread}</div>
             </div>
 
             {/* C */}
-            <div className="grid grid-cols-12 gap-3 justify-center items-center col-span-5">
-                <div className="w-full col-span-3">{props.startedAt}</div>
-                <div className="w-full col-span-3">{props.endedAt}</div>
-                <div className="w-full col-span-2">{props.duration}</div>
-                <div className="w-full col-span-2">{props.trades}</div>
-                <div className="w-full col-span-2">{props.eoa}</div>
+            <div className="col-span-5 grid grid-cols-12 items-center justify-center gap-3">
+                <div className="col-span-3 w-full">{props.startedAt}</div>
+                <div className="col-span-3 w-full">{props.endedAt}</div>
+                <div className="col-span-2 w-full">{props.duration}</div>
+                <div className="col-span-2 w-full">{props.trades}</div>
+                <div className="col-span-2 w-full">{props.eoa}</div>
             </div>
         </div>
     )
@@ -79,21 +79,21 @@ export function InstancesTableHeaders() {
                     if (isActive) toggleFilterDirection()
                     else sortInstancesBy(sortKey)
                 }}
-                className="flex items-center gap-1 hover:text-milk-300 transition-colors min-w-fit"
+                className="hover:text-milk-300 flex min-w-fit items-center gap-1 transition-colors"
             >
                 <p className="truncate text-center">{children}</p>
-                <div className="flex flex-col w-5 h-8 relative">
+                <div className="relative flex h-8 w-5 flex-col">
                     <IconWrapper
                         id={IconIds.TRIANGLE_UP}
                         className={cn(
-                            'size-5 absolute top-1 transition-opacity duration-200',
+                            'absolute top-1 size-5 transition-opacity duration-200',
                             isActive && isAscending ? 'text-aquamarine opacity-100' : 'text-milk-400',
                         )}
                     />
                     <IconWrapper
                         id={IconIds.TRIANGLE_DOWN}
                         className={cn(
-                            'size-5 absolute bottom-0.5 transition-opacity duration-200',
+                            'absolute bottom-0.5 size-5 transition-opacity duration-200',
                             isActive && !isAscending ? 'text-aquamarine opacity-100' : 'text-milk-400',
                         )}
                     />
@@ -117,7 +117,7 @@ export function InstancesTableHeaders() {
             duration={<SortableHeader sortKey={SupportedFilters.RUNNING_TIME}>Duration</SortableHeader>}
             trades={<SortableHeader sortKey={SupportedFilters.TRADE_COUNT}>Trades</SortableHeader>}
             eoa={<p className="truncate">EOA</p>}
-            className="text-milk-200 px-4"
+            className="px-4 text-milk-200"
         />
     )
 }
@@ -127,7 +127,7 @@ export function InstancesTableHeaders() {
  */
 
 export function LoadingInstanceRows() {
-    const loadingParagraph = <p className="w-3/4 skeleton-loading h-6 rounded-lg">Loading...</p>
+    const loadingParagraph = <p className="skeleton-loading h-6 w-3/4 rounded-lg">Loading...</p>
     return (
         <div className="max-h-[50vh] overflow-y-auto">
             <div className="flex flex-col gap-1 px-4 pb-2">
@@ -147,7 +147,7 @@ export function LoadingInstanceRows() {
                         duration={loadingParagraph}
                         trades={loadingParagraph}
                         eoa={loadingParagraph}
-                        className="bg-milk-50 py-2 rounded-lg text-transparent"
+                        className="rounded-lg bg-milk-50 py-2 text-transparent"
                     />
                 ))}
             </div>
@@ -175,12 +175,12 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                     </StyledTooltip>
                 }
                 chain={
-                    <div className="flex gap-1 items-center">
+                    <div className="flex items-center gap-1">
                         <ChainImage id={data.chainId} size={22} />
                     </div>
                 }
                 pair={
-                    <div className="flex gap-1 items-center">
+                    <div className="flex items-center gap-1">
                         <DoubleSymbol symbolLeft={data.baseSymbol} symbolRight={data.quoteSymbol} size={23} gap={1} />
                         <p className="truncate">
                             {data.baseSymbol ? data.baseSymbol : '?'}/{data.quoteSymbol ? data.quoteSymbol : '?'}
@@ -218,7 +218,7 @@ export const InstanceRow = memo(function InstanceRow({ data, index }: { data: En
                 }
                 trades={<div className="truncate">{data.instance._count.Trade}</div>}
                 eoa={<div className="truncate">{shortenValue(eoa)}</div>}
-                className="bg-milk-50 px-3 py-2 rounded-lg hover:bg-milk-100 transition-colors duration-200"
+                className="rounded-lg bg-milk-50 px-3 py-2 transition-colors duration-200 hover:bg-milk-100"
             />
         </LinkWrapper>
     )

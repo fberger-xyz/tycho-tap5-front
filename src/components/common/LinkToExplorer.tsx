@@ -15,7 +15,7 @@ export function LinkToExplorer(props: { chainId: number; txHash: string; classNa
                 <LinkWrapper
                     href={`${CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${props.txHash}` : ''}`}
                     target="_blank"
-                    className="cursor-alias flex items-center gap-2 hover:underline"
+                    className="flex cursor-alias items-center gap-2 hover:underline"
                 >
                     <p>{CHAINS_CONFIG[props.chainId] ? `${CHAINS_CONFIG[props.chainId]?.explorerRoot}/tx/${shortenValue(props.txHash)}` : ''}</p>
                     <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4 text-milk" />

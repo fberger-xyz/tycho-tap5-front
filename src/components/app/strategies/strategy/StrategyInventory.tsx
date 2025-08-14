@@ -22,23 +22,23 @@ export default function StrategyInventory({ tokens, isLoading }: StrategyInvento
 
     return (
         <Card className="gap-5 px-0 pb-0">
-            <div className="flex justify-between px-5 items-center">
-                <h1 className="text-lg font-semibold font-inter-tight">Your Funds</h1>
+            <div className="flex items-center justify-between px-5">
+                <h1 className="font-inter-tight text-lg font-semibold">Your Funds</h1>
             </div>
             <div className="flex flex-col text-xs">
-                <div className="grid grid-cols-2 px-5 mb-3">
-                    <p className="text-milk-600 truncate">Asset</p>
-                    <p className="text-milk-600 truncate">Size</p>
+                <div className="mb-3 grid grid-cols-2 px-5">
+                    <p className="truncate text-milk-600">Asset</p>
+                    <p className="truncate text-milk-600">Size</p>
                 </div>
                 {isLoading ? (
                     <div className="px-5 py-4">
-                        <p className="text-milk-400 text-center">Loading...</p>
+                        <p className="text-center text-milk-400">Loading...</p>
                     </div>
                 ) : displayTokens.length === 0 ? (
-                    <p className="text-milk-400 text-center py-4">No tokens found</p>
+                    <p className="py-4 text-center text-milk-400">No tokens found</p>
                 ) : (
                     displayTokens.map((token) => (
-                        <div key={token.id} className="grid grid-cols-2 items-center border-t border-milk-100 py-3 px-5">
+                        <div key={token.id} className="grid grid-cols-2 items-center border-t border-milk-100 px-5 py-3">
                             <div className="flex items-center gap-2">
                                 <SymbolImage symbol={token.optimized_symbol || token.symbol || undefined} size={20} />
                                 <p className="truncate">{token.optimized_symbol || token.symbol || 'Unknown'}</p>
@@ -46,7 +46,7 @@ export default function StrategyInventory({ tokens, isLoading }: StrategyInvento
                             <p className="truncate">
                                 {token.amount.toFixed(4)}{' '}
                                 {token.price > 0 && (
-                                    <span className="text-xs text-milk-400 ml-2">
+                                    <span className="ml-2 text-xs text-milk-400">
                                         {cleanOutput(`($${numeral(token.amount * token.price).format('0,0.[00]')})`)}
                                     </span>
                                 )}

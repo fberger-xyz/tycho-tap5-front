@@ -78,7 +78,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
 
     return (
         <Card className="gap-5">
-            <h1 className="text-lg font-semibold font-inter-tight">Configuration</h1>
+            <h1 className="font-inter-tight text-lg font-semibold">Configuration</h1>
             <div className="flex flex-col gap-3 text-sm">
                 <StatRow
                     label={STRATEGY_LABELS.STATS.CHAIN}
@@ -90,7 +90,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
                     value={
                         <LinkWrapper
                             href={`${explorerRoot}/token/${parsedConfig.base.address}`}
-                            className="truncate hover:underline cursor-alias"
+                            className="cursor-alias truncate hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -104,7 +104,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
                     value={
                         <LinkWrapper
                             href={`${explorerRoot}/token/${parsedConfig.quote.address}`}
-                            className="truncate hover:underline cursor-alias"
+                            className="cursor-alias truncate hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -136,7 +136,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
                     value={
                         <LinkWrapper
                             href={priceSourceUrl || ''}
-                            className="truncate capitalize hover:underline cursor-alias"
+                            className="cursor-alias truncate capitalize hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -151,7 +151,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
                     value={
                         <LinkWrapper
                             href={`${explorerRoot}/address/${walletAddress}`}
-                            className="truncate capitalize hover:underline cursor-alias"
+                            className="cursor-alias truncate capitalize hover:underline"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
@@ -203,7 +203,7 @@ export default function StrategyConfiguration({ parsedConfig, priceSourceUrl, tr
                         value={
                             <LinkWrapper
                                 href={`${explorerRoot}/address/${parsedConfig.tycho.permit2Address}`}
-                                className="truncate hover:underline cursor-alias"
+                                className="cursor-alias truncate hover:underline"
                                 target="_blank"
                                 rel="noopener noreferrer"
                             >

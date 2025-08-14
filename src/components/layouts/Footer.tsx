@@ -24,15 +24,15 @@ export default function Footer(props: { className?: string }) {
     return (
         <footer
             className={cn(
-                'w-full flex text-xs flex-col lg:flex-row lg:justify-between lg:items-end py-4 px-6 text-milk-400 font-light gap-6 lg:gap-0',
+                'flex w-full flex-col gap-6 px-6 py-4 text-xs font-light text-milk-400 lg:flex-row lg:items-end lg:justify-between lg:gap-0',
                 props.className,
             )}
         >
             {/* left */}
-            <div className="flex lg:gap-8 flex-col gap-6 lg:flex-row">
-                <p className="truncate hidden lg:flex">2025 © PropellerHeads</p>
+            <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
+                <p className="hidden truncate lg:flex">2025 © PropellerHeads</p>
                 <StyledTooltip closeDelay={500} content={<p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>}>
-                    <p className="truncate hover:underline hover:text-aquamarine">Alpha version</p>
+                    <p className="truncate hover:text-aquamarine hover:underline">Alpha version</p>
                 </StyledTooltip>
             </div>
 

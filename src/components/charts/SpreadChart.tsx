@@ -611,7 +611,7 @@ export default function SpreadChart({
     // Error state
     if (error) {
         return (
-            <div className={cn('flex items-center justify-center h-[400px]', className)}>
+            <div className={cn('flex h-[400px] items-center justify-center', className)}>
                 <div className="text-folly">Error loading spread data</div>
             </div>
         )

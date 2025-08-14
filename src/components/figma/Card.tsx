@@ -4,7 +4,7 @@ export default function Card({ children, className, hoverable = false }: { child
     return (
         <div
             className={cn(
-                'flex flex-col gap-1 bg-milk-50 rounded-xl p-5 transition-colors duration-300',
+                'flex flex-col gap-1 rounded-xl bg-milk-50 p-5 transition-colors duration-300',
                 hoverable && 'hover:bg-milk-100',
                 className,
             )}
