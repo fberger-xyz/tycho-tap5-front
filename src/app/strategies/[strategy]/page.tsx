@@ -29,6 +29,7 @@ import StrategyHeader from '@/components/app/strategies/strategy/StrategyHeader'
 import StrategyKPIs from '@/components/app/strategies/strategy/StrategyKPIs'
 import StrategyInventory from '@/components/app/strategies/strategy/StrategyInventory'
 import StrategyConfiguration from '@/components/app/strategies/strategy/StrategyConfiguration'
+import PageWrapper from '@/components/common/PageWrapper'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -172,11 +173,9 @@ export default function StrategyPage() {
     // Handle errors
     if (configHasError) {
         return (
-            <ErrorBoundary
-                fallback={<ErrorPlaceholder entryName="Configuration" errorMessage={configError?.message || 'Failed to load configuration'} />}
-            >
+            <PageWrapper>
                 <ErrorPlaceholder entryName="Configuration" errorMessage={configError?.message || 'Failed to load configuration'} />
-            </ErrorBoundary>
+            </PageWrapper>
         )
     }
 

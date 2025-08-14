@@ -148,14 +148,14 @@ export default function SpreadChart({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [poolsData, referencePrice, refreshInterval, maxPoints, binanceTimeSeries.length, poolsTimeSeries.size])
 
-    // Check if we have enough data points to show actual chart (need 2+ points to draw a line)
+    // Check if we have enough data points to show actual chart (need at least 1 point to start showing)
     const hasEnoughData = useMemo(() => {
-        // Check if Binance has enough points
-        if (binanceTimeSeries.length >= CHART_CONSTANTS.MIN_DATA_POINTS) return true
+        // Check if Binance has any points
+        if (binanceTimeSeries.length >= 1) return true
 
-        // Check if any pool has enough points
+        // Check if any pool has any points
         for (const pool of poolsTimeSeries.values()) {
-            if (pool.data.length >= CHART_CONSTANTS.MIN_DATA_POINTS) return true
+            if (pool.data.length >= 1) return true
         }
 
         return false
@@ -163,25 +163,29 @@ export default function SpreadChart({
 
     const chartOptions = useMemo(() => {
         // Build the chart configuration for when we have real data
-
-        // Calculate spread bands
-        const upperBand = referencePrice ? referencePrice * (1 + targetSpreadBps / 10000) : null
-        const lowerBand = referencePrice ? referencePrice * (1 - targetSpreadBps / 10000) : null
+        console.log('[SpreadChart] Building chart options with:', {
+            binanceTimeSeriesLength: binanceTimeSeries.length,
+            poolsTimeSeriesSize: poolsTimeSeries.size,
+            referencePrice,
+            targetSpreadBps,
+        })
 
         // Find min/max for y-axis from all time series data
         const allPrices: number[] = []
 
-        // Add Binance prices
-        binanceTimeSeries.forEach((point) => allPrices.push(point.value))
+        // Add Binance prices and their spread bands
+        binanceTimeSeries.forEach((point) => {
+            allPrices.push(point.value)
+            if (targetSpreadBps > 0) {
+                allPrices.push(point.value * (1 + targetSpreadBps / 10000))
+                allPrices.push(point.value * (1 - targetSpreadBps / 10000))
+            }
+        })
 
         // Add pool prices
         poolsTimeSeries.forEach((pool) => {
             pool.data.forEach((point) => allPrices.push(point.value))
         })
-
-        // Add spread bands
-        if (upperBand) allPrices.push(upperBand)
-        if (lowerBand) allPrices.push(lowerBand)
 
         const minPrice = allPrices.length > 0 ? Math.min(...allPrices) * 0.998 : 100
         const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) * 1.002 : 100
@@ -202,6 +206,12 @@ export default function SpreadChart({
         return {
             backgroundColor: 'transparent',
             grid: { top: 5, left: 0, right: 70, bottom: isMobile ? 100 : 70 },
+            axisPointer: {
+                link: [{ xAxisIndex: 'all' }],
+                label: {
+                    backgroundColor: colors.milkOpacity[100],
+                },
+            },
             xAxis: {
                 type: 'time' as const,
                 axisLine: { show: false },
@@ -217,6 +227,17 @@ export default function SpreadChart({
                 },
                 splitLine: {
                     show: false,
+                },
+                axisPointer: {
+                    show: true,
+                    type: 'line',
+                    lineStyle: {
+                        color: colors.milkOpacity[400],
+                        type: 'dashed',
+                    },
+                    label: {
+                        show: false,
+                    },
                 },
             },
             yAxis: {
@@ -240,7 +261,7 @@ export default function SpreadChart({
                 },
             },
             tooltip: {
-                borderColor: 'rgba(55, 65, 81, 0.5)',
+                borderColor: 'rgba(55, 65, 81, 0.5)', // subtle border
                 triggerOn: 'mousemove',
                 backgroundColor: '#FFF4E005',
                 borderRadius: 12,
@@ -311,18 +332,32 @@ export default function SpreadChart({
                 },
             },
             series: [
-                // Spread bands
-                ...(upperBand && lowerBand
+                // Spread bands (follow Binance price over time)
+                ...(binanceTimeSeries.length > 0 && targetSpreadBps > 0
                     ? [
                           {
                               name: 'Upper Band',
                               type: 'line' as const,
-                              data: [],
+                              data: binanceTimeSeries.map((point) => [point.time, point.value * (1 + targetSpreadBps / 10000)]),
+                              symbol: 'none',
+                              lineStyle: {
+                                  color: colors.milkOpacity[200],
+                                  type: 'dashed',
+                                  width: 1,
+                              },
+                              silent: true,
                           },
                           {
                               name: 'Lower Band',
                               type: 'line' as const,
-                              data: [],
+                              data: binanceTimeSeries.map((point) => [point.time, point.value * (1 - targetSpreadBps / 10000)]),
+                              symbol: 'none',
+                              lineStyle: {
+                                  color: colors.milkOpacity[200],
+                                  type: 'dashed',
+                                  width: 1,
+                              },
+                              silent: true,
                           },
                       ]
                     : []),
@@ -577,6 +612,13 @@ export default function SpreadChart({
 
     // Simple logic: show chart if we have enough data, otherwise show loading
     const options = hasEnoughData ? chartOptions : loadingOptions
+
+    console.log('[SpreadChart] Rendering with:', {
+        hasEnoughData,
+        binanceTimeSeriesLength: binanceTimeSeries.length,
+        poolsTimeSeriesSize: poolsTimeSeries.size,
+        isUsingChartOptions: hasEnoughData,
+    })
 
     return (
         <Suspense fallback={<CustomFallback />}>

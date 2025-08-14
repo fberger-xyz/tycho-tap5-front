@@ -109,15 +109,19 @@ export default function CandlestickChart({
     const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
     const isMobile = false // You can add proper mobile detection if needed
     const isClient = typeof window !== 'undefined'
-    
+
     // Generate fixed skeleton candlesticks for smooth appearance
-    const skeletonBars = useMemo(() => Array.from({ length: 20 }, (_, i) => {
-        // Use sine wave for smooth height variation
-        const wave = Math.sin((i / 20) * Math.PI * 2.5 + 1.5)
-        const height = 25 + wave * 15
-        const top = 35 + Math.sin((i / 20) * Math.PI * 3) * 10
-        return { height, top, delay: i * 0.05 }
-    }), [])
+    const skeletonBars = useMemo(
+        () =>
+            Array.from({ length: 20 }, (_, i) => {
+                // Use sine wave for smooth height variation
+                const wave = Math.sin((i / 20) * Math.PI * 2.5 + 1.5)
+                const height = 25 + wave * 15
+                const top = 35 + Math.sin((i / 20) * Math.PI * 3) * 10
+                return { height, top, delay: i * 0.05 }
+            }),
+        [],
+    )
 
     // DETAILED DEBUG LOGGING
     console.log('🔵 [CandlestickChart] Component Rendered', {

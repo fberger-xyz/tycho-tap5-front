@@ -13,6 +13,9 @@ import { TradeValuesV2, isSuccessfulTrade, isRevertedTrade, isSimulationFailedTr
 import { LinkToExplorer } from '@/components/common/LinkToExplorer'
 import StyledTooltip from '@/components/common/StyledTooltip'
 import PoolLink from '../../pools/LinkToPool'
+import { IconIds } from '@/enums'
+import IconWrapper from '@/components/icons/IconWrapper'
+import { toast } from 'react-hot-toast'
 
 /**
  * ------------------------ 1 template
@@ -32,6 +35,7 @@ export const RecentTradeRowTemplate = (props: {
     sim: ReactNode
     idx: ReactNode
     tx: ReactNode
+    raw: ReactNode
     className?: string
 }) => {
     return (
@@ -49,6 +53,7 @@ export const RecentTradeRowTemplate = (props: {
             <div className="w-[100px]">{props.sim}</div>
             <div className="w-[55px]">{props.idx}</div>
             <div className="w-[80px]">{props.tx}</div>
+            <div className="w-[65px]">{props.raw}</div>
         </div>
     )
 }
@@ -73,6 +78,7 @@ export function RecentTradesTableHeaders() {
             sim={<p className="truncate">Simulation (ms)</p>}
             idx={<p className="truncate">Index</p>}
             tx={<p className="truncate">Tx</p>}
+            raw={<p className="truncate">Raw</p>}
             className="px-4 py-3 text-milk-600 text-xs"
         />
     )
@@ -103,6 +109,7 @@ export function LoadingRecentTradeRows() {
                         sim={loadingParagraph}
                         idx={loadingParagraph}
                         tx={loadingParagraph}
+                        raw={loadingParagraph}
                         className="py-2 rounded-lg text-transparent border-b border-milk-50"
                     />
                 ))}
@@ -343,6 +350,25 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 ) : (
                     <p className="text-xs text-milk-400">-</p>
                 )
+            }
+            raw={
+                <StyledTooltip
+                    content={
+                        <div className="flex flex-col gap-1">
+                            <p>Raw: {JSON.stringify(trade.values, null, 2)}</p>
+                        </div>
+                    }
+                >
+                    <button
+                        onClick={() => {
+                            navigator.clipboard.writeText(JSON.stringify(trade.values, null, 2))
+                            toast.success('Copied to clipboard')
+                        }}
+                        className="flex items-center gap-1 cursor-pointer"
+                    >
+                        <IconWrapper id={IconIds.COPY} className="size-4 text-milk group-hover:text-milk" />
+                    </button>
+                </StyledTooltip>
             }
             className={cn('px-4 py-3 hover:bg-milk-100 transition-colors duration-200', className)}
         />
