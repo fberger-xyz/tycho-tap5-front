@@ -1,4 +1,3 @@
-import React from 'react'
 import Card from '@/components/figma/Card'
 import UsdAmount from '@/components/figma/UsdAmount'
 import LinkWrapper from '@/components/common/LinkWrapper'

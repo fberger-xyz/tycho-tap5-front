@@ -1,4 +1,3 @@
-import React from 'react'
 import Card from '@/components/figma/Card'
 import StatRow from './StatRow'
 import LinkWrapper from '@/components/common/LinkWrapper'

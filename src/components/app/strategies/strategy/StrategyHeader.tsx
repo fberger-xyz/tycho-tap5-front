@@ -1,4 +1,3 @@
-import React from 'react'
 import { ButtonDark, ButtonDanger } from '@/components/figma/Button'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'

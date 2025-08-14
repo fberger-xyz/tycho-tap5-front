@@ -1,4 +1,3 @@
-import React from 'react'
 import Card from '@/components/figma/Card'
 import { SymbolImage } from '@/components/common/ImageWrapper'
 import numeral from 'numeral'
