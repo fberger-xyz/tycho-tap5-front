@@ -28,19 +28,10 @@ export default function Authors(props: { className?: string }) {
                         target="_blank"
                         className="cursor-alias underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
                     >
-                        xMerso,
+                        xMerso
                     </LinkWrapper>
                 </StyledTooltip>
-            </p>
-            <p className="text-wrap lg:text-right">
-                <LinkWrapper
-                    href={AppUrls.QUANT_TELEGRAM}
-                    target="_blank"
-                    className="cursor-alias pr-1 underline decoration-milk-200 underline-offset-2 hover:text-aquamarine hover:underline"
-                >
-                    @hugoschrng
-                </LinkWrapper>
-                and
+                {' and'}
             </p>
             <p className="text-wrap lg:text-right">
                 <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
