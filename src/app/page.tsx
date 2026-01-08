@@ -21,11 +21,11 @@ export default function Page() {
     return (
         <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}
-            <div className="mb-14 grid w-full grid-cols-1 gap-4 px-6 sm:grid-cols-3 md:px-8 lg:px-10">
-                <Card>
+            <div className="mb-14 grid w-full grid-cols-1 gap-4 px-6 sm:grid-cols-2 md:px-8 lg:px-10">
+                {/* <Card>
                     <p className="text-xs text-milk-600">Total PnL</p>
                     <p className="truncate text-lg text-milk-200">To be computed</p>
-                </Card>
+                </Card> */}
                 <Card>
                     <p className="text-xs text-milk-600">Total AUM</p>
                     {totalAUMIsLoading ? (
