@@ -1,13 +1,13 @@
 'use client'
 
-import { cn } from '@/utils'
-import LinkWrapper from '../common/LinkWrapper'
-import Image from 'next/image'
 import { AppUrls, FileIds, IconIds } from '@/enums'
+import { cn } from '@/utils'
+import Image from 'next/image'
+import LinkWrapper from '../common/LinkWrapper'
+import StyledTooltip from '../common/StyledTooltip'
+import { ButtonDark } from '../figma/Button'
 import IconWrapper from '../icons/IconWrapper'
 import GridDropdownButton from './GridDropdownButton'
-import { ButtonDark } from '../figma/Button'
-import StyledTooltip from '../common/StyledTooltip'
 
 export default function HeaderDesktop(props: { className?: string }) {
     return (
@@ -24,7 +24,7 @@ export default function HeaderDesktop(props: { className?: string }) {
                     target="_blank"
                     className="ml-4 flex w-max cursor-alias items-center gap-1 px-2.5 hover:underline" // mr-6
                 >
-                    <p className="truncate text-sm text-milk">Docs (Run locally)</p>
+                    <p className="truncate text-sm text-milk">Docs</p>
                     <IconWrapper id={IconIds.ARROW_UP_RIGHT} className="size-4" />
                 </LinkWrapper>
                 <StyledTooltip content="Coming soon: Create a new strategy">

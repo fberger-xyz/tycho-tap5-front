@@ -1,7 +1,7 @@
 export enum AppUrls {
     // app pages
     ABOUT = '/about',
-    STRATEGIES = '/',
+    STRATEGIES = 'https://tycho-openmaker.gitbook.io/docs/',
 
     // api
     API_CONFIGURATIONS = '/api/configurations',
