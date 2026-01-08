@@ -1,33 +1,32 @@
 'use client'
 
-import { lazy } from 'react'
-import { useParams } from 'next/navigation'
-import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
-import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
-import StrategyTemplate from '@/components/app/strategies/strategy/StrategyTemplate'
-import Card from '@/components/figma/Card'
-import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
-import { jsonConfigParser } from '@/utils/data/parser'
-import { useDebankData } from '@/hooks/fetchs/useDebankData'
-import { useDebankTokenList } from '@/hooks/fetchs/useDebankTokenList'
-import { cn } from '@/utils'
-import { parseAsString, useQueryState } from 'nuqs'
-import { StrategyTradesList } from '@/components/app/trades/strategy/StrategyTradesList'
-import React from 'react'
-import { getPriceSourceUrl } from '@/utils/price-source.util'
 import { PoolsList } from '@/components/app/pools/PoolsList'
 import RefreshCountdown from '@/components/app/pools/RefreshCountdown'
+import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
+import StrategyTemplate from '@/components/app/strategies/strategy/StrategyTemplate'
+import { StrategyTradesList } from '@/components/app/trades/strategy/StrategyTradesList'
+import Card from '@/components/figma/Card'
+import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
+import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
+import { useDebankData } from '@/hooks/fetchs/useDebankData'
+import { useDebankTokenList } from '@/hooks/fetchs/useDebankTokenList'
+import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { useEthBalance } from '@/hooks/useEthBalance'
+import { cn } from '@/utils'
+import { jsonConfigParser } from '@/utils/data/parser'
+import { getPriceSourceUrl } from '@/utils/price-source.util'
+import { useParams } from 'next/navigation'
+import { parseAsString, useQueryState } from 'nuqs'
+import React, { lazy } from 'react'
 
 // Lazy load heavy components
 const ChartForPairOnChain = lazy(() => import('@/components/charts/ChartForPairOnChain'))
 
 // Import smaller components
-import StrategyHeader from '@/components/app/strategies/strategy/StrategyHeader'
-import StrategyKPIs from '@/components/app/strategies/strategy/StrategyKPIs'
-import StrategyInventory from '@/components/app/strategies/strategy/StrategyInventory'
 import StrategyConfiguration from '@/components/app/strategies/strategy/StrategyConfiguration'
+import StrategyHeader from '@/components/app/strategies/strategy/StrategyHeader'
+import StrategyInventory from '@/components/app/strategies/strategy/StrategyInventory'
+import StrategyKPIs from '@/components/app/strategies/strategy/StrategyKPIs'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -206,15 +205,16 @@ export default function StrategyPage() {
                     </Card>
                 }
                 pools={
-                    <PoolsCard
-                        chainId={parsedConfig?.chain.id}
-                        token0={parsedConfig?.base.address}
-                        token1={parsedConfig?.quote.address}
-                        targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
-                        isInRange={!isEthBalanceBelowThreshold}
-                        referencePrice={liveReferencePrice || priceUsd}
-                        isLoading={isInitialLoading}
-                    />
+                    null
+                    // <PoolsCard
+                    //     chainId={parsedConfig?.chain.id}
+                    //     token0={parsedConfig?.base.address}
+                    //     token1={parsedConfig?.quote.address}
+                    //     targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
+                    //     isInRange={!isEthBalanceBelowThreshold}
+                    //     referencePrice={liveReferencePrice || priceUsd}
+                    //     isLoading={isInitialLoading}
+                    // />
                 }
                 trades={
                     isInitialLoading ? (
