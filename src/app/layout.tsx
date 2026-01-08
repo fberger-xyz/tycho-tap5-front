@@ -1,22 +1,21 @@
-import type { Metadata } from 'next'
-import './globals.css'
-import { APP_METADATA } from '../config/app.config'
-import { cn } from '../utils'
-import { Suspense } from 'react'
-import DefaultFallback from '@/components/layouts/DefaultFallback'
-import { Toaster } from 'react-hot-toast'
-import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorBoundaryFallback } from '@/components/common/ErrorBoundaryFallback'
+import DefaultFallback from '@/components/layouts/DefaultFallback'
 import Footer from '@/components/layouts/Footer'
 import HeaderDesktop from '@/components/layouts/HeaderDesktop'
 import HeaderMobile from '@/components/layouts/HeaderMobile'
-import { ThemeProvider } from 'next-themes'
-import { AppThemes, Authors } from '@/enums'
-import { ReactQueryProvider } from '@/providers/react-query.providers'
-import PWAProvider from '@/providers/pwa.provider'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme.config'
-import { AppUrls } from '@/enums'
+import { AppThemes, AppUrls, Authors } from '@/enums'
+import PWAProvider from '@/providers/pwa.provider'
+import { ReactQueryProvider } from '@/providers/react-query.providers'
+import type { Metadata } from 'next'
+import { ThemeProvider } from 'next-themes'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Suspense } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
+import { Toaster } from 'react-hot-toast'
+import { APP_METADATA } from '../config/app.config'
+import { cn } from '../utils'
+import './globals.css'
 
 const image = {
     url: '/market-maker.png',
@@ -76,7 +75,7 @@ export const metadata: Metadata = {
     authors: [
         { name: APP_METADATA.AUTHOR.name, url: APP_METADATA.AUTHOR.url },
         { name: 'xMerso', url: 'https://x.com/xMerso' },
-        { name: 'hugoschrng', url: 'https://x.com/hugoschrng' },
+        // { name: 'hugoschrng', url: 'https://x.com/hugoschrng' },
         { name: 'PropellerHeads', url: 'https://www.propellerheads.xyz/' },
     ],
     category: 'finance',
