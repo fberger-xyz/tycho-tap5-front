@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { fetchWithTimeout } from '@/utils/requests.util'
+import { logger } from '@/utils/logger.util'
 
 interface UseEthBalanceParams {
     walletAddress?: string
@@ -91,7 +92,7 @@ export function useEthBalance({ walletAddress, chainId }: UseEthBalanceParams) {
 
                 // Only update state if component is still mounted to prevent memory leaks and React warnings
                 if (isMountedRef.current) {
-                    console.error('Error fetching ETH balance:', err)
+                    logger.error('Error fetching ETH balance:', { error: err instanceof Error ? err.message : String(err) })
                     setError(err instanceof Error ? err : new Error('Unknown error'))
                     setBalance(0)
                 }

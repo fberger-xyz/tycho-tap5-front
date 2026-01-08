@@ -2,17 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Light mode background = same as dark mode background for now */
 html {
-    background-image: url('/figma/background/light.svg');
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center top;
-    background-attachment: fixed;
-}
-
-/* Dark mode background */
-html.dark {
     background-image: url('/figma/background/dark.svg');
     background-size: cover;
     background-repeat: no-repeat;
@@ -20,35 +10,7 @@ html.dark {
     background-attachment: fixed;
 }
 
-/* Default colors = light theme = same as dark theme for now */
 :root {
-    /* Background */
-    --color-background: 0 0% 7%; /* #121212 */
-
-    /* Jagger colors */
-    --color-jagger: 285 68% 33%; /* #6b1a8c */
-    --color-jagger-800: 285 68% 33%; /* #6b1a8c with 80% opacity */
-    --color-jagger-500: 285 68% 33%; /* #6b1a8c with 56% opacity */
-    --color-jagger-400: 285 68% 33%; /* #6b1a8c with 40% opacity */
-    --color-jagger-300: 285 68% 33%; /* #6b1a8c with 27% opacity */
-    --color-jagger-200: 285 68% 33%; /* #6b1a8c with 10% opacity */
-
-    /* Other colors */
-    --color-folly: 345 100% 65%; /* #ff4d7a */
-    --color-aquamarine: 165 100% 55%; /* #00ffc4 */
-
-    /* Milk colors (opacity-derivated from #FFF4E0) */
-    --color-milk: 36 100% 94%; /* #FFF4E0 */
-    --color-milk-600: 36 100% 94% / 0.64; /* 64% opacity */
-    --color-milk-400: 36 100% 94% / 0.4; /* 40% opacity */
-    --color-milk-200: 36 100% 94% / 0.2; /* 20% opacity */
-    --color-milk-150: 36 100% 94% / 0.15; /* 15% opacity */
-    --color-milk-100: 36 100% 94% / 0.07; /* 7% opacity */
-    --color-milk-50: 36 100% 94% / 0.04; /* 4% opacity */
-}
-
-/* Dark theme */
-.dark {
     /* Background */
     --color-background: 0 0% 7%; /* #121212 */
 

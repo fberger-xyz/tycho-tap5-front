@@ -6,9 +6,10 @@ import { extractErrorMessage } from '@/utils'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { AppUrls, IconIds } from '@/enums'
 import LinkWrapper from '@/components/common/LinkWrapper'
+import { logger } from '@/utils/logger.util'
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
-    useEffect(() => console.error(error), [error])
+    useEffect(() => logger.error('Error boundary triggered', { message: error.message, digest: error.digest }), [error])
     return (
         <PageWrapper>
             <div className="mx-auto mt-10 flex max-w-lg flex-col items-center gap-4">
@@ -31,16 +32,16 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
                     <p className="text-wrap text-sm text-milk">
                         Or reach out for help:
-                        <LinkWrapper href={AppUrls.PROPELLERHEADS_TELEGRAM} target="_blank" className="pl-1 hover:text-aquamarine hover:underline">
-                            PropellerHeads
+                        <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="pl-1 hover:text-aquamarine hover:underline">
+                            @fberger_xyz
                         </LinkWrapper>
                         ,
                         <LinkWrapper href={AppUrls.MERSO_TELEGRAM} target="_blank" className="px-1 hover:text-aquamarine hover:underline">
                             @xMerso
                         </LinkWrapper>
                         and
-                        <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="px-1 hover:text-aquamarine hover:underline">
-                            @fberger_xyz
+                        <LinkWrapper href={AppUrls.PROPELLERHEADS_TELEGRAM} target="_blank" className="px-1 hover:text-aquamarine hover:underline">
+                            PropellerHeads
                         </LinkWrapper>
                     </p>
                 </div>

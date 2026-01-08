@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { AppUrls, ReactQueryKeys } from '@/enums'
+import { logger } from '@/utils/logger.util'
 
 interface PriceData {
     id: string
@@ -24,7 +25,7 @@ async function fetchPrices(instanceId?: string): Promise<PriceData[]> {
         // Handle non-OK responses
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Network error')
-            console.error(`API Error (${response.status}):`, errorText)
+            logger.error(`API Error (${response.status}):`, { error: errorText })
             throw new Error(`Failed to fetch prices: ${response.status} ${response.statusText}`)
         }
 
@@ -35,7 +36,7 @@ async function fetchPrices(instanceId?: string): Promise<PriceData[]> {
         try {
             data = JSON.parse(text)
         } catch {
-            console.error('Failed to parse response:', text)
+            logger.error('Failed to parse response:', { error: text })
             throw new Error('Invalid JSON response from API')
         }
 
@@ -44,13 +45,13 @@ async function fetchPrices(instanceId?: string): Promise<PriceData[]> {
             return data
         } else if (data && typeof data === 'object' && 'prices' in data) {
             if (!data.prices || !Array.isArray(data.prices)) {
-                console.error('Invalid API response:', data)
+                logger.error('Invalid API response:', { error: data })
                 throw new Error('Invalid response format from API')
             }
             return data.prices
         }
 
-        console.error('Unexpected response format:', data)
+        logger.error('Unexpected response format:', { error: data })
         throw new Error('Unexpected response format from API')
     } catch (error) {
         // Re-throw with more context

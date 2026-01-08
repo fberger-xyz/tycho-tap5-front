@@ -3,7 +3,7 @@
 import { lazy } from 'react'
 import { useParams } from 'next/navigation'
 import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { useTradesWithStore } from '@/hooks/stores/useTradesWithStore'
 import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import StrategyTemplate from '@/components/app/strategies/strategy/StrategyTemplate'
 import Card from '@/components/figma/Card'
@@ -104,7 +104,7 @@ export default function StrategyPage() {
 
     // Get trades data with proper refresh interval
     const strategyIdStr = Array.isArray(strategyId) ? strategyId[0] : strategyId
-    const { trades, isLoading: tradesLoading } = useTradesData(5000, strategyIdStr, 500)
+    const { data: trades, isLoading: tradesLoading } = useTradesWithStore({ configurationId: strategyIdStr })
 
     // Parse configuration
     const parsedConfig = configuration ? jsonConfigParser(configuration.id, configuration.values) : null

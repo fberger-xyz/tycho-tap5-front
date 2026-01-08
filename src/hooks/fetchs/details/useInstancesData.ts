@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { ConfigurationWithInstances } from '@/types'
 // import { useAppStore } from '@/stores/app.store'
 import { ReactQueryKeys } from '@/enums'
+import { logger } from '@/utils/logger.util'
 
 interface ApiResponse {
     configurations?: ConfigurationWithInstances[]
@@ -18,7 +19,7 @@ async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
         // Handle non-OK responses
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Network error')
-            console.error(`API Error (${response.status}):`, errorText)
+            logger.error(`API Error (${response.status}):`, { error: errorText })
             throw new Error(`Failed to fetch dashboard data: ${response.status} ${response.statusText}`)
         }
 
@@ -27,7 +28,7 @@ async function fetchDashboardData(): Promise<ConfigurationWithInstances[]> {
 
         // Validate response structure
         if (!data.configurations || !Array.isArray(data.configurations)) {
-            console.error('Invalid API response:', data)
+            logger.error('Invalid API response:', { error: data })
             throw new Error('Invalid response format from API')
         }
 

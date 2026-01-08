@@ -1,5 +1,6 @@
 import type { ConfigurationWithInstances } from '@/types'
 import { jsonConfigParser } from './data/parser'
+import { logger } from '@/utils/logger.util'
 
 export interface WalletChainPair {
     walletAddress: string
@@ -32,7 +33,7 @@ export function extractUniqueWalletChains(configurations: ConfigurationWithInsta
                     }
                 }
             } catch (error) {
-                console.error('Error parsing configuration:', error)
+                logger.error('Error parsing configuration:', { error: error instanceof Error ? error.message : String(error) })
             }
         })
     })

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ReactQueryKeys } from '@/enums'
 import { CandlestickDataPoint } from '@/components/charts/CandlestickChart'
 import { roundPrice } from '@/config/chart-constants.config'
+import { logger } from '@/utils/logger.util'
 
 interface BinanceKlinesParams {
     baseSymbol: string
@@ -42,14 +43,14 @@ async function fetchBinanceKlines({ baseSymbol, quoteSymbol, seconds }: Omit<Bin
                 errorMessage = `Failed to fetch Binance klines: ${response.status} ${response.statusText}`
             }
 
-            console.warn(`Binance API Error (${response.status}):`, errorText)
+            logger.warn(`Binance API Error (${response.status}):`, { warning: errorText })
             throw new Error(errorMessage)
         }
 
         const data: BinanceKlinesResponse = await response.json()
 
         if (!data.data || !Array.isArray(data.data)) {
-            console.warn('Invalid Binance API response:', data)
+            logger.warn('Invalid Binance API response:', { warning: data })
             throw new Error('Invalid response format from Binance API')
         }
 
@@ -65,7 +66,7 @@ async function fetchBinanceKlines({ baseSymbol, quoteSymbol, seconds }: Omit<Bin
     } catch (error) {
         // Don't throw for Binance errors - return empty array
         // This allows the chart to render with 1inch data even if Binance fails
-        console.warn('Binance klines fetch failed:', error)
+        logger.warn('Binance klines fetch failed:', { warning: error })
         return []
     }
 }

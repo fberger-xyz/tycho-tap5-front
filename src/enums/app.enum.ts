@@ -14,7 +14,7 @@ export enum AppUrls {
     LOGS = '/logs',
 
     // external links
-    DOCUMENTATION = 'DOCUMENTATION-to-be-added',
+    DOCUMENTATION = 'https://tycho-openmaker.gitbook.io/docs',
     SPECS = 'https://github.com/propeller-heads/tycho-x/blob/main/TAP-5.md',
     BUILDERNET = 'https://buildernet.org/docs/',
 

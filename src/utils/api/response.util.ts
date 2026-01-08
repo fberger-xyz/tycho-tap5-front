@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { logger } from '@/utils/logger.util'
 
 export interface ApiErrorOptions {
     status?: number
@@ -9,7 +10,7 @@ export const createApiError = (message: string, options: ApiErrorOptions = {}): 
     const { status = 500, details } = options
 
     if (details) {
-        console.error(`API Error: ${message}`, details)
+        logger.error(`API Error: ${message}`, details as Record<string, unknown> || {})
     }
 
     return NextResponse.json({ error: message }, { status })
@@ -20,7 +21,7 @@ export const createApiSuccess = <T>(data: T, options?: { headers?: HeadersInit }
 }
 
 export const handleApiError = (error: unknown, context: string): NextResponse => {
-    console.error(`Failed to ${context}:`, error)
+    logger.error(`Failed to ${context}:`, { error: error instanceof Error ? error.message : String(error) })
 
     if (error instanceof Error) {
         if (error.message.includes('P2002') || error.message.includes('database')) {

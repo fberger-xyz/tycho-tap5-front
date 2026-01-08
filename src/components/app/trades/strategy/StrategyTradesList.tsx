@@ -198,7 +198,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                                 : 'No status'
                     }
                 >
-                    <p className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
+                    <div className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</div>
                 </StyledTooltip>
             }
             side={<TradeSide side={validTradeValues.data.metadata.trade_direction === 'Buy' ? 'buy' : 'sell'} />}

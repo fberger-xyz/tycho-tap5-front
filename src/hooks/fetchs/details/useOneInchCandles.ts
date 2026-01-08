@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { ReactQueryKeys } from '@/enums'
 import { CandlesResponse, useOneInchCandlesParams } from '@/interfaces/candles.interface'
+import { logger } from '@/utils/logger.util'
 
 // https://portal.1inch.dev/documentation/apis/charts/swagger?method=get&path=%2Fv1.0%2Fchart%2Faggregated%2Fcandle%2F%7Btoken0%7D%2F%7Btoken1%7D%2F%7Bseconds%7D%2F%7BchainId%7D
 async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<useOneInchCandlesParams, 'enabled'>): Promise<CandlesResponse> {
@@ -29,7 +30,7 @@ async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<useO
                 errorMessage = `Failed to fetch candles: ${response.status} ${response.statusText}`
             }
 
-            console.error(`API Error (${response.status}):`, errorText)
+            logger.error(`API Error (${response.status}):`, { error: errorText })
             throw new Error(errorMessage)
         }
 
@@ -38,7 +39,7 @@ async function fetch1inchCandles({ token0, token1, seconds, chainId }: Omit<useO
 
         // Validate response structure
         if (!data.data || !Array.isArray(data.data)) {
-            console.error('Invalid API response:', data)
+            logger.error('Invalid API response:', { error: data })
             throw new Error('Invalid response format from 1inch API')
         }
 

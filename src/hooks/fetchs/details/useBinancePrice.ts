@@ -2,6 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query'
 import { ReactQueryKeys } from '@/enums'
+import { logger } from '@/utils/logger.util'
 import { roundPrice } from '@/config/chart-constants.config'
 
 interface BinancePriceParams {
@@ -24,7 +25,7 @@ async function fetchBinancePrice({ baseSymbol, quoteSymbol }: Omit<BinancePriceP
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Network error')
-            console.warn(`Binance price API Error (${response.status}):`, errorText)
+            logger.warn(`Binance price API Error (${response.status}):`, { warning: errorText })
             throw new Error('Failed to fetch Binance price')
         }
 
@@ -38,7 +39,7 @@ async function fetchBinancePrice({ baseSymbol, quoteSymbol }: Omit<BinancePriceP
     } catch (error) {
         // Don't throw for Binance errors - return null
         // This allows the chart to render with fallback price
-        console.warn('Binance price fetch failed:', error)
+        logger.warn('Binance price fetch failed:', { warning: error })
         return null
     }
 }

@@ -5,6 +5,8 @@ import { DoubleSymbol, ChainImage } from '@/components/common/ImageWrapper'
 import StyledTooltip from '@/components/common/StyledTooltip'
 import { useRouter } from 'next/navigation'
 import { TargetSpread } from '@/components/figma/Tags'
+import { useState } from 'react'
+import { ComingSoonModal } from '@/components/ui/ComingSoonModal'
 
 interface StrategyHeaderProps {
     baseSymbol?: string
@@ -17,6 +19,7 @@ interface StrategyHeaderProps {
 
 export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chainName, targetSpreadBps, isLoading }: StrategyHeaderProps) {
     const router = useRouter()
+    const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false)
 
     if (isLoading || !baseSymbol || !quoteSymbol || !chainId || !chainName) {
         return (
@@ -49,7 +52,7 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
                             <p className="truncate text-sm">Stop strategy</p>
                         </ButtonDanger>
                     </StyledTooltip>
-                    <ButtonDark onClick={() => alert('To be implemented')} className="rounded-xl px-[10px] py-[7px]">
+                    <ButtonDark onClick={() => setIsOptionsModalOpen(true)} className="rounded-xl px-[10px] py-[7px]">
                         <IconWrapper id={IconIds.DOTS_HORIZONTAL} />
                     </ButtonDark>
                 </div>
@@ -89,10 +92,17 @@ export default function StrategyHeader({ baseSymbol, quoteSymbol, chainId, chain
                         <p className="truncate text-sm">Stop strategy</p>
                     </ButtonDanger>
                 </StyledTooltip>
-                <ButtonDark onClick={() => alert('To be implemented')} className="rounded-xl px-[10px] py-[7px]">
+                <ButtonDark onClick={() => setIsOptionsModalOpen(true)} className="rounded-xl px-[10px] py-[7px]">
                     <IconWrapper id={IconIds.DOTS_HORIZONTAL} />
                 </ButtonDark>
             </div>
+
+            <ComingSoonModal
+                opened={isOptionsModalOpen}
+                onClose={() => setIsOptionsModalOpen(false)}
+                title="Strategy Options"
+                description="Additional strategy options will be available here in future updates."
+            />
         </>
     )
 }
