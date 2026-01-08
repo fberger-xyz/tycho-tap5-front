@@ -151,7 +151,7 @@ export default function ChartForPairOnChain({
                 {chartType === CHART_CONFIG[ChartType.CANDLES].name && (
                     <CandlestickChart
                         data={candlestickData}
-                        isLoading={isLoading || poolsLoading || binanceKlinesLoading}
+                        isLoading={isLoading || binanceKlinesLoading}
                         chainId={chainId}
                         baseSymbol={baseTokenSymbol}
                         quoteSymbol={quoteTokenSymbol}
