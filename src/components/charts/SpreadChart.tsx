@@ -3,7 +3,6 @@
 import { useMemo, useEffect, useState, useRef, Suspense } from 'react'
 import EchartWrapper, { CustomFallback } from './EchartWrapper'
 import { IS_DEV } from '@/config/app.config'
-import { useTheme } from 'next-themes'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
 import numeral from 'numeral'
@@ -15,11 +14,12 @@ import { DAYJS_FORMATS } from '@/utils'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { ErrorBoundary } from 'react-error-boundary'
 import { CHART_CONSTANTS } from '@/config/chart-constants.config'
+import { logger } from '@/utils/logger.util'
 
 // Debug logging helper
 const debugLog = (message: string, data?: unknown) => {
     if (IS_DEV) {
-        console.log(message, data)
+        logger.info(message, data as Record<string, unknown> || {})
     }
 }
 
@@ -68,8 +68,7 @@ export default function SpreadChart({
     useFallbackPrice,
 }: SpreadChartProps) {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-    const { resolvedTheme } = useTheme()
-    const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+    const colors = ChartColors
 
     // State to accumulate time series data
     const [binanceTimeSeries, setBinanceTimeSeries] = useState<TimeSeriesPoint[]>([])

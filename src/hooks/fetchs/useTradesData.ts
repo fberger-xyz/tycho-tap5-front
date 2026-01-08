@@ -3,6 +3,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { AppUrls, ReactQueryKeys } from '@/enums'
 import { TradeWithInstanceAndConfiguration } from '@/types'
+import { logger } from '@/utils/logger.util'
 
 /**
  * ------------------------ 3 fetch trades
@@ -20,7 +21,7 @@ async function fetchTrades(configurationId?: string, limit = 500): Promise<Trade
         // Handle non-OK responses
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Network error')
-            console.error(`API Error (${response.status}):`, errorText)
+            logger.error(`API Error (${response.status}):`, { error: errorText })
             throw new Error(`Failed to fetch trades: ${response.status} ${response.statusText}`)
         }
 
@@ -29,7 +30,7 @@ async function fetchTrades(configurationId?: string, limit = 500): Promise<Trade
 
         // Validate response structure
         if (!data.trades || !Array.isArray(data.trades)) {
-            console.error('Invalid API response:', data)
+            logger.error('Invalid API response:', { error: data })
             throw new Error('Invalid response format from API')
         }
 

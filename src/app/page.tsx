@@ -8,7 +8,7 @@ import StrategiesList from '@/components/app/strategies/list/StrategiesList'
 import UsdAmount from '@/components/figma/UsdAmount'
 import { TradesList } from '@/components/app/trades/TradesList'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
-import { useStrategies } from '@/hooks/fetchs/useStrategies'
+import { useStrategiesWithStore } from '@/hooks/stores/useStrategiesWithStore'
 import Skeleton from '@/components/common/Skeleton'
 import { useTabFromUrl } from '@/hooks/useTabFromUrl'
 import { DEFAULT_PADDING_X } from '@/config'
@@ -17,7 +17,7 @@ import numeral from 'numeral'
 export default function Page() {
     const { tab, setTab } = useTabFromUrl()
     const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
-    const { strategies } = useStrategies()
+    const { strategies } = useStrategiesWithStore()
     return (
         <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}

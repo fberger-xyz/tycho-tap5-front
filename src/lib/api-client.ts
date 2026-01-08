@@ -1,5 +1,6 @@
 import { AppUrls } from '@/enums'
 import type { ConfigurationWithInstances, TradeWithInstanceAndConfiguration } from '@/types'
+import { logger } from '@/utils/logger.util'
 
 /**
  * Type-safe API client with consistent error handling
@@ -64,7 +65,7 @@ async function apiRequest<T>(url: string, options: RequestOptions = {}): Promise
     // Handle non-OK responses
     if (!response.ok) {
         const errorText = await response.text().catch(() => 'Network error')
-        console.error(`API Error (${response.status}):`, errorText)
+        logger.error(`API Error (${response.status}):`, { error: errorText })
 
         // Try to parse error message from response
         let errorMessage = `Request failed: ${response.status} ${response.statusText}`
@@ -142,21 +143,6 @@ export const apiClient = {
                 return response.prices
             }
             throw new ApiError('Invalid response format')
-        },
-    },
-
-    // Orderbook/Pools
-    orderbook: {
-        get: async (params: { chain: string; token0: string; token1: string; pointToken?: string; pointAmount?: number }): Promise<unknown> => {
-            const searchParams = new URLSearchParams({
-                chain: params.chain,
-                token0: params.token0,
-                token1: params.token1,
-            })
-            if (params.pointToken) searchParams.append('pointToken', params.pointToken)
-            if (params.pointAmount !== undefined) searchParams.append('pointAmount', params.pointAmount.toString())
-
-            return apiRequest<unknown>(`/api/orderbook?${searchParams}`)
         },
     },
 

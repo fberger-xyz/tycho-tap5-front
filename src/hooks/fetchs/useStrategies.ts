@@ -7,6 +7,7 @@ import { groupByStrategies } from '@/utils'
 import { fetchStrategyPrices } from '@/services/price/price-fetcher.service'
 import { useEffect, useState } from 'react'
 import { showErrorToast, TOAST_MESSAGES } from '@/utils/toast.util'
+import { logger } from '@/utils/logger.util'
 
 interface ApiResponse {
     configurations?: ConfigurationWithInstances[]
@@ -20,7 +21,7 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
         // Handle non-OK responses
         if (!response.ok) {
             const errorText = await response.text().catch(() => 'Network error')
-            console.error(`API Error (${response.status}):`, errorText)
+            logger.error(`API Error (${response.status}):`, { error: errorText })
             throw new Error(`Failed to fetch configurations: ${response.status} ${response.statusText}`)
         }
 
@@ -29,7 +30,7 @@ async function fetchConfigurationsWithInstances(): Promise<ConfigurationWithInst
 
         // Validate response structure
         if (!data.configurations || !Array.isArray(data.configurations)) {
-            console.error('Invalid API response:', data)
+            logger.error('Invalid API response:', { error: data })
             throw new Error('Invalid response format from API')
         }
 
@@ -123,7 +124,7 @@ export function useStrategies() {
 
                 setStrategiesWithPrices(updatedStrategies)
             } catch (error) {
-                console.error('Failed to fetch strategy prices:', error)
+                logger.error('Failed to fetch strategy prices:', { error: error instanceof Error ? error.message : String(error) })
 
                 // Show a generic error toast
                 showErrorToast(TOAST_MESSAGES.PRICE_FETCH_ERROR)

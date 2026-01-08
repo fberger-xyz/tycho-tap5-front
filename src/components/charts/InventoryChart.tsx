@@ -2,7 +2,6 @@
 
 import { useMemo, Suspense } from 'react'
 import EchartWrapper, { CustomFallback } from './EchartWrapper'
-import { useTheme } from 'next-themes'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
 import numeral from 'numeral'
@@ -13,6 +12,7 @@ import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 import { TradeValuesV2, isSuccessfulTrade } from '@/interfaces/database/trade.interface'
+import { logger } from '@/utils/logger.util'
 
 interface InventoryChartProps {
     trades: TradeWithInstanceAndConfiguration[]
@@ -51,8 +51,7 @@ function normalizeBalance(balance: number, decimals: number): number {
 
 export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoading, className }: InventoryChartProps) {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-    const { resolvedTheme } = useTheme()
-    const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+    const colors = ChartColors
 
     // Extract inventory data from trades
     const inventoryData = useMemo(() => {
@@ -80,7 +79,7 @@ export default function InventoryChart({ trades, baseSymbol, quoteSymbol, isLoad
                     })
                 }
             } catch (error) {
-                console.warn('Failed to process trade for inventory:', error)
+                logger.warn('Failed to process trade for inventory:', { error: error instanceof Error ? error.message : String(error) })
             }
         })
 

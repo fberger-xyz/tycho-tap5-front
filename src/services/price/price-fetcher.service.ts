@@ -1,5 +1,6 @@
 import { createRequest } from '@/utils/requests.util'
 import { AppSupportedChainIds } from '@/enums'
+import { logger } from '@/utils/logger.util'
 
 interface PriceResponse {
     price: number
@@ -40,7 +41,7 @@ export async function fetchPairPrice(
                 return await fetchAggregatedPrice(baseSymbol, quoteSymbol, chainId)
         }
     } catch (error) {
-        console.error(`Failed to fetch price for ${baseSymbol}/${quoteSymbol}:`, error)
+        logger.error(`Failed to fetch price for ${baseSymbol}/${quoteSymbol}:`, { error: error instanceof Error ? error.message : String(error) })
         return 0 // Return 0 if all attempts fail
     }
 }
@@ -129,7 +130,7 @@ async function fetchAggregatedPrice(baseSymbol: string, quoteSymbol: string, cha
         errors.push(`1inch: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
 
-    console.error('All price sources failed:', errors)
+    logger.error('All price sources failed:', { errors })
     throw new Error('Failed to fetch price from all sources')
 }
 
@@ -160,7 +161,7 @@ export async function fetchStrategyPrices(
                     priceMap.set(key, price)
                 } catch (error) {
                     const errorMsg = `${key}: ${error instanceof Error ? error.message : 'Unknown error'}`
-                    console.error(`Failed to fetch price for ${errorMsg}`)
+                    logger.error(`Failed to fetch price for ${errorMsg}`, {})
                     errors.push(errorMsg)
                     priceMap.set(key, 0)
                 }

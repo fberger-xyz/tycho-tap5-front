@@ -43,7 +43,7 @@
 //             txHash: tradeValues.data.broadcast.hash,
 //         }
 //     } catch (error) {
-//         console.error(error)
+//         logger.error(error)
 //         return null
 //     }
 // }

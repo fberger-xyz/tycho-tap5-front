@@ -10,7 +10,7 @@ import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
 import { useConfiguration } from '@/hooks/fetchs/useConfiguration'
 import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { useDebankTokenList } from '@/hooks/fetchs/useDebankTokenList'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { useTradesWithStore } from '@/hooks/stores/useTradesWithStore'
 import { useEthBalance } from '@/hooks/useEthBalance'
 import { cn } from '@/utils'
 import { jsonConfigParser } from '@/utils/data/parser'
@@ -103,7 +103,7 @@ export default function StrategyPage() {
 
     // Get trades data with proper refresh interval
     const strategyIdStr = Array.isArray(strategyId) ? strategyId[0] : strategyId
-    const { trades, isLoading: tradesLoading } = useTradesData(5000, strategyIdStr, 500)
+    const { data: trades, isLoading: tradesLoading } = useTradesWithStore({ configurationId: strategyIdStr })
 
     // Parse configuration
     const parsedConfig = configuration ? jsonConfigParser(configuration.id, configuration.values) : null

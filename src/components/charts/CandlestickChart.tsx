@@ -6,13 +6,13 @@ import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense } from 'react'
-import { useTheme } from 'next-themes'
 import EchartWrapper, { CustomFallback } from './EchartWrapper'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { INTER_FONT } from '@/config'
 import { ChartColors } from '@/config/chart-colors.config'
 import { cn, DAYJS_FORMATS } from '@/utils'
 import numeral from 'numeral'
+import { logger } from '@/utils/logger.util'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 
 dayjs.extend(timezone)
@@ -82,7 +82,7 @@ function createDiagonalStripePattern(color: string, backgroundColor: string = 't
             repeat: 'repeat',
         }
     } catch (e) {
-        console.warn('[createDiagonalStripePattern] Failed to create pattern:', e)
+        logger.warn('[createDiagonalStripePattern] Failed to create pattern:', { error: e instanceof Error ? e.message : String(e) })
         return backgroundColor || color
     }
 }
@@ -105,8 +105,7 @@ export default function CandlestickChart({
     const [forceReplace, setForceReplace] = useState(false)
     const prevDataLength = useRef(0)
     const zoomStateRef = useRef({ start: 70, end: 100 })
-    const { resolvedTheme } = useTheme()
-    const colors = resolvedTheme === 'dark' ? ChartColors.dark : ChartColors.light
+    const colors = ChartColors
     const isMobile = false // You can add proper mobile detection if needed
     const isClient = typeof window !== 'undefined'
 
@@ -124,7 +123,7 @@ export default function CandlestickChart({
     )
 
     // DETAILED DEBUG LOGGING
-    console.log('🔵 [CandlestickChart] Component Rendered', {
+    logger.info('🔵 [CandlestickChart] Component Rendered', {
         timestamp: new Date().toISOString(),
         props: {
             hasData: !!data,
@@ -141,13 +140,12 @@ export default function CandlestickChart({
         state: {
             hasOptions: !!options,
             forceReplace,
-            resolvedTheme,
         },
         willShowPlaceholder: isLoading || !data || data?.length === 0,
     })
 
     useEffect(() => {
-        console.log('🟢 [CandlestickChart] useEffect triggered', {
+        logger.info('🟢 [CandlestickChart] useEffect triggered', {
             timestamp: new Date().toISOString(),
             isLoading,
             hasData: !!data,
@@ -157,7 +155,7 @@ export default function CandlestickChart({
 
         // Skip if no data
         if (!data || data.length === 0) {
-            console.log('⚠️ [CandlestickChart] useEffect SKIPPING - No data')
+            logger.info('⚠️ [CandlestickChart] useEffect SKIPPING - No data')
             return
         }
 
@@ -792,7 +790,7 @@ export default function CandlestickChart({
             ],
         }
 
-        console.log('✅ [CandlestickChart] Setting chart options with data', {
+        logger.info('✅ [CandlestickChart] Setting chart options with data', {
             dataPoints: data.length,
             hasReferencePriceLine: !!referencePriceLine,
             seriesCount: Array.isArray(chartOptions.series) ? chartOptions.series.length : 0,
@@ -868,7 +866,7 @@ export default function CandlestickChart({
 
     // Show subtle loading placeholder when loading
     if (isLoading || !data || data.length === 0) {
-        console.log('🟡 [CandlestickChart] SHOWING LOADING PLACEHOLDER', {
+        logger.info('🟡 [CandlestickChart] SHOWING LOADING PLACEHOLDER', {
             reason: isLoading ? 'isLoading=true' : !data ? 'data is null/undefined' : 'data is empty array',
             isLoading,
             data,
@@ -946,7 +944,7 @@ export default function CandlestickChart({
         )
     }
 
-    console.log('🔴 [CandlestickChart] RENDERING ECHART WRAPPER', {
+    logger.info('🔴 [CandlestickChart] RENDERING ECHART WRAPPER', {
         hasOptions: !!options,
         optionsOrEmpty: !!(options || emptyStateOptions),
         className,

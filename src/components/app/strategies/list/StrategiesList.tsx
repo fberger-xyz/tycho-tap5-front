@@ -8,7 +8,7 @@ import { getPriceSourceUrl } from '@/utils/price-source.util'
 import { ChainImage, DoubleSymbol } from '@/components/common/ImageWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { CHAINS_CONFIG } from '@/config/chains.config'
-import { useStrategies } from '@/hooks/fetchs/useStrategies'
+import { useStrategiesWithStore } from '@/hooks/stores/useStrategiesWithStore'
 import { useDebankData } from '@/hooks/fetchs/useDebankData'
 import { EmptyPlaceholder, ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import UsdAmount from '@/components/figma/UsdAmount'
@@ -261,7 +261,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
  */
 
 export default function StrategiesList() {
-    const { isLoading, error, refetch, hasError, isRefetching, strategies } = useStrategies()
+    const { isLoading, error, refetch, hasError, isRefetching, strategies } = useStrategiesWithStore()
 
     // error
     if (hasError && error) {
@@ -291,7 +291,7 @@ export default function StrategiesList() {
             ) : noData ? (
                 <EmptyPlaceholder entryName="strategies" />
             ) : (
-                strategies.map((strategy, strategyIndex) => (
+                strategies.map((strategy: Strategy, strategyIndex: number) => (
                     <StrategyRow key={`${strategy.chainId}-${strategyIndex}`} data={strategy} index={strategyIndex} />
                 ))
             )}

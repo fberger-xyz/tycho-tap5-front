@@ -1,7 +1,7 @@
 'use client'
 
 import { ReactNode, memo } from 'react'
-import { useTradesData } from '@/hooks/fetchs/useTradesData'
+import { useTradesWithStore } from '@/hooks/stores/useTradesWithStore'
 import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
 import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
 import { TradeWithInstanceAndConfiguration } from '@/types'
@@ -270,7 +270,7 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                                 : 'No status'
                     }
                 >
-                    <p className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</p>
+                    <div className="mx-auto w-4 cursor-help">{getTradeStatusIcon(validTradeValues)}</div>
                 </StyledTooltip>
             }
             side={<TradeSide side={validTradeValues.data.metadata.trade_direction === 'Buy' ? 'buy' : 'sell'} />}
@@ -383,10 +383,10 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
  */
 
 export function TradesList() {
-    const { trades, isLoading } = useTradesData()
+    const { data: trades, isLoading } = useTradesWithStore()
 
     // Filter trades that match the expected pattern
-    const validTrades = trades.filter((trade) => {
+    const validTrades = trades.filter((trade: TradeWithInstanceAndConfiguration) => {
         if (!trade.Instance.Configuration) return false
         const tradeValues = trade.values as unknown
         return isValidTradePattern(tradeValues)
@@ -433,7 +433,7 @@ export function TradesList() {
                         <EmptyPlaceholder entryName="trades" />
                     ) : (
                         <div className="flex flex-col overflow-y-auto">
-                            {validTrades.map((trade, tradeIndex) => (
+                            {validTrades.map((trade: TradeWithInstanceAndConfiguration, tradeIndex: number) => (
                                 <TradeRow key={`${trade.id}-${tradeIndex}`} trade={trade} className="border-t border-milk-100" />
                             ))}
                         </div>

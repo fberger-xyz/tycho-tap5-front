@@ -4,11 +4,10 @@ import Footer from '@/components/layouts/Footer'
 import HeaderDesktop from '@/components/layouts/HeaderDesktop'
 import HeaderMobile from '@/components/layouts/HeaderMobile'
 import { INTER_FONT, INTER_TIGHT_FONT } from '@/config/theme.config'
-import { AppThemes, AppUrls, Authors } from '@/enums'
+import { AppUrls, Authors } from '@/enums'
 import PWAProvider from '@/providers/pwa.provider'
 import { ReactQueryProvider } from '@/providers/react-query.providers'
 import type { Metadata } from 'next'
-import { ThemeProvider } from 'next-themes'
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
@@ -92,18 +91,19 @@ export const metadata: Metadata = {
     },
 }
 
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+    maximumScale: 1, // prevent zooming in, useful on mobile
+    userScalable: false, // disables pinch-to-zoom
+    themeColor: '#0a0d11',
+}
+
 const Providers = ({ children }: { children: React.ReactNode }) => (
-    <ThemeProvider
-        attribute="class"
-        defaultTheme={AppThemes.DARK}
-        forcedTheme={AppThemes.DARK}
-        disableTransitionOnChange
-        themes={Object.values(AppThemes)}
-    >
-        <ReactQueryProvider>
-            <NuqsAdapter>{children}</NuqsAdapter>
-        </ReactQueryProvider>
-    </ThemeProvider>
+    <ReactQueryProvider>
+        <NuqsAdapter>{children}</NuqsAdapter>
+    </ReactQueryProvider>
 )
 
 export default async function RootLayout({
@@ -127,7 +127,7 @@ export default async function RootLayout({
     }
 
     return (
-        <html lang="en" suppressHydrationWarning className="h-screen w-screen bg-background">
+        <html lang="en" className="dark h-screen w-screen bg-background">
             <head>
                 <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
             </head>

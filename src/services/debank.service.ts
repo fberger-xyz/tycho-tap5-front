@@ -2,6 +2,7 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import { env } from '@/env/t3-env'
 import { fetchWithTimeout } from '@/utils/requests.util'
 import { DebankUserNetWorthUsd, DebankUserNetWorthUsdSnapshot, DebankToken } from '@/interfaces/debank.interface'
+import { logger } from '@/utils/logger.util'
 
 const DEBANK_API_BASE = 'https://pro-openapi.debank.com/v1'
 const DEFAULT_TIMEOUT = 60000
@@ -75,7 +76,7 @@ export class DebankService {
         try {
             result.debankLast24hNetWorth = await this.fetchNetWorthCurve(walletAddress, debankChainId)
         } catch (error) {
-            console.warn('Failed to fetch 24h net worth data:', error)
+            logger.warn('Failed to fetch 24h net worth data:', { error: error instanceof Error ? error.message : String(error) })
         }
 
         return result
