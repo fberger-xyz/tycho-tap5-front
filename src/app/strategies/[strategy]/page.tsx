@@ -1,7 +1,5 @@
 'use client'
 
-import { PoolsList } from '@/components/app/pools/PoolsList'
-import RefreshCountdown from '@/components/app/pools/RefreshCountdown'
 import { ErrorPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import StrategyTemplate from '@/components/app/strategies/strategy/StrategyTemplate'
 import { StrategyTradesList } from '@/components/app/trades/strategy/StrategyTradesList'
@@ -35,58 +33,10 @@ enum TradesView {
 
 const SKELETON_HEIGHTS = {
     CHART: 'h-[420px]',
-    POOLS: 'h-[240px]',
     TRADES: 'h-48',
 } as const
 
 const MAX_WIDTH = 'max-w-[1400px]'
-
-// Component for Pools with refresh countdown
-function PoolsCard({
-    chainId,
-    token0,
-    token1,
-    targetSpreadBps,
-    isInRange,
-    referencePrice,
-    isLoading,
-}: {
-    chainId?: number
-    token0?: string
-    token1?: string
-    targetSpreadBps?: number
-    isInRange?: boolean
-    referencePrice?: number
-    isLoading?: boolean
-}) {
-    const [refreshInterval, setRefreshInterval] = React.useState<number>()
-    const [lastRefreshTime, setLastRefreshTime] = React.useState<number>()
-
-    if (isLoading || !chainId || !token0 || !token1) {
-        return <div className="skeleton-loading h-[240px] rounded-lg" />
-    }
-
-    return (
-        <Card className="gap-5 px-0 pb-0">
-            <div className="flex items-center justify-between px-5">
-                <h1 className="font-inter-tight text-lg font-semibold text-milk">Pools Status</h1>
-                <RefreshCountdown chainId={chainId} refreshIntervalMs={refreshInterval} lastRefreshTime={lastRefreshTime} />
-            </div>
-            <PoolsList
-                chainId={chainId}
-                token0={token0}
-                token1={token1}
-                isInRange={isInRange ?? true}
-                targetSpreadBps={targetSpreadBps}
-                referencePrice={referencePrice}
-                onRefreshData={(interval, updatedAt) => {
-                    setRefreshInterval(interval)
-                    setLastRefreshTime(updatedAt)
-                }}
-            />
-        </Card>
-    )
-}
 
 export default function StrategyPage() {
     // params
@@ -94,9 +44,6 @@ export default function StrategyPage() {
 
     // trades view tab state with URL sync
     const [tradesTab, setTradesTab] = useQueryState('view', parseAsString.withDefault(TradesView.RECENT_TRADES))
-
-    // State for live reference price from Binance
-    const [liveReferencePrice, setLiveReferencePrice] = React.useState<number | undefined>()
 
     // Get configuration and strategy with price
     const { configuration, strategy, hasError: configHasError, error: configError } = useConfiguration(strategyId || '')
@@ -199,22 +146,9 @@ export default function StrategyPage() {
                                 targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
                                 strategyId={strategyIdStr}
                                 className="size-full"
-                                onReferencePriceUpdate={setLiveReferencePrice}
                             />
                         )}
                     </Card>
-                }
-                pools={
-                    null
-                    // <PoolsCard
-                    //     chainId={parsedConfig?.chain.id}
-                    //     token0={parsedConfig?.base.address}
-                    //     token1={parsedConfig?.quote.address}
-                    //     targetSpreadBps={parsedConfig?.execution.minSpreadThresholdBps}
-                    //     isInRange={!isEthBalanceBelowThreshold}
-                    //     referencePrice={liveReferencePrice || priceUsd}
-                    //     isLoading={isInitialLoading}
-                    // />
                 }
                 trades={
                     isInitialLoading ? (

@@ -1,5 +1,4 @@
 import { AppUrls } from '@/enums'
-import { env } from '@/env/t3-env'
 import { InterfaceAppLink } from '@/interfaces'
 
 /**
