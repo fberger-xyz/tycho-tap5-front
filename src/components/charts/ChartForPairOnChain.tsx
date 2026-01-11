@@ -2,9 +2,9 @@
 
 import { useEffect } from 'react'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
-import CandlestickChart, { type CandlestickDataPoint } from './CandlestickChart'
-import SpreadChart from './SpreadChart'
-import InventoryChart from './InventoryChart'
+import CandlestickChart, { type CandlestickDataPoint } from '@/components/charts/CandlestickChart'
+import SpreadChart from '@/components/charts/SpreadChart'
+import InventoryChart from '@/components/charts/InventoryChart'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
@@ -14,7 +14,7 @@ import { useBinancePrice } from '@/hooks/fetchs/details/useBinancePrice'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { CHAINS_CONFIG } from '@/config/chains.config'
-import { ButtonDark } from '../figma/Button'
+import { ButtonDark } from '@/components/figma/Button'
 import { roundPrice } from '@/config/chart-constants.config'
 
 export default function ChartForPairOnChain({

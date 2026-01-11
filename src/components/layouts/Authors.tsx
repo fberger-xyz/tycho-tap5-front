@@ -1,9 +1,9 @@
 'use client'
 
-import StyledTooltip from '../common/StyledTooltip'
-import IframeWrapper from '../common/IframeWrapper'
+import StyledTooltip from '@/components/common/StyledTooltip'
+import IframeWrapper from '@/components/common/IframeWrapper'
 import { AppUrls } from '@/enums'
-import LinkWrapper from '../common/LinkWrapper'
+import LinkWrapper from '@/components/common/LinkWrapper'
 import { cn } from '@/utils'
 
 export default function Authors(props: { className?: string }) {

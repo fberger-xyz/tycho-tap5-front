@@ -1,4 +1,4 @@
-import { ChainConfig, TokenConfig } from '../app.interface'
+import { ChainConfig, TokenConfig } from '@/interfaces/app.interface'
 
 export interface UnstableInstanceConfigValues {
     id: string

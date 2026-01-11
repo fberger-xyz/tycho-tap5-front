@@ -4,8 +4,8 @@ import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/helpers/useClickOutside'
 import Image from 'next/image'
 import { FileIds } from '@/enums'
-import GridDropdown from './GridDropdown'
-import { ButtonDark } from '../figma/Button'
+import GridDropdown from '@/components/layouts/GridDropdown'
+import { ButtonDark } from '@/components/figma/Button'
 
 export default function GridDropdownButton() {
     const [openGridDropdown, setOpenGridDropdown] = useState(false)

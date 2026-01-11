@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import LinkWrapper from './LinkWrapper'
+import LinkWrapper from '@/components/common/LinkWrapper'
 import { IconIds } from '@/enums'
-import IconWrapper from '../icons/IconWrapper'
+import IconWrapper from '@/components/icons/IconWrapper'
 
 const IframeWrapper: React.FC<{
     src?: string

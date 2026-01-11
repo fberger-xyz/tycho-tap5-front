@@ -15,7 +15,7 @@ import { DAYJS_FORMATS, cn, mapProtocolIdToProtocolConfig, shortenValue } from '
 import numeral from 'numeral'
 import { ReactNode, memo } from 'react'
 import { toast } from 'react-hot-toast'
-import PoolLink from '../../pools/LinkToPool'
+import PoolLink from '@/components/app/pools/LinkToPool'
 
 /**
  * ------------------------ 1 template

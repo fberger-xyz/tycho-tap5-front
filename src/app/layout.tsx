@@ -12,8 +12,8 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import { Suspense } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Toaster } from 'react-hot-toast'
-import { APP_METADATA } from '../config/app.config'
-import { cn } from '../utils'
+import { APP_METADATA } from '@/config/app.config'
+import { cn } from '@/utils'
 import './globals.css'
 
 const image = {

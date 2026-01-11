@@ -1,7 +1,7 @@
 'use client'
 
 import { useTimeAgo } from '@/hooks/helpers/useTimeAgo'
-import StyledTooltip from '../common/StyledTooltip'
+import StyledTooltip from '@/components/common/StyledTooltip'
 import dayjs from 'dayjs'
 
 export default function DeployedAt(props: { commitDate: null | Date }) {

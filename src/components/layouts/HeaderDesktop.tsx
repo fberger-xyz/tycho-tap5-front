@@ -5,11 +5,11 @@ import { AppUrls, FileIds, IconIds } from '@/enums'
 import { cn } from '@/utils'
 import Image from 'next/image'
 import { useState } from 'react'
-import LinkWrapper from '../common/LinkWrapper'
-import StyledTooltip from '../common/StyledTooltip'
-import { ButtonDark } from '../figma/Button'
-import IconWrapper from '../icons/IconWrapper'
-import GridDropdownButton from './GridDropdownButton'
+import LinkWrapper from '@/components/common/LinkWrapper'
+import StyledTooltip from '@/components/common/StyledTooltip'
+import { ButtonDark } from '@/components/figma/Button'
+import IconWrapper from '@/components/icons/IconWrapper'
+import GridDropdownButton from '@/components/layouts/GridDropdownButton'
 
 export default function HeaderDesktop(props: { className?: string }) {
     const [isNewStrategyModalOpen, setIsNewStrategyModalOpen] = useState(false)

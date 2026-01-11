@@ -3,8 +3,8 @@
 import { cn } from '@/utils'
 import { SITE_NAME } from '@/config/app.config'
 import { AppUrls, IconIds } from '@/enums'
-import IconWrapper from '../icons/IconWrapper'
-import LinkWrapper from '../common/LinkWrapper'
+import IconWrapper from '@/components/icons/IconWrapper'
+import LinkWrapper from '@/components/common/LinkWrapper'
 
 interface GridDropdownProps {
     isOpen: boolean

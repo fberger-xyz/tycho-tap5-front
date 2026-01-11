@@ -5,9 +5,9 @@ import { useEffect, useState } from 'react'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
 import { cn } from '@/utils'
-import StyledTooltip from '../common/StyledTooltip'
+import StyledTooltip from '@/components/common/StyledTooltip'
 import { env } from '@/env/t3-env'
-import Authors from './Authors'
+import Authors from '@/components/layouts/Authors'
 dayjs.extend(utc)
 dayjs.extend(relativeTime)
 

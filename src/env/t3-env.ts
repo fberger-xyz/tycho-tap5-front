@@ -31,7 +31,6 @@ export const env = createEnv({
      */
 
     client: {
-        NEXT_PUBLIC_APP_URL: z.string().min(1),
         NEXT_PUBLIC_COMMIT_TIMESTAMP: z.string().optional(),
         NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: z.string().optional(),
         NEXT_PUBLIC_LOG: z.string().optional(),
@@ -51,7 +50,6 @@ export const env = createEnv({
         LOG: process.env.LOG,
 
         // Client
-        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
         NEXT_PUBLIC_COMMIT_TIMESTAMP: process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP,
         NEXT_PUBLIC_GOOGLE_ANALYTICS_ID: process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID,
         NEXT_PUBLIC_LOG: process.env.NEXT_PUBLIC_LOG,

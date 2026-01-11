@@ -2,10 +2,10 @@
 
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { shortenValue } from '@/utils'
-import StyledTooltip from './StyledTooltip'
-import IconWrapper from '../icons/IconWrapper'
+import StyledTooltip from '@/components/common/StyledTooltip'
+import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
-import LinkWrapper from './LinkWrapper'
+import LinkWrapper from '@/components/common/LinkWrapper'
 
 export function LinkToExplorer(props: { chainId: number; txHash: string; className?: string; children?: React.ReactNode }) {
     return (

@@ -1,9 +1,9 @@
-import PageWrapper from '../common/PageWrapper'
-import { LoadingStrategiesList } from '../app/strategies/list/StrategiesList'
+import PageWrapper from '@/components/common/PageWrapper'
+import { LoadingStrategiesList } from '@/components/app/strategies/list/StrategiesList'
 import { DEFAULT_PADDING_X } from '@/config/theme.config'
 import { cn } from '@/utils'
-import Card from '../figma/Card'
-import Skeleton from '../common/Skeleton'
+import Card from '@/components/figma/Card'
+import Skeleton from '@/components/common/Skeleton'
 import { ListToShow } from '@/enums'
 
 export function DefaultFallbackContent() {
