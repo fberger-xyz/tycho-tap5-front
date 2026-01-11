@@ -7,8 +7,7 @@ enum LogType {
 
 // parse enabled logs from env
 const getEnabledLogs = (): Set<LogType> => {
-    // use NEXT_PUBLIC_ for client, LOG for server
-    const env = (typeof window !== 'undefined' ? process.env.NEXT_PUBLIC_LOG : process.env.LOG)?.toLowerCase().trim()
+    const env = process.env.NEXT_PUBLIC_LOG?.toLowerCase().trim()
 
     // default to info level if no env configured
     if (!env) return new Set([LogType.ERROR, LogType.WARN, LogType.INFO])

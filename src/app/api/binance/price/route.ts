@@ -4,6 +4,7 @@ import { createApiSuccess, createApiError, handleApiError } from '@/utils/api/re
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
 import { AppUrls } from '@/enums'
 import { IS_DEV } from '@/config/app.config'
+import { logger } from '@/utils/logger.util'
 
 // Binance API endpoint
 const BINANCE_API_URL = IS_DEV ? AppUrls.BINANCE_API_DEV : AppUrls.BINANCE_API_PROD
@@ -147,7 +148,7 @@ export async function GET(request: NextRequest) {
         }
 
         const binanceSymbol = toBinanceSymbol(baseSymbol, quoteSymbol)
-        console.log(`Attempting to fetch Binance price for ${binanceSymbol} (${baseSymbol}/${quoteSymbol})`)
+        logger.debug(`Binance price request: ${binanceSymbol} (${baseSymbol}/${quoteSymbol})`)
 
         try {
             // First try direct pair
@@ -162,7 +163,7 @@ export async function GET(request: NextRequest) {
             })
         } catch (fetchError) {
             // If direct pair fails, try through USDT
-            console.log(`Direct pair ${binanceSymbol} failed, trying through USDT`)
+            logger.info(`Direct pair ${binanceSymbol} failed, trying through USDT`)
             try {
                 const price = await getPriceThroughUSDT(baseSymbol, quoteSymbol)
 
@@ -174,7 +175,7 @@ export async function GET(request: NextRequest) {
                     timestamp: new Date().toISOString(),
                 })
             } catch (bridgeError) {
-                console.error(`Failed to get price through USDT bridge:`, bridgeError)
+                logger.error(`Failed to get price through USDT bridge`, { error: String(bridgeError) })
 
                 if (fetchError instanceof Error) {
                     if (fetchError.message.includes('400')) {

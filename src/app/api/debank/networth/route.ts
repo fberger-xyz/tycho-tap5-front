@@ -3,6 +3,7 @@ import { CHAINS_CONFIG } from '@/config/chains.config'
 import { DebankUserNetWorthUsd, DebankUserNetWorthUsdSnapshot } from '@/interfaces/debank.interface'
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
 import { DebankService } from '@/services/debank.service'
+import { logger } from '@/utils/logger.util'
 
 // Create cached version with 5 minute TTL
 const cachedFetchDebankNetworth = createCachedFunction(
@@ -53,7 +54,7 @@ export async function GET(request: Request): Promise<NextResponse> {
             },
         })
     } catch (error) {
-        console.error('Error fetching Debank data:', error)
+        logger.error('Error fetching Debank data', { error: String(error) })
 
         if (error instanceof Error && error.message.includes('not supported by Debank')) {
             responseBody.error = error.message

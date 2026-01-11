@@ -4,6 +4,7 @@ import { createApiSuccess, createApiError, handleApiError } from '@/utils/api/re
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
 import { AppUrls } from '@/enums'
 import { IS_DEV } from '@/config/app.config'
+import { logger } from '@/utils/logger.util'
 
 // Binance API endpoint
 const BINANCE_API_URL = IS_DEV ? AppUrls.BINANCE_API_DEV : AppUrls.BINANCE_API_PROD
@@ -120,7 +121,7 @@ export async function GET(request: NextRequest) {
         const binanceSymbol = toBinanceSymbol(baseSymbol, quoteSymbol)
         const limitNum = limit ? parseInt(limit) : 500
 
-        console.log(`Fetching Binance klines for ${binanceSymbol} with interval ${binanceInterval}`)
+        logger.info(`Fetching Binance klines for ${binanceSymbol} with interval ${binanceInterval}`)
 
         try {
             const cachedFetchKlines = getCachedFetchKlines(secondsNum)
@@ -134,12 +135,12 @@ export async function GET(request: NextRequest) {
                 timestamp: new Date().toISOString(),
             })
         } catch (fetchError) {
-            console.error(`Failed to fetch klines for ${binanceSymbol}:`, fetchError)
+            logger.error(`Failed to fetch klines for ${binanceSymbol}`, { error: String(fetchError) })
 
             // Try with USDT pairs if direct pair fails
             if (!binanceSymbol.includes('USDT')) {
                 try {
-                    console.log(`Trying cross-rate calculation through USDT`)
+                    logger.info(`Trying cross-rate calculation through USDT`)
 
                     const baseUsdt = toBinanceSymbol(baseSymbol, 'USDT')
                     const quoteUsdt = toBinanceSymbol(quoteSymbol, 'USDT')
@@ -177,7 +178,7 @@ export async function GET(request: NextRequest) {
                         timestamp: new Date().toISOString(),
                     })
                 } catch (crossError) {
-                    console.error('Cross-rate calculation failed:', crossError)
+                    logger.error('Cross-rate calculation failed', { error: String(crossError) })
                 }
             }
 

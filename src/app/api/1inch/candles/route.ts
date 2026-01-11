@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { fetchWithTimeout } from '@/utils/requests.util'
 import { createCachedFunction } from '@/services/cache/shared-cache.service'
 import { env } from '@/env/t3-env'
+import { logger } from '@/utils/logger.util'
 
 // Supported parameters
 const SUPPORTED_SECONDS = [300, 900, 3600, 14400, 86400, 604800]
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
             throw fetchError
         }
     } catch (error) {
-        console.error('Error in candles endpoint:', error)
+        logger.error('Error in candles endpoint', { error: String(error) })
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
     }
 }

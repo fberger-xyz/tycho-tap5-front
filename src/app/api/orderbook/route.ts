@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AmmAsOrderbook } from '@/interfaces'
 import { isAddress } from 'viem'
 import { extractErrorMessage, fetchWithTimeout, initOutput } from '@/utils'
+import { logger } from '@/utils/logger.util'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<AmmAsOrderbook>()
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
         }
 
         // debug
-        console.log(orderbookUrl.toString())
+        logger.debug('Orderbook request', { url: orderbookUrl.toString() })
 
         // run req
         const fetchResponse = await fetchWithTimeout(orderbookUrl.toString(), {
@@ -94,7 +95,7 @@ export async function GET(req: NextRequest) {
         const parsedError = extractErrorMessage(error)
 
         // debug
-        console.log({ parsedError })
+        logger.error('Orderbook fetch error', { parsedError })
 
         // res
         return NextResponse.json({ ...res, error: `Unexpected error while fetching orderbook: ${parsedError}` }, { status: 500 })

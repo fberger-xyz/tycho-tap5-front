@@ -29,7 +29,7 @@ export const RecentTradeRowTemplate = (props: {
     volume: ReactNode
     in: ReactNode
     out: ReactNode
-    profit: ReactNode
+    netSpread: ReactNode
     gas: ReactNode
     nonce: ReactNode
     sim: ReactNode
@@ -47,7 +47,7 @@ export const RecentTradeRowTemplate = (props: {
             <div className="w-[70px]">{props.volume}</div>
             <div className="w-[105px]">{props.in}</div>
             <div className="w-[105px]">{props.out}</div>
-            <div className="w-[90px]">{props.profit}</div>
+            <div className="w-[120px]">{props.netSpread}</div>
             <div className="w-[65px]">{props.gas}</div>
             <div className="w-[65px]">{props.nonce}</div>
             <div className="w-[100px]">{props.sim}</div>
@@ -72,7 +72,7 @@ export function RecentTradesTableHeaders() {
             volume={<p className="truncate">Volume</p>}
             in={<p className="truncate">In</p>}
             out={<p className="truncate">Out</p>}
-            profit={<p className="truncate">Net spread (bps)</p>}
+            netSpread={<p className="truncate">Net spread (bps)</p>}
             gas={<p className="truncate">Gas</p>}
             nonce={<p className="truncate">Nonce</p>}
             sim={<p className="truncate">Simulation (ms)</p>}
@@ -103,7 +103,7 @@ export function LoadingRecentTradeRows() {
                         volume={loadingParagraph}
                         in={loadingParagraph}
                         out={loadingParagraph}
-                        profit={loadingParagraph}
+                        netSpread={loadingParagraph}
                         gas={loadingParagraph}
                         nonce={loadingParagraph}
                         sim={loadingParagraph}
@@ -268,7 +268,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                     </RoundedAmount>
                 </div>
             }
-            profit={
+            netSpread={
                 <div className="flex items-center gap-1">
                     <p
                         className={cn(
@@ -421,7 +421,7 @@ function isValidTradePattern(tradeValues: unknown): tradeValues is TradeValuesV2
 export function StrategyTradesList(props: { trades: TradeWithInstanceAndConfiguration[]; isLoading: boolean }) {
     const { trades, isLoading } = props
 
-    // Filter trades that match the expected pattern
+    // Filter trades: only valid trade patterns (no status filter)
     const validTrades = trades.filter((trade) => {
         if (!trade.Instance.Configuration) return false
         const tradeValues = trade.values as unknown

@@ -20,9 +20,6 @@ export const env = createEnv({
 
         // debank
         DEBANK_ACCESS_KEY: z.string().min(1),
-
-        // logging
-        LOG: z.string().optional(),
     },
 
     /**
@@ -47,7 +44,6 @@ export const env = createEnv({
         INFURA_API_KEY: process.env.INFURA_API_KEY,
         ALCHEMY_API_KEY: process.env.ALCHEMY_API_KEY,
         DEBANK_ACCESS_KEY: process.env.DEBANK_ACCESS_KEY,
-        LOG: process.env.LOG,
 
         // Client
         NEXT_PUBLIC_COMMIT_TIMESTAMP: process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP,

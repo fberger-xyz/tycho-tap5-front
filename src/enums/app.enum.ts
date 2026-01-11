@@ -108,6 +108,7 @@ export enum ReactQueryKeys {
     DEBANK = 'debank',
     BINANCE_KLINES = 'binance-klines',
     BINANCE_PRICE = 'binance-price',
+    ETH_BALANCE = 'eth-balance',
 }
 
 export enum ChartType {
