@@ -1,5 +1,5 @@
 import Card from '@/components/figma/Card'
-import StatRow from './StatRow'
+import StatRow from '@/components/app/strategies/strategy/StatRow'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { shortenValue } from '@/utils'

@@ -1,7 +1,7 @@
-import Card from '@/components/figma/Card'
 import { SymbolImage } from '@/components/common/ImageWrapper'
-import numeral from 'numeral'
+import Card from '@/components/figma/Card'
 import { cleanOutput } from '@/utils/format.util'
+import numeral from 'numeral'
 
 interface Token {
     id: string
@@ -23,7 +23,7 @@ export default function StrategyInventory({ tokens, isLoading }: StrategyInvento
     return (
         <Card className="gap-5 px-0 pb-0">
             <div className="flex items-center justify-between px-5">
-                <h1 className="font-inter-tight text-lg font-semibold">Your Funds</h1>
+                <h1 className="font-inter-tight text-lg font-semibold">Inventory</h1>
             </div>
             <div className="flex flex-col text-xs">
                 <div className="mb-3 grid grid-cols-2 px-5">

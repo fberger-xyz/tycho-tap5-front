@@ -9,7 +9,6 @@ export default function StrategyTemplate(props: {
     banner?: ReactNode
     kpis: ReactNode
     chart: ReactNode
-    pools: ReactNode
     trades: ReactNode
     inventory: ReactNode
     configurations: ReactNode
@@ -41,15 +40,6 @@ export default function StrategyTemplate(props: {
                         {props.chart}
                     </ErrorBoundary>
 
-                    <ErrorBoundary
-                        fallback={
-                            <Card className="gap-5 px-0 pb-0">
-                                <div className="p-5 text-red-500">Error loading pools</div>
-                            </Card>
-                        }
-                    >
-                        {props.pools}
-                    </ErrorBoundary>
                     {props.trades}
                 </div>
 

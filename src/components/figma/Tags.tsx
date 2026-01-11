@@ -1,6 +1,6 @@
 import { IconIds } from '@/enums'
 import { cn } from '@/utils'
-import IconWrapper from '../icons/IconWrapper'
+import IconWrapper from '@/components/icons/IconWrapper'
 import numeral from 'numeral'
 import { ReactNode } from 'react'
 

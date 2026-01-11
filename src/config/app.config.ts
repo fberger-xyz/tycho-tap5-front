@@ -1,5 +1,4 @@
 import { AppUrls } from '@/enums'
-import { env } from '@/env/t3-env'
 import { InterfaceAppLink } from '@/interfaces'
 
 /**
@@ -9,7 +8,7 @@ import { InterfaceAppLink } from '@/interfaces'
 
 export const SITE_NAME = 'Tycho Market Maker'
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const SITE_DOMAIN = env.NEXT_PUBLIC_APP_URL
+export const SITE_DOMAIN = 'https://tycho-openmaker.propellerheads.xyz'
 export const SITE_URL = SITE_DOMAIN.replace('www.', '')
 export const APP_METADATA = {
     SITE_NAME,

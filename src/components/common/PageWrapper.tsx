@@ -1,6 +1,6 @@
 import { cn } from '@/utils'
 import { Suspense } from 'react'
-import { DefaultFallbackContent } from '../layouts/DefaultFallback'
+import { DefaultFallbackContent } from '@/components/layouts/DefaultFallback'
 import { DEFAULT_PADDING_X } from '@/config/theme.config'
 
 export default function PageWrapper({

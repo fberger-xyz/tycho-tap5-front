@@ -1,21 +1,21 @@
 'use client'
 
-import { ReactNode, memo } from 'react'
-import { cn, DAYJS_FORMATS, mapProtocolIdToProtocolConfig, shortenValue } from '@/utils'
 import { EmptyPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
-import { TradeWithInstanceAndConfiguration } from '@/types'
-import { LiveDate } from '@/components/common/LiveDate'
-import { TradeSide } from '@/components/figma/Tags'
 import { SymbolImage } from '@/components/common/ImageWrapper'
-import numeral from 'numeral'
-import { RoundedAmount } from '@/components/common/RoundedAmount'
-import { TradeValuesV2, isSuccessfulTrade, isRevertedTrade, isSimulationFailedTrade } from '@/interfaces/database/trade.interface'
 import { LinkToExplorer } from '@/components/common/LinkToExplorer'
+import { LiveDate } from '@/components/common/LiveDate'
+import { RoundedAmount } from '@/components/common/RoundedAmount'
 import StyledTooltip from '@/components/common/StyledTooltip'
-import PoolLink from '../../pools/LinkToPool'
-import { IconIds } from '@/enums'
+import { TradeSide } from '@/components/figma/Tags'
 import IconWrapper from '@/components/icons/IconWrapper'
+import { IconIds } from '@/enums'
+import { TradeValuesV2, isRevertedTrade, isSimulationFailedTrade, isSuccessfulTrade } from '@/interfaces/database/trade.interface'
+import { TradeWithInstanceAndConfiguration } from '@/types'
+import { DAYJS_FORMATS, cn, mapProtocolIdToProtocolConfig, shortenValue } from '@/utils'
+import numeral from 'numeral'
+import { ReactNode, memo } from 'react'
 import { toast } from 'react-hot-toast'
+import PoolLink from '@/components/app/pools/LinkToPool'
 
 /**
  * ------------------------ 1 template
@@ -72,7 +72,7 @@ export function RecentTradesTableHeaders() {
             volume={<p className="truncate">Volume</p>}
             in={<p className="truncate">In</p>}
             out={<p className="truncate">Out</p>}
-            profit={<p className="truncate">Profit (bps)</p>}
+            profit={<p className="truncate">Net spread (bps)</p>}
             gas={<p className="truncate">Gas</p>}
             nonce={<p className="truncate">Nonce</p>}
             sim={<p className="truncate">Simulation (ms)</p>}

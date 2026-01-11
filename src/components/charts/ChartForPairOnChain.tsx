@@ -1,10 +1,9 @@
 'use client'
 
-import { useEffect } from 'react'
 import { parseAsString, parseAsInteger, useQueryState } from 'nuqs'
-import CandlestickChart, { type CandlestickDataPoint } from './CandlestickChart'
-import SpreadChart from './SpreadChart'
-import InventoryChart from './InventoryChart'
+import CandlestickChart, { type CandlestickDataPoint } from '@/components/charts/CandlestickChart'
+import SpreadChart from '@/components/charts/SpreadChart'
+import InventoryChart from '@/components/charts/InventoryChart'
 import { cn } from '@/utils'
 import { CHART_CONFIG, INTERVAL_LABELS } from '@/config/charts.config'
 import { ChartType } from '@/enums/app.enum'
@@ -14,7 +13,7 @@ import { useBinancePrice } from '@/hooks/fetchs/details/useBinancePrice'
 import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { CHAINS_CONFIG } from '@/config/chains.config'
-import { ButtonDark } from '../figma/Button'
+import { ButtonDark } from '@/components/figma/Button'
 import { roundPrice } from '@/config/chart-constants.config'
 
 export default function ChartForPairOnChain({
@@ -26,7 +25,6 @@ export default function ChartForPairOnChain({
     targetSpreadBps,
     className,
     strategyId,
-    onReferencePriceUpdate,
 }: {
     baseTokenAddress: string
     quoteTokenAddress: string
@@ -36,7 +34,6 @@ export default function ChartForPairOnChain({
     targetSpreadBps: number
     className?: string
     strategyId?: string
-    onReferencePriceUpdate?: (price: number | undefined) => void
 }) {
     const [chartType, setChartType] = useQueryState('chart', parseAsString.withDefault(CHART_CONFIG[ChartType.CANDLES].name))
     const [selectedInterval, selectInterval] = useQueryState('interval', parseAsInteger.withDefault(CHART_CONFIG[ChartType.CANDLES].defaultInterval))
@@ -59,17 +56,6 @@ export default function ChartForPairOnChain({
         enabled: !!baseTokenSymbol && !!quoteTokenSymbol && chartType === CHART_CONFIG[ChartType.SPREAD].name,
         refetchInterval: refreshInterval,
     })
-
-    // Notify parent of price updates
-    useEffect(() => {
-        if (chartType === CHART_CONFIG[ChartType.SPREAD].name) {
-            onReferencePriceUpdate?.(binancePrice ?? undefined)
-        } else if (chartType === CHART_CONFIG[ChartType.CANDLES].name && binanceKlines && binanceKlines.length > 0) {
-            onReferencePriceUpdate?.(binanceKlines[binanceKlines.length - 1].close)
-        } else {
-            onReferencePriceUpdate?.(undefined)
-        }
-    }, [chartType, binancePrice, binanceKlines, onReferencePriceUpdate])
 
     // Fetch 1inch candles data - only for candles chart
     const { data, isLoading } = useOneInchCandles({

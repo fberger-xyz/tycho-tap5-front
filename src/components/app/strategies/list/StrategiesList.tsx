@@ -217,10 +217,10 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
             }
             kpis={
                 <>
-                    <div className="flex flex-col items-start gap-1">
+                    {/* <div className="flex flex-col items-start gap-1">
                         <p className="truncate text-xs text-milk-600">PnL</p>
                         <p className="truncate text-milk-200">To be computed</p>
-                    </div>
+                    </div> */}
                     <LinkWrapper href={`https://debank.com/profile/${walletAddress}`} target="_blank" className="flex flex-col items-start gap-1">
                         <p className="truncate text-xs text-milk-600">AUM</p>
                         {aum ? <UsdAmount amountUsd={aum} className="cursor-alias hover:underline" /> : <Skeleton variant="text" />}

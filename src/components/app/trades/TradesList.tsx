@@ -3,7 +3,7 @@
 import { ReactNode, memo } from 'react'
 import { useTradesWithStore } from '@/hooks/stores/useTradesWithStore'
 import { cn, DAYJS_FORMATS, shortenValue } from '@/utils'
-import { EmptyPlaceholder } from '../shared/PlaceholderTemplates'
+import { EmptyPlaceholder } from '@/components/app/shared/PlaceholderTemplates'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 import { LiveDate } from '@/components/common/LiveDate'
 import { Tag, TradeSide } from '@/components/figma/Tags'

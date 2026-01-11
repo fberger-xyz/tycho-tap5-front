@@ -1,4 +1,4 @@
-import { AppSupportedChainIds, AppSupportedProtocols, AppUrls, FileIds } from '../enums'
+import { AppSupportedChainIds, AppSupportedProtocols, AppUrls, FileIds } from '@/enums'
 
 export interface InterfaceAppLink {
     name: string
