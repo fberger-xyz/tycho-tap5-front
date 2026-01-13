@@ -24,7 +24,6 @@ export interface ChainConfig {
     }
     debankId: string // https://docs.cloud.debank.com/en/readme/api-pro-reference/chain
     chainlinkFeeds?: Record<string, string> // Price feed addresses for this chain
-    idForOrderbookApi: string
     showTopUpBannerIfEthBalanceBelow: number
     poolRefreshIntervalMs?: number // Pool refresh interval in milliseconds
 }

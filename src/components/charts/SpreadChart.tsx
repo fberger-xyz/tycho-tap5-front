@@ -7,7 +7,6 @@ import { ChartColors } from '@/config/chart-colors.config'
 import { cn } from '@/utils'
 import numeral from 'numeral'
 import { INTER_FONT } from '@/config'
-import { AmmAsOrderbook } from '@/interfaces'
 import type { EChartsOption } from 'echarts'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { DAYJS_FORMATS } from '@/utils'
@@ -16,26 +15,15 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { CHART_CONSTANTS } from '@/config/chart-constants.config'
 import { logger } from '@/utils/logger.util'
 
-// Debug logging helper
+// debug logging helper
 const debugLog = (message: string, data?: unknown) => {
     if (IS_DEV) {
-        logger.info(message, data as Record<string, unknown> || {})
+        logger.debug(message, (data as Record<string, unknown>) || {})
     }
-}
-
-// Simple protocol colors
-const PROTOCOL_COLORS: Record<string, string> = {
-    uniswap: '#FF007A',
-    sushiswap: '#0E0F23',
-    curve: '#861FFF',
-    balancer: '#1E1E1E',
-    pancakeswap: '#1FC7D4',
-    default: '#6B7280',
 }
 
 interface SpreadChartProps {
     referencePrice?: number
-    poolsData?: AmmAsOrderbook | null
     targetSpreadBps: number
     baseSymbol?: string
     quoteSymbol?: string
@@ -43,7 +31,6 @@ interface SpreadChartProps {
     error?: Error | null
     className?: string
     chainId?: number
-    useFallbackPrice?: boolean
 }
 
 interface TimeSeriesPoint {
@@ -51,50 +38,23 @@ interface TimeSeriesPoint {
     value: number
 }
 
-interface PoolTimeSeries {
-    name: string
-    color: string
-    data: TimeSeriesPoint[]
-}
-
-export default function SpreadChart({
-    referencePrice,
-    poolsData,
-    targetSpreadBps,
-    // isLoading, // Keeping for future use
-    error,
-    className,
-    chainId,
-    useFallbackPrice,
-}: SpreadChartProps) {
+export default function SpreadChart({ referencePrice, targetSpreadBps, error, className, chainId }: SpreadChartProps) {
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
     const colors = ChartColors
 
-    // State to accumulate time series data
+    // state to accumulate time series data
     const [binanceTimeSeries, setBinanceTimeSeries] = useState<TimeSeriesPoint[]>([])
-    const [poolsTimeSeries, setPoolsTimeSeries] = useState<Map<string, PoolTimeSeries>>(new Map())
     const lastUpdateTime = useRef<number>(0)
 
-    // Get refresh interval from chain config
+    // get refresh interval from chain config
     const refreshInterval = chainId
         ? CHAINS_CONFIG[chainId]?.poolRefreshIntervalMs || CHART_CONSTANTS.DEFAULT_REFRESH_INTERVAL
         : CHART_CONSTANTS.DEFAULT_REFRESH_INTERVAL
 
-    // Maximum number of points to keep
+    // maximum number of points to keep
     const maxPoints = Math.floor((CHART_CONSTANTS.DATA_WINDOW_MINUTES * 60 * 1000) / refreshInterval)
 
-    // Helper function to get protocol display name
-    const getProtocolDisplayName = (protocolSystem: string): string => {
-        const protocol = protocolSystem?.toLowerCase() || 'unknown'
-        if (protocol.includes('uniswap')) return 'Uniswap'
-        if (protocol.includes('sushi')) return 'Sushiswap'
-        if (protocol.includes('curve')) return 'Curve'
-        if (protocol.includes('balancer')) return 'Balancer'
-        if (protocol.includes('pancake')) return 'Pancakeswap'
-        return 'Unknown'
-    }
-
-    // Helper function to check if enough time has passed for update
+    // helper function to check if enough time has passed for update
     const shouldUpdate = (now: number): boolean => {
         if (lastUpdateTime.current === 0) return true
         const timeSinceLastUpdate = now - lastUpdateTime.current
@@ -102,85 +62,40 @@ export default function SpreadChart({
         return timeSinceLastUpdate >= minTimeBetweenUpdates
     }
 
-    // Update time series data when new data arrives
+    // update time series data when new data arrives
     useEffect(() => {
-        // Skip if no data
-        if (!poolsData && !referencePrice) return
+        if (!referencePrice) return
 
         const now = Date.now()
 
-        // Only throttle if we already have some data
-        // For initial data collection, always accept the data
-        if (binanceTimeSeries.length > 0 || poolsTimeSeries.size > 0) {
+        // only throttle if we already have some data
+        if (binanceTimeSeries.length > 0) {
             if (!shouldUpdate(now)) return
         }
 
         lastUpdateTime.current = now
 
-        // Update Binance price time series
+        // update Binance price time series
         if (referencePrice && referencePrice > 0) {
             setBinanceTimeSeries((prev) => [...prev, { time: now, value: referencePrice }].slice(-maxPoints))
         }
-
-        // Update pools time series
-        if (poolsData?.pools && poolsData?.prices_base_to_quote) {
-            setPoolsTimeSeries((prevPoolsMap) => {
-                const newPoolsMap = new Map(prevPoolsMap)
-
-                poolsData.pools.forEach((pool, index) => {
-                    const price = poolsData.prices_base_to_quote[index]
-                    const fallbackPrice = poolsData.mpd_base_to_quote?.mid || referencePrice || 0
-                    const finalPrice = price && price > 0 ? price : fallbackPrice
-
-                    if (finalPrice > 0) {
-                        const poolId = `${pool.protocol_system}_${pool.fee}_${index}`
-                        const displayName = getProtocolDisplayName(pool.protocol_system)
-                        const poolName = `${displayName} (${numeral(pool.fee).format('0.[00]')} bps)`
-                        const poolColor = PROTOCOL_COLORS[displayName.toLowerCase()] || PROTOCOL_COLORS.default
-
-                        const existingPool = newPoolsMap.get(poolId) || {
-                            name: poolName,
-                            color: poolColor,
-                            data: [],
-                        }
-
-                        existingPool.data = [...existingPool.data, { time: now, value: finalPrice }].slice(-maxPoints)
-                        newPoolsMap.set(poolId, existingPool)
-                    }
-                })
-
-                return newPoolsMap
-            })
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [poolsData, referencePrice, refreshInterval, maxPoints, binanceTimeSeries.length, poolsTimeSeries.size])
+    }, [referencePrice, refreshInterval, maxPoints, binanceTimeSeries.length])
 
-    // Check if we have enough data points to show actual chart (need at least 2 points for a line)
-    const hasEnoughData = useMemo(() => {
-        // Need at least 2 points to draw a meaningful line
-        if (binanceTimeSeries.length >= 2) return true
-
-        // Check if any pool has at least 2 points
-        for (const pool of poolsTimeSeries.values()) {
-            if (pool.data.length >= 2) return true
-        }
-
-        return false
-    }, [binanceTimeSeries, poolsTimeSeries])
+    // check if we have enough data points to show actual chart
+    const hasEnoughData = useMemo(() => binanceTimeSeries.length >= 2, [binanceTimeSeries])
 
     const chartOptions = useMemo(() => {
-        // Build the chart configuration for when we have real data
         debugLog('[SpreadChart] Building chart options with:', {
             binanceTimeSeriesLength: binanceTimeSeries.length,
-            poolsTimeSeriesSize: poolsTimeSeries.size,
             referencePrice,
             targetSpreadBps,
         })
 
-        // Find min/max for y-axis from all time series data
+        // find min/max for y-axis from all time series data
         const allPrices: number[] = []
 
-        // Add Binance prices and their spread bands
+        // add Binance prices and their spread bands
         binanceTimeSeries.forEach((point) => {
             allPrices.push(point.value)
             if (targetSpreadBps > 0) {
@@ -189,35 +104,15 @@ export default function SpreadChart({
             }
         })
 
-        // Add pool prices
-        poolsTimeSeries.forEach((pool) => {
-            pool.data.forEach((point) => allPrices.push(point.value))
-        })
-
         const minPrice = allPrices.length > 0 ? Math.min(...allPrices) * 0.998 : 100
         const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) * 1.002 : 100
-
-        // Create time axis labels (last 5 minutes)
-        const timeLabels: string[] = []
-        const now = Date.now()
-        for (let i = maxPoints - 1; i >= 0; i--) {
-            const time = now - i * refreshInterval
-            const date = new Date(time)
-            if (i % Math.floor(maxPoints / 6) === 0) {
-                timeLabels.push(date.toLocaleTimeString('en-US', { hour12: false, minute: '2-digit', second: '2-digit' }))
-            } else {
-                timeLabels.push('')
-            }
-        }
 
         return {
             backgroundColor: 'transparent',
             grid: { top: 5, left: 0, right: 70, bottom: isMobile ? 100 : 70 },
             axisPointer: {
                 link: [{ xAxisIndex: 'all' }],
-                label: {
-                    backgroundColor: colors.milkOpacity[100],
-                },
+                label: { backgroundColor: colors.milkOpacity[100] },
             },
             xAxis: {
                 type: 'time' as const,
@@ -232,19 +127,12 @@ export default function SpreadChart({
                         return date.toLocaleTimeString('en-US', { hour12: false, minute: '2-digit', second: '2-digit' })
                     },
                 },
-                splitLine: {
-                    show: false,
-                },
+                splitLine: { show: false },
                 axisPointer: {
                     show: true,
                     type: 'line',
-                    lineStyle: {
-                        color: colors.milkOpacity[400],
-                        type: 'dashed',
-                    },
-                    label: {
-                        show: false,
-                    },
+                    lineStyle: { color: colors.milkOpacity[400], type: 'dashed' },
+                    label: { show: false },
                 },
             },
             yAxis: {
@@ -260,16 +148,12 @@ export default function SpreadChart({
                     margin: 15,
                 },
                 splitLine: {
-                    lineStyle: {
-                        color: colors.milkOpacity[100],
-                        type: 'dashed' as const,
-                        opacity: 0.3,
-                    },
+                    lineStyle: { color: colors.milkOpacity[100], type: 'dashed' as const, opacity: 0.3 },
                 },
             },
             tooltip: {
                 show: true,
-                borderColor: 'rgba(55, 65, 81, 0.5)', // subtle border
+                borderColor: 'rgba(55, 65, 81, 0.5)',
                 triggerOn: 'mousemove|click',
                 backgroundColor: '#FFF4E005',
                 borderRadius: 12,
@@ -282,10 +166,7 @@ export default function SpreadChart({
                 transitionDuration: 0,
                 enterable: false,
                 confine: true,
-                axisPointer: {
-                    type: 'cross',
-                    animation: false,
-                },
+                axisPointer: { type: 'cross', animation: false },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 formatter: function (params: any) {
                     if (!params || params.length === 0) return ''
@@ -301,7 +182,6 @@ export default function SpreadChart({
                         </div>
                     `
 
-                    // Track which series we've already shown to avoid duplicates
                     const shownSeries = new Set<string>()
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -311,15 +191,9 @@ export default function SpreadChart({
                         const value = Array.isArray(item.value) ? item.value[1] : item.value
                         if (!value) return
 
-                        let displayColor = item.color
+                        const displayColor = item.seriesName === 'Market Price (Binance)' ? '#F3BA2F' : item.color
                         const displayName = item.seriesName
 
-                        // Format Market price
-                        if (item.seriesName === 'Market Price (Binance)') {
-                            displayColor = useFallbackPrice ? '#888888' : '#F3BA2F'
-                        }
-
-                        // Skip if we've already shown this series name
                         if (shownSeries.has(displayName)) return
                         shownSeries.add(displayName)
 
@@ -338,7 +212,7 @@ export default function SpreadChart({
                 },
             },
             series: [
-                // Spread bands (follow Binance price over time)
+                // spread bands (follow Binance price over time)
                 ...(binanceTimeSeries.length > 0 && targetSpreadBps > 0
                     ? [
                           {
@@ -346,11 +220,7 @@ export default function SpreadChart({
                               type: 'line' as const,
                               data: binanceTimeSeries.map((point) => [point.time, point.value * (1 + targetSpreadBps / 10000)]),
                               symbol: 'none',
-                              lineStyle: {
-                                  color: colors.milkOpacity[200],
-                                  type: 'dashed',
-                                  width: 1,
-                              },
+                              lineStyle: { color: colors.milkOpacity[200], type: 'dashed', width: 1 },
                               silent: true,
                           },
                           {
@@ -358,17 +228,13 @@ export default function SpreadChart({
                               type: 'line' as const,
                               data: binanceTimeSeries.map((point) => [point.time, point.value * (1 - targetSpreadBps / 10000)]),
                               symbol: 'none',
-                              lineStyle: {
-                                  color: colors.milkOpacity[200],
-                                  type: 'dashed',
-                                  width: 1,
-                              },
+                              lineStyle: { color: colors.milkOpacity[200], type: 'dashed', width: 1 },
                               silent: true,
                           },
                       ]
                     : []),
 
-                // Binance reference price time series
+                // binance reference price time series
                 ...(binanceTimeSeries.length > 0
                     ? [
                           {
@@ -377,50 +243,12 @@ export default function SpreadChart({
                               data: binanceTimeSeries.map((point) => [point.time, point.value]),
                               smooth: true,
                               symbol: 'none',
-                              lineStyle: {
-                                  color: useFallbackPrice ? '#888888' : '#F3BA2F',
-                                  width: 2,
-                                  opacity: 1,
-                              },
-                              itemStyle: {
-                                  color: useFallbackPrice ? '#888888' : '#F3BA2F',
-                                  opacity: 1,
-                              },
-                              emphasis: {
-                                  focus: 'series',
-                                  lineStyle: {
-                                      width: 2.5,
-                                      opacity: 1,
-                                  },
-                              },
+                              lineStyle: { color: '#F3BA2F', width: 2, opacity: 1 },
+                              itemStyle: { color: '#F3BA2F', opacity: 1 },
+                              emphasis: { focus: 'series', lineStyle: { width: 2.5, opacity: 1 } },
                           },
                       ]
                     : []),
-
-                // Pool price time series
-                ...Array.from(poolsTimeSeries.values()).map((pool) => ({
-                    name: pool.name,
-                    type: 'line' as const,
-                    data: pool.data.map((point) => [point.time, point.value]),
-                    smooth: true,
-                    symbol: 'none',
-                    lineStyle: {
-                        color: pool.color,
-                        width: 1.5,
-                        opacity: 1,
-                    },
-                    itemStyle: {
-                        color: pool.color,
-                        opacity: 1,
-                    },
-                    emphasis: {
-                        focus: 'series',
-                        lineStyle: {
-                            width: 2,
-                            opacity: 1,
-                        },
-                    },
-                })),
             ],
             legend: {
                 show: true,
@@ -430,54 +258,24 @@ export default function SpreadChart({
                 itemGap: 15,
                 itemWidth: 14,
                 itemHeight: 10,
-                textStyle: {
-                    fontSize: 11,
-                    color: colors.milkOpacity[600],
-                    fontFamily: INTER_FONT.style.fontFamily,
-                },
+                textStyle: { fontSize: 11, color: colors.milkOpacity[600], fontFamily: INTER_FONT.style.fontFamily },
                 selectedMode: 'multiple',
-                data: [
-                    // ...(binanceTimeSeries.length > 0 ? ['Binance'] : []),
-                    ...(binanceTimeSeries.length
-                        ? [
-                              {
-                                  name: 'Market Price (Binance)',
-                                  icon: 'roundRect',
-                                  itemStyle: {
-                                      color: useFallbackPrice ? '#888888' : '#F3BA2F',
-                                  },
-                              },
-                          ]
-                        : []),
-                    ...Array.from(poolsTimeSeries.values()).map((pool) => {
-                        return {
-                            name: pool.name,
-                            icon: 'roundRect',
-                            itemStyle: {
-                                color: pool.color,
-                            },
-                        }
-                    }),
-                ],
+                data: binanceTimeSeries.length
+                    ? [{ name: 'Market Price (Binance)', icon: 'roundRect', itemStyle: { color: '#F3BA2F' } }]
+                    : [],
             },
-            // No graphic overlay when we have actual data
         } as EChartsOption
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [binanceTimeSeries, poolsTimeSeries, targetSpreadBps, colors, isMobile, useFallbackPrice])
+    }, [binanceTimeSeries, targetSpreadBps, colors, isMobile])
 
-    // Loading placeholder with animated skeleton
+    // loading placeholder with animated skeleton
     const loadingOptions = useMemo((): EChartsOption => {
-        // Use a reasonable default price range for loading state
         const basePrice = 3400
         const now = Date.now()
-
-        // Generate time points for skeleton
         const skeletonPoints = 30
         const timePoints = Array.from({ length: skeletonPoints }, (_, i) => now - (skeletonPoints - i - 1) * refreshInterval)
 
-        // Create smooth animated lines with VISIBLE amplitudes
         const createSkeletonLine = (offset: number, amplitudePercent: number) => {
-            // Use percentage of base price for more visible waves
             const amplitude = basePrice * amplitudePercent
             return timePoints.map((time, i) => {
                 const wave = Math.sin((i + offset) * 0.2) * amplitude
@@ -498,12 +296,7 @@ export default function SpreadChart({
                 type: 'time',
                 axisLine: { show: false },
                 axisTick: { show: false },
-                axisLabel: {
-                    show: true,
-                    color: colors.milkOpacity[100],
-                    fontSize: 10,
-                    formatter: () => '••:••',
-                },
+                axisLabel: { show: true, color: colors.milkOpacity[100], fontSize: 10, formatter: () => '••:••' },
                 splitLine: { show: false },
             },
             yAxis: {
@@ -512,70 +305,20 @@ export default function SpreadChart({
                 min: basePrice * 0.995,
                 max: basePrice * 1.005,
                 axisLine: { show: false },
-                axisLabel: {
-                    show: true,
-                    color: colors.milkOpacity[100],
-                    fontSize: 10,
-                    margin: 15,
-                    formatter: () => '$•,•••',
-                },
-                splitLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors.milkOpacity[50],
-                        type: 'dashed',
-                        opacity: 0.3,
-                    },
-                },
+                axisLabel: { show: true, color: colors.milkOpacity[100], fontSize: 10, margin: 15, formatter: () => '$•,•••' },
+                splitLine: { show: true, lineStyle: { color: colors.milkOpacity[50], type: 'dashed', opacity: 0.3 } },
             },
             series: [
-                // Skeleton line 1 - simulating Binance price
                 {
                     name: 'skeleton1',
                     type: 'line',
-                    data: createSkeletonLine(0, 0.002), // 0.2% amplitude for visibility
+                    data: createSkeletonLine(0, 0.002),
                     smooth: true,
                     symbol: 'none',
-                    lineStyle: {
-                        color: colors.milkOpacity[200],
-                        width: 2,
-                        opacity: 0.6,
-                    },
+                    lineStyle: { color: colors.milkOpacity[200], width: 2, opacity: 0.6 },
                     animation: true,
                     animationDuration: 3000,
                     animationDelay: 0,
-                },
-                // Skeleton line 2 - simulating pool 1
-                {
-                    name: 'skeleton2',
-                    type: 'line',
-                    data: createSkeletonLine(10, 0.0015), // 0.15% amplitude
-                    smooth: true,
-                    symbol: 'none',
-                    lineStyle: {
-                        color: colors.milkOpacity[150],
-                        width: 1.5,
-                        opacity: 0.5,
-                    },
-                    animation: true,
-                    animationDuration: 3000,
-                    animationDelay: 200,
-                },
-                // Skeleton line 3 - simulating pool 2
-                {
-                    name: 'skeleton3',
-                    type: 'line',
-                    data: createSkeletonLine(20, 0.001), // 0.1% amplitude
-                    smooth: true,
-                    symbol: 'none',
-                    lineStyle: {
-                        color: colors.milkOpacity[100],
-                        width: 1.5,
-                        opacity: 0.4,
-                    },
-                    animation: true,
-                    animationDuration: 3000,
-                    animationDelay: 400,
                 },
             ],
             legend: {
@@ -583,31 +326,11 @@ export default function SpreadChart({
                 bottom: 15,
                 left: 10,
                 data: [{ name: 'Loading...', icon: 'roundRect', itemStyle: { color: colors.milkOpacity[100] } }],
-                textStyle: {
-                    fontSize: 11,
-                    color: colors.milkOpacity[200],
-                    fontFamily: INTER_FONT.style.fontFamily,
-                },
+                textStyle: { fontSize: 11, color: colors.milkOpacity[200], fontFamily: INTER_FONT.style.fontFamily },
             },
-            // graphic: [
-            //     {
-            //         type: 'text',
-            //         left: 'center',
-            //         top: 'center',
-            //         style: {
-            //             text: 'Collecting price data...',
-            //             fontSize: 14,
-            //             fontWeight: 'normal',
-            //             fill: colors.milkOpacity[400],
-            //             fontFamily: INTER_FONT.style.fontFamily,
-            //         },
-            //         z: 100,
-            //     },
-            // ],
         }
-    }, [refreshInterval, isMobile, colors]) // Removed referencePrice dependency - always use fixed basePrice for loading
+    }, [refreshInterval, isMobile, colors])
 
-    // Error state
     if (error) {
         return (
             <div className={cn('flex h-[400px] items-center justify-center', className)}>
@@ -616,24 +339,18 @@ export default function SpreadChart({
         )
     }
 
-    // Simple logic: show chart if we have enough data, otherwise show loading
     const options = hasEnoughData ? chartOptions : loadingOptions
 
     debugLog('[SpreadChart] Rendering with:', {
         hasEnoughData,
         binanceTimeSeriesLength: binanceTimeSeries.length,
-        poolsTimeSeriesSize: poolsTimeSeries.size,
         isUsingChartOptions: hasEnoughData,
     })
 
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <EchartWrapper
-                    options={options}
-                    className={cn('size-full', className)}
-                    forceReplace={!hasEnoughData} // Force replace when transitioning from loading to chart
-                />
+                <EchartWrapper options={options} className={cn('size-full', className)} forceReplace={!hasEnoughData} />
             </ErrorBoundary>
         </Suspense>
     )

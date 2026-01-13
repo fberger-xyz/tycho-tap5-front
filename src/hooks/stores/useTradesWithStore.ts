@@ -54,8 +54,8 @@ export function useTradesWithStore(options?: UseTradesWithStoreOptions) {
     
     // get cached data from store
     const cached = configurationId ? getTradesByConfiguration(configurationId) : instanceId ? getTradesByInstance(instanceId) : []
-    
-    // return combined data
+
+    // return combined data - prefer cache if available
     return {
         data: cached.length > 0 ? cached : activeQuery.data?.data || [],
         isLoading: activeQuery.isLoading,

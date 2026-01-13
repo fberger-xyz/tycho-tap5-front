@@ -290,7 +290,7 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                     content={
                         <div className="flex flex-col gap-1">
                             <p>Gas cost: ${numeral(gasCostUsd).format('0,0.000000')}</p>
-                            <p>Gas used: {numeral(validTradeValues.data.broadcast?.receipt.gas_used).format('0,0')}</p>
+                            <p>Gas used: {numeral(validTradeValues.data.broadcast?.receipt?.gas_used).format('0,0')}</p>
                         </div>
                     }
                 >
@@ -303,12 +303,16 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 </p>
             }
             sim={
-                <p className="text-sm text-milk" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
-                    {validTradeValues.data.simulation.simulated_took_ms} ms
-                </p>
+                validTradeValues.data.simulation ? (
+                    <p className="text-sm text-milk" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
+                        {validTradeValues.data.simulation.simulated_took_ms} ms
+                    </p>
+                ) : (
+                    <p className="text-xs text-milk-400">-</p>
+                )
             }
             idx={
-                hasValidTx && validTradeValues.data.broadcast ? (
+                hasValidTx && validTradeValues.data.broadcast?.receipt ? (
                     <StyledTooltip
                         content={
                             <div className="flex flex-col gap-1">
@@ -396,7 +400,8 @@ function isValidTradePattern(tradeValues: unknown): tradeValues is TradeValuesV2
             broadcast?: unknown
         }
 
-        if (!data.status || !data.context || !data.metadata || !data.inventory || !data.simulation) return false
+        // simulation can be null when skip_simulation is enabled (mainnet)
+        if (!data.status || !data.context || !data.metadata || !data.inventory) return false
         if (!['BroadcastSucceeded', 'SimulationFailed'].includes(data.status)) return false
         if (data.status === 'BroadcastSucceeded' && !data.broadcast) return false
         if (data.status === 'SimulationFailed' && data.broadcast !== null) return false
@@ -421,11 +426,10 @@ function isValidTradePattern(tradeValues: unknown): tradeValues is TradeValuesV2
 export function StrategyTradesList(props: { trades: TradeWithInstanceAndConfiguration[]; isLoading: boolean }) {
     const { trades, isLoading } = props
 
-    // Filter trades that match the expected pattern
+    // filter trades that match the expected pattern
     const validTrades = trades.filter((trade) => {
         if (!trade.Instance.Configuration) return false
-        const tradeValues = trade.values as unknown
-        return isValidTradePattern(tradeValues)
+        return isValidTradePattern(trade.values as unknown)
     })
 
     // easy ternary

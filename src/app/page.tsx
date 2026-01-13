@@ -9,6 +9,7 @@ import UsdAmount from '@/components/figma/UsdAmount'
 import { TradesList } from '@/components/app/trades/TradesList'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategiesWithStore } from '@/hooks/stores/useStrategiesWithStore'
+import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
 import Skeleton from '@/components/common/Skeleton'
 import { useTabFromUrl } from '@/hooks/useTabFromUrl'
 import { DEFAULT_PADDING_X } from '@/config'
@@ -42,7 +43,19 @@ export default function Page() {
                         <p className="text-lg font-semibold text-milk">
                             {numeral(
                                 strategies.reduce(
-                                    (acc, strategy) => acc + strategy.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0),
+                                    (acc, strategy) =>
+                                        acc +
+                                        strategy.instances.reduce(
+                                            (acc, instance) =>
+                                                acc +
+                                                instance.value.trades.filter((trade) => {
+                                                    const values = trade.values as unknown as TradeValuesV2
+                                                    // safety check for malformed or SimulationFailed trades
+                                                    if (!values?.data?.broadcast?.receipt) return false
+                                                    return isSuccessfulTrade(values)
+                                                }).length,
+                                            0,
+                                        ),
                                     0,
                                 ),
                             ).format('0,0')}

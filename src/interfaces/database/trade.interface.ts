@@ -190,13 +190,21 @@ export interface TradeValuesSimulationFailed {
 // Union type for all trade types
 export type TradeValuesV2 = TradeValuesSuccess | TradeValuesReverted | TradeValuesSimulationFailed
 
-// Type guards
+// Type guards with defensive null checks
 export function isSuccessfulTrade(trade: TradeValuesV2): trade is TradeValuesSuccess {
-    return trade.data.status === 'BroadcastSucceeded' && trade.data.broadcast !== null && trade.data.broadcast.receipt.status === true
+    return (
+        trade.data.status === 'BroadcastSucceeded' &&
+        trade.data.broadcast !== null &&
+        trade.data.broadcast?.receipt?.status === true
+    )
 }
 
 export function isRevertedTrade(trade: TradeValuesV2): trade is TradeValuesReverted {
-    return trade.data.status === 'BroadcastSucceeded' && trade.data.broadcast !== null && trade.data.broadcast.receipt.status === false
+    return (
+        trade.data.status === 'BroadcastSucceeded' &&
+        trade.data.broadcast !== null &&
+        trade.data.broadcast?.receipt?.status === false
+    )
 }
 
 export function isSimulationFailedTrade(trade: TradeValuesV2): trade is TradeValuesSimulationFailed {

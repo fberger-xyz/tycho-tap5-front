@@ -12,11 +12,11 @@ interface StrategyKPIsProps {
 
 export default function StrategyKPIs({ aum, priceUsd, priceSourceUrl, isLoading }: StrategyKPIsProps) {
     return (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <Card>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {/* <Card>
                 <p className="text-xs text-milk-600">PnL</p>
                 {isLoading ? <Skeleton variant="text" /> : <p className="truncate text-lg text-milk-200">To be computed</p>}
-            </Card>
+            </Card> */}
             <Card>
                 <p className="text-xs text-milk-600">AUM</p>
                 {isLoading ? (

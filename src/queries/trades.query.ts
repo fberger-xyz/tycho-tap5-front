@@ -2,7 +2,7 @@ import { prisma } from '@/clients/prisma'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 
 export async function getTrades({
-    limit = 10,
+    limit = 1000,
     skip = 0,
     configurationId,
 }: {

@@ -10,7 +10,6 @@ import { ChartType } from '@/enums/app.enum'
 import { useOneInchCandles } from '@/hooks/fetchs/details/useOneInchCandles'
 import { useBinanceKlines } from '@/hooks/fetchs/details/useBinanceKlines'
 import { useBinancePrice } from '@/hooks/fetchs/details/useBinancePrice'
-import { usePoolsData } from '@/hooks/fetchs/usePoolsData'
 import { useTradesData } from '@/hooks/fetchs/useTradesData'
 import { CHAINS_CONFIG } from '@/config/chains.config'
 import { ButtonDark } from '@/components/figma/Button'
@@ -66,15 +65,6 @@ export default function ChartForPairOnChain({
         enabled: !!baseTokenAddress && !!quoteTokenAddress && chartType === CHART_CONFIG[ChartType.CANDLES].name,
     })
 
-    // Fetch pool data - always needed for both charts
-    const chainName = chainId ? CHAINS_CONFIG[chainId]?.idForOrderbookApi : undefined
-    const { data: poolsData, isLoading: poolsLoading } = usePoolsData({
-        chain: chainName || '',
-        token0: baseTokenAddress?.toLowerCase() || '',
-        token1: quoteTokenAddress?.toLowerCase() || '',
-        enabled: !!chainName && !!baseTokenAddress && !!quoteTokenAddress,
-    })
-
     // Fetch trades data for inventory chart
     const { trades, isLoading: tradesLoading } = useTradesData(5000, strategyId, 500)
 
@@ -123,15 +113,13 @@ export default function ChartForPairOnChain({
             <div className="h-full flex-1">
                 {chartType === CHART_CONFIG[ChartType.SPREAD].name && (
                     <SpreadChart
-                        referencePrice={binancePrice || poolsData?.mpd_base_to_quote?.mid}
-                        poolsData={poolsData}
+                        referencePrice={binancePrice ?? undefined}
                         targetSpreadBps={targetSpreadBps}
                         baseSymbol={baseTokenSymbol}
                         quoteSymbol={quoteTokenSymbol}
-                        isLoading={poolsLoading || binancePriceLoading}
+                        isLoading={binancePriceLoading}
                         error={null}
                         chainId={chainId}
-                        useFallbackPrice={!binancePrice && !!poolsData?.mpd_base_to_quote?.mid}
                     />
                 )}
                 {chartType === CHART_CONFIG[ChartType.CANDLES].name && (

@@ -18,6 +18,7 @@ import Skeleton from '@/components/common/Skeleton'
 import { DEFAULT_PADDING_X } from '@/config'
 import { useEthBalance } from '@/hooks/useEthBalance'
 import numeral from 'numeral'
+import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
 
 /**
  * ------------------------ 1 template
@@ -239,7 +240,18 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                     <div className="flex flex-col items-start gap-1">
                         <p className="truncate text-xs text-milk-600">Trades</p>
                         <p className="truncate">
-                            {numeral(data.instances.reduce((acc, instance) => acc + instance.value.trades.length, 0)).format('0,0')}
+                            {numeral(
+                                data.instances.reduce(
+                                    (acc, instance) =>
+                                        acc +
+                                        instance.value.trades.filter((trade) => {
+                                            const values = trade.values as unknown as TradeValuesV2
+                                            if (!values?.data?.broadcast?.receipt) return false
+                                            return isSuccessfulTrade(values)
+                                        }).length,
+                                    0,
+                                ),
+                            ).format('0,0')}
                         </p>
                     </div>
                 </>
