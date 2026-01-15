@@ -1,15 +1,15 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
 import { AppUrls, ReactQueryKeys } from '@/enums'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 import { logger } from '@/utils/logger.util'
+import { useQuery } from '@tanstack/react-query'
 
 /**
  * ------------------------ 3 fetch trades
  */
 
-async function fetchTrades(configurationId?: string, limit = 500): Promise<TradeWithInstanceAndConfiguration[]> {
+async function fetchTrades(configurationId?: string, limit = 1000): Promise<TradeWithInstanceAndConfiguration[]> {
     try {
         const params = new URLSearchParams({ limit: limit.toString() })
         if (configurationId) {

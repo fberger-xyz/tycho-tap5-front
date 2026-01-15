@@ -9,7 +9,7 @@ import StyledTooltip from '@/components/common/StyledTooltip'
 import { TradeSide } from '@/components/figma/Tags'
 import IconWrapper from '@/components/icons/IconWrapper'
 import { IconIds } from '@/enums'
-import { TradeValuesV2, isRevertedTrade, isSimulationFailedTrade, isSuccessfulTrade } from '@/interfaces/database/trade.interface'
+import { type TradeValuesV2, isRevertedTrade, isSimulationFailedTrade, isSuccessfulTrade } from '@/interfaces/database/trade.interface'
 import { TradeWithInstanceAndConfiguration } from '@/types'
 import { DAYJS_FORMATS, cn, mapProtocolIdToProtocolConfig, shortenValue } from '@/utils'
 import numeral from 'numeral'
@@ -30,9 +30,12 @@ export const RecentTradeRowTemplate = (props: {
     in: ReactNode
     out: ReactNode
     profit: ReactNode
+    spotPrice: ReactNode
+    refPrice: ReactNode
     gas: ReactNode
     nonce: ReactNode
     sim: ReactNode
+    broadcast: ReactNode
     idx: ReactNode
     tx: ReactNode
     raw: ReactNode
@@ -48,9 +51,12 @@ export const RecentTradeRowTemplate = (props: {
             <div className="w-[105px]">{props.in}</div>
             <div className="w-[105px]">{props.out}</div>
             <div className="w-[90px]">{props.profit}</div>
+            <div className="w-[80px]">{props.spotPrice}</div>
+            <div className="w-[80px]">{props.refPrice}</div>
             <div className="w-[65px]">{props.gas}</div>
             <div className="w-[65px]">{props.nonce}</div>
             <div className="w-[100px]">{props.sim}</div>
+            <div className="w-[85px]">{props.broadcast}</div>
             <div className="w-[55px]">{props.idx}</div>
             <div className="w-[80px]">{props.tx}</div>
             <div className="w-[65px]">{props.raw}</div>
@@ -73,9 +79,12 @@ export function RecentTradesTableHeaders() {
             in={<p className="truncate">In</p>}
             out={<p className="truncate">Out</p>}
             profit={<p className="truncate">Net spread (bps)</p>}
+            spotPrice={<p className="truncate">Spot Price</p>}
+            refPrice={<p className="truncate">Ref Price</p>}
             gas={<p className="truncate">Gas</p>}
             nonce={<p className="truncate">Nonce</p>}
             sim={<p className="truncate">Simulation (ms)</p>}
+            broadcast={<p className="truncate">Broadcast (ms)</p>}
             idx={<p className="truncate">Index</p>}
             tx={<p className="truncate">Tx</p>}
             raw={<p className="truncate">Raw</p>}
@@ -104,9 +113,12 @@ export function LoadingRecentTradeRows() {
                         in={loadingParagraph}
                         out={loadingParagraph}
                         profit={loadingParagraph}
+                        spotPrice={loadingParagraph}
+                        refPrice={loadingParagraph}
                         gas={loadingParagraph}
                         nonce={loadingParagraph}
                         sim={loadingParagraph}
+                        broadcast={loadingParagraph}
                         idx={loadingParagraph}
                         tx={loadingParagraph}
                         raw={loadingParagraph}
@@ -285,6 +297,16 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                     </p>
                 </div>
             }
+            spotPrice={
+                <p className="text-sm text-milk" title={`Spot price: ${validTradeValues.data.metadata.spot_price}`}>
+                    {numeral(validTradeValues.data.metadata.spot_price).format('0,0.[0000]')}
+                </p>
+            }
+            refPrice={
+                <p className="text-sm text-milk" title={`Reference price: ${validTradeValues.data.metadata.reference_price}`}>
+                    {numeral(validTradeValues.data.metadata.reference_price).format('0,0.[00]')}
+                </p>
+            }
             gas={
                 <StyledTooltip
                     content={
@@ -306,6 +328,15 @@ export const RecentTradeRow = memo(function RecentTradeRow({ trade, className }:
                 validTradeValues.data.simulation ? (
                     <p className="text-sm text-milk" title={`Simulation took ${validTradeValues.data.simulation.simulated_took_ms}ms`}>
                         {validTradeValues.data.simulation.simulated_took_ms} ms
+                    </p>
+                ) : (
+                    <p className="text-xs text-milk-400">-</p>
+                )
+            }
+            broadcast={
+                validTradeValues.data.broadcast?.broadcasted_took_ms ? (
+                    <p className="text-sm text-milk" title={`Broadcast took ${validTradeValues.data.broadcast.broadcasted_took_ms}ms`}>
+                        {numeral(validTradeValues.data.broadcast.broadcasted_took_ms).format('0,0')} ms
                     </p>
                 ) : (
                     <p className="text-xs text-milk-400">-</p>
@@ -426,10 +457,11 @@ function isValidTradePattern(tradeValues: unknown): tradeValues is TradeValuesV2
 export function StrategyTradesList(props: { trades: TradeWithInstanceAndConfiguration[]; isLoading: boolean }) {
     const { trades, isLoading } = props
 
-    // filter trades that match the expected pattern
+    // filter trades that match the expected pattern and are successful (status: true)
     const validTrades = trades.filter((trade) => {
         if (!trade.Instance.Configuration) return false
-        return isValidTradePattern(trade.values as unknown)
+        if (!isValidTradePattern(trade.values as unknown)) return false
+        return isSuccessfulTrade(trade.values as unknown as TradeValuesV2)
     })
 
     // easy ternary
