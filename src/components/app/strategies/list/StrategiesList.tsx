@@ -19,6 +19,14 @@ import { DEFAULT_PADDING_X } from '@/config'
 import { useEthBalance } from '@/hooks/useEthBalance'
 import numeral from 'numeral'
 import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
+import { AppSupportedChainIds } from '@/enums/app.enum'
+
+// Chain priority for sorting (lower = shown first)
+const CHAIN_SORT_PRIORITY: Record<number, number> = {
+    [AppSupportedChainIds.ETHEREUM]: 1,
+    [AppSupportedChainIds.BASE]: 2,
+    [AppSupportedChainIds.UNICHAIN]: 3,
+}
 
 /**
  * ------------------------ 1 template
@@ -296,6 +304,13 @@ export default function StrategiesList() {
     const showLoading = isLoading && strategies?.length === 0
     const noData = !isLoading && strategies?.length === 0
 
+    // Sort strategies by chain priority (Ethereum first, then Base, then Unichain)
+    const sortedStrategies = [...strategies].sort((a, b) => {
+        const priorityA = CHAIN_SORT_PRIORITY[a.chainId] ?? 999
+        const priorityB = CHAIN_SORT_PRIORITY[b.chainId] ?? 999
+        return priorityA - priorityB
+    })
+
     return (
         <div className={cn('mx-auto flex w-full flex-col gap-5', DEFAULT_PADDING_X)}>
             {showLoading ? (
@@ -303,7 +318,7 @@ export default function StrategiesList() {
             ) : noData ? (
                 <EmptyPlaceholder entryName="strategies" />
             ) : (
-                strategies.map((strategy: Strategy, strategyIndex: number) => (
+                sortedStrategies.map((strategy: Strategy, strategyIndex: number) => (
                     <StrategyRow key={`${strategy.chainId}-${strategyIndex}`} data={strategy} index={strategyIndex} />
                 ))
             )}
