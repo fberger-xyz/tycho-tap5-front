@@ -32,7 +32,8 @@ export const TradeRowTemplate = (props: {
     in: ReactNode
     out: ReactNode
     profit: ReactNode
-    gas: ReactNode
+    gasUsed: ReactNode
+    gasCost: ReactNode
     nonce: ReactNode
     sim: ReactNode
     idx: ReactNode
@@ -50,7 +51,8 @@ export const TradeRowTemplate = (props: {
             <div className="w-[105px]">{props.in}</div>
             <div className="w-[105px]">{props.out}</div>
             <div className="w-[90px]">{props.profit}</div>
-            <div className="w-[65px]">{props.gas}</div>
+            <div className="w-[75px]">{props.gasUsed}</div>
+            <div className="w-[65px]">{props.gasCost}</div>
             <div className="w-[65px]">{props.nonce}</div>
             <div className="w-[100px]">{props.sim}</div>
             <div className="w-[55px]">{props.idx}</div>
@@ -75,7 +77,8 @@ export function TradesTableHeaders() {
             in={<p className="truncate">In</p>}
             out={<p className="truncate">Out</p>}
             profit={<p className="truncate">Profit (bps)</p>}
-            gas={<p className="truncate">Gas</p>}
+            gasUsed={<p className="truncate">Gas Used</p>}
+            gasCost={<p className="truncate">Gas ($)</p>}
             nonce={<p className="truncate">Nonce</p>}
             sim={<p className="truncate">Simulation (ms)</p>}
             idx={<p className="truncate">Index</p>}
@@ -106,7 +109,8 @@ export function LoadingTradeRows() {
                         in={loadingParagraph}
                         out={loadingParagraph}
                         profit={loadingParagraph}
-                        gas={loadingParagraph}
+                        gasUsed={loadingParagraph}
+                        gasCost={loadingParagraph}
                         nonce={loadingParagraph}
                         sim={loadingParagraph}
                         idx={loadingParagraph}
@@ -324,17 +328,17 @@ export const TradeRow = memo(function TradeRow({ trade, className }: { trade: Tr
                     </p>
                 </div>
             }
-            gas={
-                <StyledTooltip
-                    content={
-                        <div className="flex flex-col gap-1">
-                            <p>Gas cost: ${numeral(gasCostUsd).format('0,0.000000')}</p>
-                            <p>Gas used: {numeral(validTradeValues.data.broadcast?.receipt.gas_used).format('0,0')}</p>
-                        </div>
-                    }
-                >
-                    <p className="cursor-help text-sm text-milk">${numeral(gasCostUsd).format('0,0.[00]')}</p>
-                </StyledTooltip>
+            gasUsed={
+                validTradeValues.data.broadcast?.receipt.gas_used ? (
+                    <p className="text-sm text-milk">
+                        {numeral(validTradeValues.data.broadcast.receipt.gas_used).format('0,0')}
+                    </p>
+                ) : (
+                    <p className="text-xs text-milk-400">-</p>
+                )
+            }
+            gasCost={
+                <p className="text-sm text-milk">${numeral(gasCostUsd).format('0,0.[00]')}</p>
             }
             nonce={
                 <p className="text-sm text-milk" title={`Transaction nonce: ${validTradeValues.data.inventory.nonce}`}>
