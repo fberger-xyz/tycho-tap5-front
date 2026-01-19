@@ -7,6 +7,7 @@ import { ReactNode } from 'react'
 export default function StrategyTemplate(props: {
     header: ReactNode
     banner?: ReactNode
+    performanceBanner?: ReactNode
     kpis: ReactNode
     chart: ReactNode
     trades: ReactNode
@@ -29,6 +30,8 @@ export default function StrategyTemplate(props: {
                     >
                         {props.kpis}
                     </ErrorBoundary>
+
+                    {props.performanceBanner && <div className="w-full">{props.performanceBanner}</div>}
 
                     <ErrorBoundary
                         fallback={

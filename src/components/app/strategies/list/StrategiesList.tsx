@@ -265,11 +265,32 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
                 </>
             }
             banner={
-                !isEthBalanceLoading &&
-                isEthBalanceBelowThreshold && (
-                    <div className="w-full bg-folly/20 p-5">
-                        <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
+                data.chainId === AppSupportedChainIds.UNICHAIN ? (
+                    <div className="w-full bg-milk-100 p-5">
+                        <p className="text-milk-400">
+                            Strategy paused — spreads too tight on this pair on Unichain due to high competition.
+                        </p>
                     </div>
+                ) : data.chainId === AppSupportedChainIds.ETHEREUM &&
+                  data.base.symbol === 'WETH' &&
+                  data.quote.symbol === 'USDC' ? (
+                    <LinkWrapper href="https://tycho-stabiliser.gitbook.io/docs/demo" target="_blank" className="block">
+                        <div className="flex w-full flex-col gap-2 bg-emerald-950/40 p-5 transition-colors duration-200 hover:bg-emerald-950/60">
+                            <p className="text-sm font-medium text-emerald-400">
+                                ETH/USDC Mainnet | Sep 14 - Dec 30, 2025 | 107 days
+                            </p>
+                            <p className="text-xs text-emerald-300/80">
+                                USD: -1.58% | ETH: +32.68% | Outperformed ETH hold by ~31% — <span className="underline">View full PnL report</span>
+                            </p>
+                        </div>
+                    </LinkWrapper>
+                ) : (
+                    !isEthBalanceLoading &&
+                    isEthBalanceBelowThreshold && (
+                        <div className="w-full bg-folly/20 p-5">
+                            <p className="text-folly">Out of range. Bot has run out of funds and can&apos;t operate until it&apos;s topped up.</p>
+                        </div>
+                    )
                 )
             }
         />

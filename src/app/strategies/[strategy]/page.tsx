@@ -25,6 +25,8 @@ import StrategyConfiguration from '@/components/app/strategies/strategy/Strategy
 import StrategyHeader from '@/components/app/strategies/strategy/StrategyHeader'
 import StrategyInventory from '@/components/app/strategies/strategy/StrategyInventory'
 import StrategyKPIs from '@/components/app/strategies/strategy/StrategyKPIs'
+import { AppSupportedChainIds } from '@/enums/app.enum'
+import LinkWrapper from '@/components/common/LinkWrapper'
 
 enum TradesView {
     RECENT_TRADES = 'Recent Trades',
@@ -132,6 +134,23 @@ export default function StrategyPage() {
                     )
                 }
                 kpis={<StrategyKPIs aum={aum} priceUsd={priceUsd} priceSourceUrl={priceSourceUrl} isLoading={isInitialLoading} />}
+                performanceBanner={
+                    !isInitialLoading &&
+                    parsedConfig?.chain.id === AppSupportedChainIds.ETHEREUM &&
+                    parsedConfig?.base.symbol === 'WETH' &&
+                    parsedConfig?.quote.symbol === 'USDC' && (
+                        <LinkWrapper href="https://tycho-stabiliser.gitbook.io/docs/demo" target="_blank" className="block">
+                            <div className="flex w-full flex-col gap-2 rounded-xl bg-emerald-950/40 p-5 transition-colors duration-200 hover:bg-emerald-950/60">
+                                <p className="text-sm font-medium text-emerald-400">
+                                    ETH/USDC Mainnet | Sep 14 - Dec 30, 2025 | 107 days
+                                </p>
+                                <p className="text-xs text-emerald-300/80">
+                                    USD: -1.58% | ETH: +32.68% | Outperformed ETH hold by ~31% — <span className="underline">View full PnL report</span>
+                                </p>
+                            </div>
+                        </LinkWrapper>
+                    )
+                }
                 chart={
                     <Card className="h-[420px] p-0">
                         {isInitialLoading || !parsedConfig ? (
