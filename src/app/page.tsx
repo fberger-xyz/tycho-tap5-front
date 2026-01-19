@@ -1,22 +1,16 @@
 'use client'
 
 import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
-import { ListToShow } from '@/enums'
-import { cn } from '@/utils'
 import Card from '@/components/figma/Card'
 import StrategiesList from '@/components/app/strategies/list/StrategiesList'
 import UsdAmount from '@/components/figma/UsdAmount'
-import { TradesList } from '@/components/app/trades/TradesList'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategiesWithStore } from '@/hooks/stores/useStrategiesWithStore'
 import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
 import Skeleton from '@/components/common/Skeleton'
-import { useTabFromUrl } from '@/hooks/useTabFromUrl'
-import { DEFAULT_PADDING_X } from '@/config'
 import numeral from 'numeral'
 
 export default function Page() {
-    const { tab, setTab } = useTabFromUrl()
     const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
     const { strategies } = useStrategiesWithStore()
     return (
@@ -66,17 +60,7 @@ export default function Page() {
                 </Card>
             </div>
 
-            {/* list to show */}
-            <div className={cn('mb-8 flex gap-6', DEFAULT_PADDING_X)}>
-                {Object.values(ListToShow).map((list) => (
-                    <button key={list} className="cursor-pointer" onClick={() => setTab(list)}>
-                        <p className={cn('font-inter-tight text-lg', { 'text-milk': list === tab, 'text-milk-400': list !== tab })}>{list}</p>
-                    </button>
-                ))}
-            </div>
-
-            {tab === ListToShow.STRATEGIES && <StrategiesList />}
-            {tab === ListToShow.TRADES && <TradesList />}
+            <StrategiesList />
         </HydratedPageWrapper>
     )
 }
