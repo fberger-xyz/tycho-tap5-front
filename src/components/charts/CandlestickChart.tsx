@@ -122,42 +122,8 @@ export default function CandlestickChart({
         [],
     )
 
-    // DETAILED DEBUG LOGGING
-    logger.info('🔵 [CandlestickChart] Component Rendered', {
-        timestamp: new Date().toISOString(),
-        props: {
-            hasData: !!data,
-            dataLength: data?.length || 0,
-            isLoading,
-            chainId,
-            baseSymbol,
-            quoteSymbol,
-            targetSpreadBps,
-            hasReferencePrice: !!referencePrice,
-            referencePrice,
-            className,
-        },
-        state: {
-            hasOptions: !!options,
-            forceReplace,
-        },
-        willShowPlaceholder: isLoading || !data || data?.length === 0,
-    })
-
     useEffect(() => {
-        logger.info('🟢 [CandlestickChart] useEffect triggered', {
-            timestamp: new Date().toISOString(),
-            isLoading,
-            hasData: !!data,
-            dataLength: data?.length,
-            willSkip: !data || data.length === 0,
-        })
-
-        // Skip if no data
-        if (!data || data.length === 0) {
-            logger.info('⚠️ [CandlestickChart] useEffect SKIPPING - No data')
-            return
-        }
+        if (!data || data.length === 0) return
 
         // Check if we need to force replace (data length changed significantly or first load)
         const shouldForceReplace = prevDataLength.current === 0 || Math.abs(data.length - prevDataLength.current) > 10
@@ -790,11 +756,6 @@ export default function CandlestickChart({
             ],
         }
 
-        logger.info('✅ [CandlestickChart] Setting chart options with data', {
-            dataPoints: data.length,
-            hasReferencePriceLine: !!referencePriceLine,
-            seriesCount: Array.isArray(chartOptions.series) ? chartOptions.series.length : 0,
-        })
         setOptions(chartOptions)
     }, [
         data,
@@ -866,14 +827,6 @@ export default function CandlestickChart({
 
     // Show subtle loading placeholder when loading
     if (isLoading || !data || data.length === 0) {
-        logger.info('🟡 [CandlestickChart] SHOWING LOADING PLACEHOLDER', {
-            reason: isLoading ? 'isLoading=true' : !data ? 'data is null/undefined' : 'data is empty array',
-            isLoading,
-            data,
-            dataLength: data?.length,
-            className,
-        })
-
         return (
             <div className={cn('relative overflow-hidden bg-transparent', className || 'h-[400px]')}>
                 {/* Subtle grid lines */}
@@ -943,12 +896,6 @@ export default function CandlestickChart({
             </div>
         )
     }
-
-    logger.info('🔴 [CandlestickChart] RENDERING ECHART WRAPPER', {
-        hasOptions: !!options,
-        optionsOrEmpty: !!(options || emptyStateOptions),
-        className,
-    })
 
     return (
         <Suspense fallback={<CustomFallback />}>

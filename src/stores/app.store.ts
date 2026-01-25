@@ -6,65 +6,45 @@ import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { SupportedFilters, SupportedFilterDirections, InstanceDisplayMode, SupportedStrategyChainsFilters, ListToShow } from '@/enums'
 import { env } from '@/env/t3-env'
 
-export const useAppStore = create<{
-    /**
-     * store
-     */
-
+// state
+interface AppStoreState {
     hasHydrated: boolean
-    setHasHydrated: (hasHydrated: boolean) => void
-
-    /**
-     * ui
-     */
-
-    // list
     appStoreRefreshedAt: number
-    setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
     showMobileMenu: boolean
-    setShowMobileMenu: (showMobileMenu: boolean) => void
-
-    // unstable v1
     showActivitySection: boolean
-    setShowActivitySection: (showActivitySection: boolean) => void
     showInstancesSection: boolean
-    setShowInstancesSection: (showInstancesSection: boolean) => void
     showStrategiesSection: boolean
-    setShowStrategiesSection: (showStrategiesSection: boolean) => void
-
-    // unstable v2
     showCandlesSection: boolean
-    setShowCandlesSection: (showCandlesSection: boolean) => void
     showInventorySection: boolean
-    setShowInventorySection: (showInventorySection: boolean) => void
-
-    // unstable v3
     listToShow: ListToShow
-    setListToShow: (listToShow: ListToShow) => void
-
-    /**
-     * sorting
-     */
-
-    // instances
     instancesSortedBy: SupportedFilters
     instancesSortedByFilterDirection: SupportedFilterDirections
-    sortInstancesBy: (filter: SupportedFilters) => void
-    toggleFilterDirection: () => void
-
-    // strategy chains
     strategyChainsSortedBy: SupportedStrategyChainsFilters
     strategyChainsSortedByFilterDirection: SupportedFilterDirections
+    instanceDisplayMode: InstanceDisplayMode
+}
+
+// actions
+interface AppStoreActions {
+    setHasHydrated: (hasHydrated: boolean) => void
+    setAppStoreRefreshedAt: (appStoreRefreshedAt: number) => void
+    setShowMobileMenu: (showMobileMenu: boolean) => void
+    setShowActivitySection: (showActivitySection: boolean) => void
+    setShowInstancesSection: (showInstancesSection: boolean) => void
+    setShowStrategiesSection: (showStrategiesSection: boolean) => void
+    setShowCandlesSection: (showCandlesSection: boolean) => void
+    setShowInventorySection: (showInventorySection: boolean) => void
+    setListToShow: (listToShow: ListToShow) => void
+    sortInstancesBy: (filter: SupportedFilters) => void
+    toggleFilterDirection: () => void
     sortStrategyChainsBy: (filter: SupportedStrategyChainsFilters) => void
     toggleStrategyChainsFilterDirection: () => void
-
-    /**
-     * display mode
-     */
-
-    instanceDisplayMode: InstanceDisplayMode
     setInstanceDisplayMode: (mode: InstanceDisplayMode) => void
-}>()(
+}
+
+type AppStore = AppStoreState & AppStoreActions
+
+export const useAppStore = create<AppStore>()(
     persist(
         (set) => ({
             /**
@@ -140,9 +120,8 @@ export const useAppStore = create<{
         {
             name: `${APP_METADATA.SITE_DOMAIN}-app-store-${IS_DEV ? 'dev' : 'prod'}-${env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
             storage: createJSONStorage(() => localStorage),
-            skipHydration: false,
             onRehydrateStorage: () => (state) => {
-                if (state && !state.hasHydrated) state.setHasHydrated(true)
+                state?.setHasHydrated(true)
             },
         },
     ),

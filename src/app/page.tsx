@@ -1,18 +1,20 @@
 'use client'
 
+import { useMemo } from 'react'
 import HydratedPageWrapper from '@/components/stores/HydratedPageWrapper'
 import Card from '@/components/figma/Card'
 import StrategiesList from '@/components/app/strategies/list/StrategiesList'
 import UsdAmount from '@/components/figma/UsdAmount'
 import { useAggregatedAUM } from '@/hooks/useAggregatedAUM'
 import { useStrategiesWithStore } from '@/hooks/stores/useStrategiesWithStore'
-import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
+import { countTotalTrades } from '@/utils/trade-count.util'
 import Skeleton from '@/components/common/Skeleton'
 import numeral from 'numeral'
 
 export default function Page() {
     const { totalAUM, isLoading: totalAUMIsLoading, error: aumError } = useAggregatedAUM()
     const { strategies } = useStrategiesWithStore()
+    const totalTrades = useMemo(() => countTotalTrades(strategies), [strategies])
     return (
         <HydratedPageWrapper paddingX="px-0">
             {/* KPIs */}
@@ -34,26 +36,7 @@ export default function Page() {
                 <Card>
                     <p className="text-xs text-milk-600">Total Trades</p>
                     {strategies.length ? (
-                        <p className="text-lg font-semibold text-milk">
-                            {numeral(
-                                strategies.reduce(
-                                    (acc, strategy) =>
-                                        acc +
-                                        strategy.instances.reduce(
-                                            (acc, instance) =>
-                                                acc +
-                                                instance.value.trades.filter((trade) => {
-                                                    const values = trade.values as unknown as TradeValuesV2
-                                                    // safety check for malformed or SimulationFailed trades
-                                                    if (!values?.data?.broadcast?.receipt) return false
-                                                    return isSuccessfulTrade(values)
-                                                }).length,
-                                            0,
-                                        ),
-                                    0,
-                                ),
-                            ).format('0,0')}
-                        </p>
+                        <p className="text-lg font-semibold text-milk">{numeral(totalTrades).format('0,0')}</p>
                     ) : (
                         <Skeleton variant="text" />
                     )}

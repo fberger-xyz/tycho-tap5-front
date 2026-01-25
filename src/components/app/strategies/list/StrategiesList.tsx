@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import { ReactNode, useMemo } from 'react'
 import { cn } from '@/utils'
 import { memo } from 'react'
 import { Strategy } from '@/types'
@@ -18,7 +18,7 @@ import Skeleton from '@/components/common/Skeleton'
 import { DEFAULT_PADDING_X } from '@/config'
 import { useEthBalance } from '@/hooks/useEthBalance'
 import numeral from 'numeral'
-import { isSuccessfulTrade, TradeValuesV2 } from '@/interfaces/database/trade.interface'
+import { countStrategyTrades } from '@/utils/trade-count.util'
 import { AppSupportedChainIds } from '@/enums/app.enum'
 
 // Chain priority for sorting (lower = shown first)
@@ -191,7 +191,7 @@ export const StrategyHeader = ({ data, className }: { data: Strategy; className?
     )
 }
 
-export const StrategyRow = memo(function StrategyRow({ data, index }: { data: Strategy; index: number }) {
+export const StrategyRow = memo(function StrategyRow({ data }: { data: Strategy }) {
     const walletAddress = data.config.inventory.walletPublicKey
 
     // Fetch AUM and 24h history for this specific strategy
@@ -215,7 +215,6 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
 
     return (
         <StrategyRowTemplate
-            key={`${data.chainId}-${index}`}
             className="group"
             headerLink={`/strategies/${data.config.id}`}
             header={<StrategyHeader data={data} />}
@@ -247,20 +246,7 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
 
                     <div className="flex flex-col items-start gap-1">
                         <p className="truncate text-xs text-milk-600">Trades</p>
-                        <p className="truncate">
-                            {numeral(
-                                data.instances.reduce(
-                                    (acc, instance) =>
-                                        acc +
-                                        instance.value.trades.filter((trade) => {
-                                            const values = trade.values as unknown as TradeValuesV2
-                                            if (!values?.data?.broadcast?.receipt) return false
-                                            return isSuccessfulTrade(values)
-                                        }).length,
-                                    0,
-                                ),
-                            ).format('0,0')}
-                        </p>
+                        <p className="truncate">{numeral(countStrategyTrades(data)).format('0,0')}</p>
                     </div>
                 </>
             }
@@ -304,6 +290,17 @@ export const StrategyRow = memo(function StrategyRow({ data, index }: { data: St
 export default function StrategiesList() {
     const { isLoading, error, refetch, hasError, isRefetching, strategies } = useStrategiesWithStore()
 
+    // sort strategies by chain priority (Ethereum first, then Base, then Unichain) - must be before early returns
+    const sortedStrategies = useMemo(
+        () =>
+            [...strategies].sort((a, b) => {
+                const priorityA = CHAIN_SORT_PRIORITY[a.chainId] ?? 999
+                const priorityB = CHAIN_SORT_PRIORITY[b.chainId] ?? 999
+                return priorityA - priorityB
+            }),
+        [strategies],
+    )
+
     // error
     if (hasError && error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load strategies'
@@ -325,13 +322,6 @@ export default function StrategiesList() {
     const showLoading = isLoading && strategies?.length === 0
     const noData = !isLoading && strategies?.length === 0
 
-    // Sort strategies by chain priority (Ethereum first, then Base, then Unichain)
-    const sortedStrategies = [...strategies].sort((a, b) => {
-        const priorityA = CHAIN_SORT_PRIORITY[a.chainId] ?? 999
-        const priorityB = CHAIN_SORT_PRIORITY[b.chainId] ?? 999
-        return priorityA - priorityB
-    })
-
     return (
         <div className={cn('mx-auto flex w-full flex-col gap-5', DEFAULT_PADDING_X)}>
             {showLoading ? (
@@ -339,9 +329,7 @@ export default function StrategiesList() {
             ) : noData ? (
                 <EmptyPlaceholder entryName="strategies" />
             ) : (
-                sortedStrategies.map((strategy: Strategy, strategyIndex: number) => (
-                    <StrategyRow key={`${strategy.chainId}-${strategyIndex}`} data={strategy} index={strategyIndex} />
-                ))
+                sortedStrategies.map((strategy: Strategy) => <StrategyRow key={strategy.config.id} data={strategy} />)
             )}
         </div>
     )
